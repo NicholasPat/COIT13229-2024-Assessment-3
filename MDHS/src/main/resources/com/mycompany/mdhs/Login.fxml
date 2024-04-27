@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="215.0" prefWidth="505.0" spacing="20.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.mdhs.LoginController">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   <children>
+      <AnchorPane prefHeight="174.0" prefWidth="440.0">
+         <children>
+            <Button layoutX="331.0" layoutY="63.0" mnemonicParsing="false" onAction="#ClicktoRegister" text="Register" />
+            <Button layoutX="331.0" layoutY="100.0" mnemonicParsing="false" onAction="#clickToSignIn" text="Sign In" />
+            <Label layoutX="213.0" layoutY="25.0" text="Login Page" />
+            <PasswordField fx:id="passwordField" layoutX="168.0" layoutY="100.0" promptText="Input Password" />
+            <TextField fx:id="userNameField" layoutX="168.0" layoutY="63.0" promptText="Input Username" />
+            <Label layoutX="76.0" layoutY="67.0" text="Username" />
+            <Label layoutX="78.0" layoutY="104.0" text="Password" />
+         </children>
+      </AnchorPane>
+   </children>
+</VBox>

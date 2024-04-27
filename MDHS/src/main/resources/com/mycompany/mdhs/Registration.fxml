@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.mdhs.RegistrationController">
+   <children>
+      <Button layoutX="160.0" layoutY="330.0" mnemonicParsing="false" onAction="#onClickBackToLogin" text="Back to Login" />
+      <Button layoutX="376.0" layoutY="330.0" mnemonicParsing="false" onAction="#onClickRegister" text="Register" />
+      <Label layoutX="225.0" layoutY="28.0" text="Registration Page For MDHS" />
+      <Label layoutX="125.0" layoutY="88.0" text="First Name" />
+      <Label layoutX="125.0" layoutY="115.0" text="Last Name" />
+      <Label layoutX="125.0" layoutY="141.0" text="Username" />
+      <Label layoutX="125.0" layoutY="166.0" text="Phone Number" />
+      <Label layoutX="125.0" layoutY="192.0" text="Email Address" />
+      <Label layoutX="125.0" layoutY="220.0" text="Delivery Address" />
+      <Label layoutX="125.0" layoutY="247.0" text="Password" />
+      <TextField fx:id="firstNameField" layoutX="236.0" layoutY="84.0" promptText="Input First Name" />
+      <TextField fx:id="lastNameField" layoutX="236.0" layoutY="111.0" promptText="Input Last Name" />
+      <TextField fx:id="usernameField" layoutX="236.0" layoutY="137.0" promptText="Input Username" />
+      <TextField fx:id="phoneNumberField" layoutX="236.0" layoutY="162.0" promptText="Input Phone Number" />
+      <TextField fx:id="emailAddressField" layoutX="236.0" layoutY="188.0" promptText="Input Email Address" />
+      <TextField fx:id="deliveryAddressField" layoutX="236.0" layoutY="216.0" promptText="Input Delivery Address" />
+      <PasswordField fx:id="passwordField" layoutX="236.0" layoutY="243.0" promptText="Input Password" />
+   </children>
+</AnchorPane>
