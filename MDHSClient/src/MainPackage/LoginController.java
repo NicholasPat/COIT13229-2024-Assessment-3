@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javax.crypto.Cipher;
@@ -54,11 +55,39 @@ public class LoginController implements Initializable {
         } catch (IOException e) {System.out.println("readline:"+e.getMessage());}
     }    
 
+    /** 
+     * 
+     * @param event 
+     */
+    @FXML
+    private void clickToRegister(ActionEvent event) {
+        try {
+           MdhsClient.setRoot("Registration") ;
+        } catch (IOException e){
+           System.out.println(e) ; 
+        }
+    }
+    
+    /** 
+     * 
+     * @param event 
+     */
     @FXML
     private void clickToLogin(ActionEvent event) {
+        String error = errorMessage() ; 
+        
+        if (!error.equals("")) { 
+            Alert alert = new Alert(Alert.AlertType.ERROR, error) ; 
+            alert.showAndWait() ; 
+            return ; 
+        } 
+        
         encryptAndSendPassword() ; 
     }
     
+    /** 
+     * 
+     */
     private void encryptAndSendPassword() { 
         String userName = usernameField.getText() ; 
         String password = passwordField.getText() ; //NEEDS SECURITY - but for now won't bother 
@@ -71,15 +100,11 @@ public class LoginController implements Initializable {
         System.out.println("TRACE: After declarations") ; 
         
         try { 
-            //out.writeUTF("PasswordCheck") ; 
-            System.out.println("TRACE: Setup socket and streas ") ; 
+            dataOut.writeUTF("Password Check") ; 
+            System.out.println("TRACE: Setup socket and streams ") ; 
             
-            //message = in.readUTF() ; 
+            //message = dataIn.readUTF() ; 
             //if (message.equalsIgnoreCase("all good")) { 
-                //out.writeUTF(userName + "::" + password) ; 
-                //dataOut.writeUTF("Public key?"); 
-                //System.out.println("TRACE: Sent query public key?") ; 
-                
                 pubKeyLength = dataIn.readInt() ; 
                 System.out.println("TRACE: Took in pubKeyLength " + pubKeyLength) ; 
                 bytesPublicKey = new byte[pubKeyLength] ; 
@@ -91,15 +116,18 @@ public class LoginController implements Initializable {
             //Generate key specification for encoding -- SUMMARISE LATER 
             X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
-            System.out.println("TRACE: X509 AND KeyFactory done") ; 
+            System.out.println("TRACE: X509 AND KeyFactory done\n"
+                    + "PubKeySpec: " + pubKeySpec + "\n"
+                            + "KeyFactory: " + keyFactory + "\n") ; 
             
             //Extract the public key - EXPLAIN LATER 
             publicKey = keyFactory.generatePublic(pubKeySpec) ; 
             System.out.println("TRACE: public key extract") ; 
+            System.out.println("Public Key: " + publicKey + "\n") ; 
             
             //Encrypt the password 
             byte[] encodedMessage = encrypt(password) ; 
-            dataOut.writeUTF("Password incoming") ; 
+            //dataOut.writeUTF("Password incoming") ; 
             System.out.println("TRACE: Sent password incoming") ; 
             
             //Send length of the wncrypted pass word length 
@@ -111,6 +139,7 @@ public class LoginController implements Initializable {
             
             System.out.println("TRACE DEBUG: Sent password encrypted: " + Arrays.toString(encodedMessage)) ; 
             
+            //Remove the close of the socket. Should close upon switching the scene, or keep open somehow 
         }catch (UnknownHostException e){System.out.println("Socket:"+e.getMessage());
         }catch (EOFException e){System.out.println("EOF:"+e.getMessage());
         }catch (IOException e){System.out.println("readline:"+e.getMessage());
@@ -120,6 +149,12 @@ public class LoginController implements Initializable {
         }finally {if(s!=null) try {s.close();}catch (IOException e){System.out.println("close:"+e.getMessage());}}
     }
 
+    /** 
+     * 
+     * @param message
+     * @return
+     * @throws Exception 
+     */
     private byte[] encrypt(String message) throws Exception { 
         Cipher cipher = Cipher.getInstance("RSA") ; 
         cipher.init(Cipher.ENCRYPT_MODE, publicKey) ; 
@@ -128,13 +163,17 @@ public class LoginController implements Initializable {
         return cipherData ; 
     }
     
-    @FXML
-    private void clickToRegister(ActionEvent event) {
-        try {
-           MdhsClient.setRoot("Registration") ;
-        } catch (IOException e){
-           System.out.println(e) ; 
+    private String errorMessage() { 
+        String message = "" ; 
+        
+        if (usernameField.getText().equals("")) { 
+            message += "Username field is a necessary field\n" ; 
         }
+        if (passwordField.getText().equals("")) { 
+            message += "Password field is a necessary field\n" ; 
+        }
+        
+        return message ; 
     }
     
 }
