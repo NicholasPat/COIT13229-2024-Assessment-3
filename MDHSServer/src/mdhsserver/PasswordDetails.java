@@ -4,6 +4,7 @@
  */
 package mdhsserver;
 
+import java.io.Serializable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -19,17 +20,18 @@ import javax.crypto.NoSuchPaddingException;
 /**
  * This class is used to perform all the checks for the password for the server
  * Split into a different class to attempt and obfuscate 
+ * It will also generate the public and private key for the session 
  * 
  * @author linke
  */
-public class PasswordDetails {
-    /**/
+public class PasswordDetails implements Serializable {
+    /*Public variables for the class*/
     private KeyPairGenerator keyPairGen = null ;
     private PrivateKey privateKey = null ;
     private PublicKey publicKey = null ;
     
     /**
-     * 
+     * Creates new Public and Private key for use 
      */
     public PasswordDetails() throws NoSuchAlgorithmException {
         keyPairGen =  KeyPairGenerator.getInstance("RSA");
@@ -38,14 +40,39 @@ public class PasswordDetails {
         this.publicKey = keyPair.getPublic(); 
     } 
     
+    /** 
+     * This is used to set for when the keys are already known. So saved to file 
+     * then on startup would be invoked from reading a file. To set the key used 
+     * to encrypt a password 
+     * 
+     * @param privKey
+     * @param pubKey 
+     */
+    public PasswordDetails(PrivateKey privKey, PublicKey pubKey) { 
+        privateKey = privKey ; 
+        publicKey = pubKey ; 
+    }
+    
+    /** 
+     * 
+     * @return 
+     */
     public KeyPairGenerator getKeyPairGen() {
         return keyPairGen;
     }
     
+    /** 
+     * 
+     * @return 
+     */
     public PrivateKey getPrivateKey() {
         return privateKey;
     }
     
+    /** 
+     * 
+     * @return 
+     */
     public PublicKey getPublicKey() {
         return publicKey;
     }

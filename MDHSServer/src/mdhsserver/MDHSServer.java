@@ -2,6 +2,9 @@ package mdhsserver;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,8 +17,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -25,6 +26,9 @@ import javax.crypto.NoSuchPaddingException;
  * @author linke
  */
 public class MDHSServer {
+    private static PublicKey publicK ; 
+    private static PrivateKey privateK ; 
+    private static PasswordDetails passwordDetails ; 
     
     /**
      * 
@@ -34,9 +38,13 @@ public class MDHSServer {
     public static void main(String[] args) throws NoSuchAlgorithmException {
         int threadCount = 1 ; 
         int serverPort = 6464 ; 
-        PasswordDetails passwordDetails = new PasswordDetails() ; 
-        PublicKey publicK = passwordDetails.getPublicKey() ; 
-        PrivateKey privateK = passwordDetails.getPrivateKey() ; 
+        
+        /* 
+        Check if passworddetailsObject exists 
+        If not, then create a new object and serialise it to file immediately 
+        If it does, then deserialise from file and assign to passwordDetails object
+        */
+        readKeyObject() ; 
         
         //For debugging 
         System.out.println("Public Key: " + passwordDetails.getPublicKey()) ; 
@@ -53,6 +61,56 @@ public class MDHSServer {
                 c.start() ; 
             } 
         }catch(IOException e){System.out.println("Listen :"+e.getMessage());}
+    }
+    
+    /** 
+     * CURRENT ISSUE! Won't serialize the object due to KeyPairGeneratorDelegate
+     * exception. Need to figure out alternative 
+     */
+    public static void readKeyObject() { 
+        String fileName = "passworddetailsObject" ; 
+        FileOutputStream fos ; 
+        ObjectOutputStream oos ; 
+        FileInputStream fis ; 
+        ObjectInputStream ois ; 
+        
+        /*If the keys are null, then attempt to read from file, if that doesn't 
+        exist, then make the keys and serialize the object*/
+        try { 
+            System.out.println("Reading in the keys") ; 
+            fis = new FileInputStream(fileName) ; 
+            ois = new ObjectInputStream(fis) ; 
+            
+            passwordDetails = (PasswordDetails)ois.readObject() ; 
+            ois.close() ; 
+            
+            System.out.println("Read in the keys") ; 
+            
+            /*Since we are done with this, can return and end the method, 
+            otherwise it would override the old key with a new one as the next
+            try block is invoked*/
+            return ; 
+        } catch (FileNotFoundException e) {System.out.println("File not found: " + e.getMessage()) ; 
+        } catch (IOException e) {System.out.println("IOException: " + e.getMessage());
+        } catch (ClassNotFoundException e) {System.out.println("Class not found: " + e.getMessage());}
+        
+        try { 
+            System.out.println("Setting new keys since no file exists") ; 
+            /*Create the current key pair plus PasswordDetails object */
+            passwordDetails = new PasswordDetails() ; 
+            publicK = passwordDetails.getPublicKey() ; 
+            privateK = passwordDetails.getPrivateKey() ; 
+            
+            /*Create the file object output stream*/
+            fos = new FileOutputStream(fileName) ; 
+            oos = new ObjectOutputStream(fos) ; 
+            
+            /*With the created output stream, serialize the file for use later*/
+            oos.writeObject(passwordDetails) ; 
+            oos.close() ; 
+        } catch (FileNotFoundException e){System.out.println("File Not Found Exception: " + e.getMessage());
+        } catch (IOException e){System.out.println("IOException: " + e.getMessage());
+        } catch (NoSuchAlgorithmException e){System.out.println("No such algorithm: " + e.getMessage());}
     }
     
 }
@@ -105,13 +163,20 @@ class MainConnection extends Thread {
             String data1 = dataIn.readUTF() ;  
             if (data1.equalsIgnoreCase("Password check")) { 
                 //dataOut.writeUTF("All good") ; 
-                passwordMethod() ;
+                passwordMethod(1) ;
             } 
+            if (data1.equalsIgnoreCase("Public key please")) { 
+                passwordMethod(2) ; 
+            }
         } catch (IOException ex){System.out.println("Listen: " + ex.getMessage());}
     }
     
-    //NEEDS PROPER COMMENTING 
-    private void passwordMethod() throws IOException { 
+    /** 
+     * REMEMBER TO COMMENT AND REMOVE THE TRACE COMMANDS 
+     * @throws IOException 
+     * @param i 
+     */
+    private void passwordMethod(int i) throws IOException { 
         //DEBUG 
         System.out.println("Public Key: " + passwordDetails.getPublicKey()) ; 
         System.out.println("Private Key: " + passwordDetails.getPrivateKey()) ; 
@@ -137,6 +202,11 @@ class MainConnection extends Thread {
         dataOut.write(bytesPubKey, 0, bytesPubKey.length) ; 
         System.out.println("TRACE: Sent the bytesPubeKey") ;
         
+        /*If identifier equals case 2, then end method here*/
+        if (i == 2) { 
+            return ; 
+        }
+        
         //Send size of encrypted message to be sent from client 
         int messageLength = dataIn.readInt() ; 
         byte[] encodedMessage = new byte[messageLength] ; 
@@ -153,8 +223,7 @@ class MainConnection extends Thread {
         } catch (InvalidKeyException e) {System.out.println("Invalid Key: " + e.getMessage()) ; 
         } catch (InvalidAlgorithmParameterException e) {System.out.println("Invalid Alg Para: " + e.getMessage()) ; 
         } catch (IllegalBlockSizeException e) {System.out.println("Illegal Block Size: " + e.getMessage()) ; 
-        } catch (BadPaddingException e) {System.out.println("Bad Padding: " + e.getMessage()) ; 
-        } 
+        } catch (BadPaddingException e) {System.out.println("Bad Padding: " + e.getMessage()) ; } 
         
         System.out.println("Encrypted byte[]: " + Arrays.toString(encodedMessage)) ; 
         System.out.println("Decrypted password: " + decryptedPassword) ; 

@@ -5,15 +5,14 @@ package mdhsserver;
  * @author linke
  */
 public class Customer {
-    int customerId ; 
-    String firstName ; 
-    String lastName ; 
-    String userName ; 
-    int phoneNumber ; 
-    String emailAddress ; 
-    String password ; //NOTE! PASSWORD WILL BE ENCRYPTED SO THIS WILL CHANGE. THIS IS TEMP 
-    String deliveryAdress ; 
-    byte[] passworddd ; 
+    private int customerId ; 
+    private String firstName ; 
+    private String lastName ; 
+    private String userName ; 
+    private int phoneNumber ; 
+    private String emailAddress ; 
+    private String password ; //NOTE! PASSWORD WILL BE ENCRYPTED SO THIS WILL CHANGE. THIS IS TEMP 
+    private String deliveryAdress ; 
 
     public Customer(int customerId, String firstName, String lastName, String userName, int phoneNumber, String emailAddress, String password, String deliveryAdress) {
         this.customerId = customerId;
