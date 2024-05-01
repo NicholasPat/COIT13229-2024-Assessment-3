@@ -2,6 +2,7 @@ package mdhsserver;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,11 +13,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -43,12 +50,15 @@ public class MDHSServer {
         Check if passworddetailsObject exists 
         If not, then create a new object and serialise it to file immediately 
         If it does, then deserialise from file and assign to passwordDetails object
-        */
-        readKeyObject() ; 
+        
+        Fucking giving up. I don't think I will bother saving Private Key to 
+        Key Store. Because it ain't working, so will be a new key each time
+        */        
+        passwordDetails = new PasswordDetails() ; 
         
         //For debugging 
-        System.out.println("Public Key: " + passwordDetails.getPublicKey()) ; 
-        System.out.println("Private Key: " + passwordDetails.getPrivateKey()) ; 
+        System.out.println("Public Key: \n" + passwordDetails.getPublicKey()) ; 
+        System.out.println("Private Key: \n" + passwordDetails.getPrivateKey()) ; 
         
         try { 
             ServerSocket listenSocket = new ServerSocket(serverPort) ; 
@@ -61,56 +71,6 @@ public class MDHSServer {
                 c.start() ; 
             } 
         }catch(IOException e){System.out.println("Listen :"+e.getMessage());}
-    }
-    
-    /** 
-     * CURRENT ISSUE! Won't serialize the object due to KeyPairGeneratorDelegate
-     * exception. Need to figure out alternative 
-     */
-    public static void readKeyObject() { 
-        String fileName = "passworddetailsObject" ; 
-        FileOutputStream fos ; 
-        ObjectOutputStream oos ; 
-        FileInputStream fis ; 
-        ObjectInputStream ois ; 
-        
-        /*If the keys are null, then attempt to read from file, if that doesn't 
-        exist, then make the keys and serialize the object*/
-        try { 
-            System.out.println("Reading in the keys") ; 
-            fis = new FileInputStream(fileName) ; 
-            ois = new ObjectInputStream(fis) ; 
-            
-            passwordDetails = (PasswordDetails)ois.readObject() ; 
-            ois.close() ; 
-            
-            System.out.println("Read in the keys") ; 
-            
-            /*Since we are done with this, can return and end the method, 
-            otherwise it would override the old key with a new one as the next
-            try block is invoked*/
-            return ; 
-        } catch (FileNotFoundException e) {System.out.println("File not found: " + e.getMessage()) ; 
-        } catch (IOException e) {System.out.println("IOException: " + e.getMessage());
-        } catch (ClassNotFoundException e) {System.out.println("Class not found: " + e.getMessage());}
-        
-        try { 
-            System.out.println("Setting new keys since no file exists") ; 
-            /*Create the current key pair plus PasswordDetails object */
-            passwordDetails = new PasswordDetails() ; 
-            publicK = passwordDetails.getPublicKey() ; 
-            privateK = passwordDetails.getPrivateKey() ; 
-            
-            /*Create the file object output stream*/
-            fos = new FileOutputStream(fileName) ; 
-            oos = new ObjectOutputStream(fos) ; 
-            
-            /*With the created output stream, serialize the file for use later*/
-            oos.writeObject(passwordDetails) ; 
-            oos.close() ; 
-        } catch (FileNotFoundException e){System.out.println("File Not Found Exception: " + e.getMessage());
-        } catch (IOException e){System.out.println("IOException: " + e.getMessage());
-        } catch (NoSuchAlgorithmException e){System.out.println("No such algorithm: " + e.getMessage());}
     }
     
 }
@@ -128,7 +88,7 @@ class MainConnection extends Thread {
     int threadNumber ; 
     PublicKey publicKey ; 
     PrivateKey privateKey ; 
-    PasswordDetails passwordDetails ; 
+    PasswordDetails passwordClass ; 
     
     /** 
      * 
@@ -143,7 +103,7 @@ class MainConnection extends Thread {
         clientSocket = aSocket ; 
         publicKey = key ; 
         privateKey = privKey ; 
-        this.passwordDetails = passwordDetails ; 
+        passwordClass = passwordDetails ; 
         try { 
             dataIn = new DataInputStream(clientSocket.getInputStream()) ; 
             dataOut = new DataOutputStream(clientSocket.getOutputStream()) ; 
@@ -178,8 +138,8 @@ class MainConnection extends Thread {
      */
     private void passwordMethod(int i) throws IOException { 
         //DEBUG 
-        System.out.println("Public Key: " + passwordDetails.getPublicKey()) ; 
-        System.out.println("Private Key: " + passwordDetails.getPrivateKey()) ; 
+        System.out.println("Public Key: " + passwordClass.getPublicKey()) ; 
+        System.out.println("Private Key: " + passwordClass.getPrivateKey()) ; 
         
         String data ; 
         String message = null ; 
@@ -217,7 +177,7 @@ class MainConnection extends Thread {
         dataIn.read(encodedMessage, 0, encodedMessage.length) ; 
 
         try { 
-            decryptedPassword = passwordDetails.decrypt(encodedMessage) ; 
+            decryptedPassword = passwordClass.decrypt(encodedMessage) ; 
         } catch (NoSuchAlgorithmException e) {System.out.println("No Algorithm: " + e.getMessage()) ; 
         } catch (NoSuchPaddingException e) {System.out.println("No Padding: " + e.getMessage()) ; 
         } catch (InvalidKeyException e) {System.out.println("Invalid Key: " + e.getMessage()) ; 
@@ -266,4 +226,58 @@ dataOut.writeUTF("All good");
             }
         }
         System.out.println("TRACE: Outside while") ; 
+*/
+
+/* 
+Scrapped serialise key method 
+    public static void readKeyObject() { 
+        String fileName = "passworddetailsObject" ; 
+        FileOutputStream fos ; 
+        ObjectOutputStream oos ; 
+        FileInputStream fis ; 
+        ObjectInputStream ois ; 
+        
+        /*If the keys are null, then attempt to read from file, if that doesn't 
+        exist, then make the keys and serialize the object*/
+/*
+        try { 
+            System.out.println("Reading in the keys") ; 
+            fis = new FileInputStream(fileName) ; 
+            ois = new ObjectInputStream(fis) ; 
+            
+            passwordDetails = (PasswordDetails)ois.readObject() ; 
+            ois.close() ; 
+            
+            System.out.println("Read in the keys") ; 
+            
+            /*Since we are done with this, can return and end the method, 
+            otherwise it would override the old key with a new one as the next
+            try block is invoked*/
+/*
+            return ; 
+        } catch (FileNotFoundException e) {System.out.println("File not found: " + e.getMessage()) ; 
+        } catch (IOException e) {System.out.println("IOException: " + e.getMessage());
+        } catch (ClassNotFoundException e) {System.out.println("Class not found: " + e.getMessage());}
+        
+        try { 
+            System.out.println("Setting new keys since no file exists") ; 
+            /*Create the current key pair plus PasswordDetails object */
+/*
+            passwordDetails = new PasswordDetails() ; 
+            publicK = passwordDetails.getPublicKey() ; 
+            privateK = passwordDetails.getPrivateKey() ; 
+            
+            /*Create the file object output stream*/
+/*
+            fos = new FileOutputStream(fileName) ; 
+            oos = new ObjectOutputStream(fos) ; 
+            
+            /*With the created output stream, serialize the file for use later*/
+/*
+            oos.writeObject(passwordDetails) ; 
+            oos.close() ; 
+        } catch (FileNotFoundException e){System.out.println("File Not Found Exception: " + e.getMessage());
+        } catch (IOException e){System.out.println("IOException: " + e.getMessage());
+        } catch (NoSuchAlgorithmException e){System.out.println("No such algorithm: " + e.getMessage());}
+    }
 */

@@ -25,10 +25,12 @@ import javax.crypto.NoSuchPaddingException;
  * @author linke
  */
 public class PasswordDetails implements Serializable {
-    /*Public variables for the class*/
-    private KeyPairGenerator keyPairGen = null ;
+    /*Public variables for the class*/ 
     private PrivateKey privateKey = null ;
     private PublicKey publicKey = null ;
+    private PrivateKey privateK = null ; 
+    private PublicKey publicK = null ; 
+    private KeyPairGenerator keyPairGen = null ; 
     
     /**
      * Creates new Public and Private key for use 
@@ -36,8 +38,12 @@ public class PasswordDetails implements Serializable {
     public PasswordDetails() throws NoSuchAlgorithmException {
         keyPairGen =  KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = keyPairGen.genKeyPair();
-        this.privateKey = keyPair.getPrivate();
-        this.publicKey = keyPair.getPublic(); 
+        this.privateK = keyPair.getPrivate();
+        this.publicK = keyPair.getPublic(); 
+        //keyPairGen =  KeyPairGenerator.getInstance("RSA");
+        //KeyPair keyPair = keyPairGen.genKeyPair();
+        //this.privateKey = keyPair.getPrivate();
+        //this.publicKey = keyPair.getPublic(); 
     } 
     
     /** 
@@ -51,14 +57,6 @@ public class PasswordDetails implements Serializable {
     public PasswordDetails(PrivateKey privKey, PublicKey pubKey) { 
         privateKey = privKey ; 
         publicKey = pubKey ; 
-    }
-    
-    /** 
-     * 
-     * @return 
-     */
-    public KeyPairGenerator getKeyPairGen() {
-        return keyPairGen;
     }
     
     /** 
@@ -98,3 +96,5 @@ public class PasswordDetails implements Serializable {
     }
     
 }
+
+//System.out.println("KSH TRACE: ") ; 
