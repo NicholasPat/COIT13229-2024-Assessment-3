@@ -42,6 +42,7 @@ public class LoginController implements Initializable {
     private final String hostName = "localhost" ; 
     private final int serverPort = 6464 ; 
     private static PublicKey publicKey ; 
+    private String validString ; 
     
     /**
      * Initializes the controller class.
@@ -83,6 +84,14 @@ public class LoginController implements Initializable {
         } 
         
         encryptAndSendPassword() ; 
+        
+        if (validString.equals("Validation Confirmed")) { 
+            try {
+                MdhsClient.setRoot("Orders") ;
+             } catch (IOException e){
+                System.out.println(e) ; 
+             }
+        }
     }
     
     /** 
@@ -138,6 +147,8 @@ public class LoginController implements Initializable {
             dataOut.write(encodedMessage, 0, encodedMessage.length) ; 
             
             System.out.println("TRACE DEBUG: Sent password encrypted: " + Arrays.toString(encodedMessage)) ; 
+            
+            validString = dataIn.readUTF() ; 
             
             //Remove the close of the socket. Should close upon switching the scene, or keep open somehow 
         }catch (UnknownHostException e){System.out.println("Socket:"+e.getMessage());

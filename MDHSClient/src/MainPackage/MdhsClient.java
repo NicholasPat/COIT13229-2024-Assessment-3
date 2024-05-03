@@ -15,7 +15,7 @@ import javafx.stage.Stage;
  */
 public class MdhsClient extends Application {
 
-    private static Scene scene;
+    private static Scene scene; 
 
     /** 
      * 
@@ -58,5 +58,7 @@ public class MdhsClient extends Application {
     public static void main(String[] args) {
         launch();
     }
+    
+    
     
 }
