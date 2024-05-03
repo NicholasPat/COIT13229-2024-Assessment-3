@@ -2,10 +2,6 @@ package mdhsserver;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,17 +9,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -43,7 +33,7 @@ public class MDHSServer {
      * @throws java.security.NoSuchAlgorithmException
      */
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        int threadCount = 1 ; 
+        int threadCount = 0 ; 
         int serverPort = 6464 ; 
         
         /* 
@@ -55,8 +45,10 @@ public class MDHSServer {
         Key Store. Because it ain't working, so will be a new key each time
         */        
         passwordDetails = new PasswordDetails() ; 
+        privateK = passwordDetails.getPrivateKey() ; 
+        publicK = passwordDetails.getPublicKey() ; 
         
-        //For debugging 
+        //For debugging purposes
         System.out.println("Public Key: \n" + passwordDetails.getPublicKey()) ; 
         System.out.println("Private Key: \n" + passwordDetails.getPrivateKey()) ; 
         
@@ -91,6 +83,9 @@ class MainConnection extends Thread {
     PasswordDetails passwordClass ; 
     
     /** 
+     * Initialises the current thread with the following parameters. Not sure 
+     * about having the private key passed here, it probably should be obfuscated 
+     * into another class 
      * 
      * @param aSocket
      * @param count 
@@ -187,6 +182,10 @@ class MainConnection extends Thread {
         
         System.out.println("Encrypted byte[]: " + Arrays.toString(encodedMessage)) ; 
         System.out.println("Decrypted password: " + decryptedPassword) ; 
+        
+        //This is in no way secure but not sure how to actually handle valid 
+        //sessions 
+        dataOut.writeUTF("Validation Confirmed") ; 
         
     }
 }

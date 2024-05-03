@@ -20,9 +20,18 @@ public class DatabaseConnection {
     private PreparedStatement deleteProduct = null ; 
     private PreparedStatement getAllProducts = null ; 
     
+    private PreparedStatement getCustomerDeliverySchedule = null ; 
+    private PreparedStatement getAllDeliverySchedules = null ; 
+    
     public DatabaseConnection() { 
         try { 
             connection = DriverManager.getConnection(MYSQL_URL, userName, password) ; 
+            
+            // = connection.prepareStatement("") ; 
         } catch (SQLException e){System.out.println("SQL Exception: " + e.getMessage());} 
+    } 
+    
+    private void deleteAllCustomers() { 
+        
     }
 }

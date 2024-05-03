@@ -25,9 +25,7 @@ import javax.crypto.NoSuchPaddingException;
  * @author linke
  */
 public class PasswordDetails implements Serializable {
-    /*Public variables for the class*/ 
-    private PrivateKey privateKey = null ;
-    private PublicKey publicKey = null ;
+    /*Private variables for the class*/ 
     private PrivateKey privateK = null ; 
     private PublicKey publicK = null ; 
     private KeyPairGenerator keyPairGen = null ; 
@@ -38,33 +36,16 @@ public class PasswordDetails implements Serializable {
     public PasswordDetails() throws NoSuchAlgorithmException {
         keyPairGen =  KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = keyPairGen.genKeyPair();
-        this.privateK = keyPair.getPrivate();
-        this.publicK = keyPair.getPublic(); 
-        //keyPairGen =  KeyPairGenerator.getInstance("RSA");
-        //KeyPair keyPair = keyPairGen.genKeyPair();
-        //this.privateKey = keyPair.getPrivate();
-        //this.publicKey = keyPair.getPublic(); 
+        privateK = keyPair.getPrivate();
+        publicK = keyPair.getPublic(); 
     } 
-    
-    /** 
-     * This is used to set for when the keys are already known. So saved to file 
-     * then on startup would be invoked from reading a file. To set the key used 
-     * to encrypt a password 
-     * 
-     * @param privKey
-     * @param pubKey 
-     */
-    public PasswordDetails(PrivateKey privKey, PublicKey pubKey) { 
-        privateKey = privKey ; 
-        publicKey = pubKey ; 
-    }
     
     /** 
      * 
      * @return 
      */
     public PrivateKey getPrivateKey() {
-        return privateKey;
+        return privateK;
     }
     
     /** 
@@ -72,7 +53,7 @@ public class PasswordDetails implements Serializable {
      * @return 
      */
     public PublicKey getPublicKey() {
-        return publicKey;
+        return publicK;
     }
     
     /** 
@@ -91,7 +72,7 @@ public class PasswordDetails implements Serializable {
             IllegalBlockSizeException, BadPaddingException 
     { 
         Cipher cipher = Cipher.getInstance("RSA") ; 
-        cipher.init(Cipher.DECRYPT_MODE, privateKey, cipher.getParameters()) ; 
+        cipher.init(Cipher.DECRYPT_MODE, privateK, cipher.getParameters()) ; 
         return new String(cipher.doFinal(encodedMessage)) ; 
     }
     
