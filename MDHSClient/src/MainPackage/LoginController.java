@@ -49,11 +49,15 @@ public class LoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            s = new Socket(hostName, serverPort) ;
-            dataOut = new DataOutputStream(s.getOutputStream()) ; 
-            dataIn = new DataInputStream(s.getInputStream()) ;
-        } catch (IOException e) {System.out.println("readline:"+e.getMessage());}
+        //try {
+            s = CurrentSession.getS() ; 
+            dataIn = CurrentSession.getDataIn() ; 
+            dataOut = CurrentSession.getDataOut() ; 
+            
+            //s = new Socket(hostName, serverPort) ;
+            //dataOut = new DataOutputStream(s.getOutputStream()) ; 
+            //dataIn = new DataInputStream(s.getInputStream()) ;
+        //} catch (IOException e) {System.out.println("readline:"+e.getMessage());}
     }    
 
     /** 
@@ -63,6 +67,7 @@ public class LoginController implements Initializable {
     @FXML
     private void clickToRegister(ActionEvent event) {
         try {
+           CurrentSession.setUsername("Username") ; 
            MdhsClient.setRoot("Registration") ;
         } catch (IOException e){
            System.out.println(e) ; 
@@ -86,11 +91,10 @@ public class LoginController implements Initializable {
         encryptAndSendPassword() ; 
         
         if (validString.equals("Validation Confirmed")) { 
-            try {
+            try { 
                 MdhsClient.setRoot("Orders") ;
-             } catch (IOException e){
-                System.out.println(e) ; 
-             }
+                System.out.println("Weeee: " + validString) ; 
+             } catch (IOException e){System.out.println("IO Exception: " +e.getMessage());}
         }
     }
     
@@ -111,6 +115,8 @@ public class LoginController implements Initializable {
         try { 
             dataOut.writeUTF("Password Check") ; 
             System.out.println("TRACE: Setup socket and streams ") ; 
+            
+            dataOut.writeUTF(userName) ; 
             
             //message = dataIn.readUTF() ; 
             //if (message.equalsIgnoreCase("all good")) { 

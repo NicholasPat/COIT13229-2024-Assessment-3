@@ -59,43 +59,12 @@ public class RegistrationController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            /*DEBUG ERROR: Socket won't persist through FXML loading. Have to 
-            consider if socket can be passed from scene to scene perhaps */
-            s = new Socket(hostName, serverPort) ;
-            dataOut = new DataOutputStream(s.getOutputStream()) ; 
-            dataIn = new DataInputStream(s.getInputStream()) ; 
-            
-            /*If the public key isn't set then request it from the server
-            Will persist through loading new FXML */
-            if (publicKey == null) { 
-                dataOut.writeUTF("Public key please") ; 
-                setPublicKey() ; 
-            } 
-            
-        } catch (IOException e) {System.out.println("readline:"+e.getMessage());}
+        
+        s = CurrentSession.getS() ; 
+        dataOut = CurrentSession.getDataOut() ; 
+        dataIn = CurrentSession.getDataIn() ; 
+        
     }    
-    
-    /** 
-     * On startup of this class, get the public key and set the variable for use 
-     */
-    public void setPublicKey() { 
-        try { 
-            //dataOut.writeUTF("Public key please") ; 
-            int pubKeyLength = dataIn.readInt() ; 
-            byte[] bytesPublicKey = new byte[pubKeyLength] ; 
-            dataIn.readFully(bytesPublicKey, 0, pubKeyLength) ; 
-            
-            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
-            
-            publicKey = keyFactory.generatePublic(pubKeySpec) ; 
-            
-            System.out.println("Public Key from the server: " + publicKey) ; 
-        } catch (IOException e) {System.out.println("readline:"+e.getMessage());
-        } catch (NoSuchAlgorithmException ex) {ex.printStackTrace();
-        } catch (InvalidKeySpecException ex) {ex.printStackTrace();}
-    }
 
     @FXML
     private void onClickBackToLogin(ActionEvent event) {
@@ -180,3 +149,14 @@ public class RegistrationController implements Initializable {
     }
     
 }
+/** 
+ * try {
+            System.out.println(CurrentSession.getUsername()) ; 
+            /*DEBUG ERROR: Socket won't persist through FXML loading. Have to 
+            consider if socket can be passed from scene to scene perhaps */
+            
+            //s = new Socket(hostName, serverPort) ;
+            //dataOut = new DataOutputStream(s.getOutputStream()) ; 
+            //dataIn = new DataInputStream(s.getInputStream()) ; 
+       // } catch (IOException e) {System.out.println("readline:"+e.getMessage());}
+ //*/

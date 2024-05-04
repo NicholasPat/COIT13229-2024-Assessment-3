@@ -4,32 +4,36 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import javafx.scene.control.Alert;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 
 /**
  * This class is used like a session handler, or a cookie. It will hold current
  * information sent from the server plus any other flags needed. Will share 
- * commonalities with the Customer class on the server side. Will be initialised 
+ * commonalities with the Customer class on the server side. Will be initialized 
  * by the MdhsClient.java class (application) and then passed to the controllers 
- * as they are initialised. This handles the issue of needing to pass session 
+ * as they are initialized. This handles the issue of needing to pass session 
  * information between classes 
  * 
  * @author linke
  */
 public class CurrentSession {
     /*Customer information*/
-    private int customerId ; 
-    private String firstName ; 
-    private String lastName ; 
-    private String username ; 
-    private int phoneNumber ; 
-    private String emailAddress ; 
-    private String password ; 
-    private String deliveryAddress ; 
+    private static int customerId ; 
+    private static String firstName ; 
+    private static String lastName ; 
+    private static String username ; 
+    private static int phoneNumber ; 
+    private static String emailAddress ; 
+    private static String password ; 
+    private static String deliveryAddress ; 
     
     /*Flags and necessary information*/
-    private String currentOrder ; 
-    private int serverCode ; //Used by server to determine it's the current user 
+    private static String currentOrder ; 
+    private static int serverCode ; //Used by server to determine it's the current user 
     
     //Socket and streams. This is like this because the way the streams are going 
     //to work is that it is all data streams used. Opening and closing the streams
@@ -38,92 +42,141 @@ public class CurrentSession {
     private static DataOutputStream dataOut = null ; 
     private static DataInputStream dataIn = null ; 
     
+    private static PublicKey publicKey = null ; 
+    
+    private static final String hostName = "localhost" ; 
+    private static final int serverPort = 6464 ; 
+    
     /**
-     * Upon initialising the program, will attempt connecting to the server and if 
+     * Upon initializing the program, will attempt connecting to the server and if 
      * it fails, then throw an error and then exit the program
      */
     public CurrentSession() { 
         
     }
+    
+    public static void initialiseStream() { 
+        try {
+            s = new Socket(hostName, serverPort) ;
+            dataOut = new DataOutputStream(s.getOutputStream()) ; 
+            dataIn = new DataInputStream(s.getInputStream()) ;
+            
+            if (publicKey == null) { 
+                dataOut.writeUTF("Public key please") ; 
+                setPublicKey() ; 
+            } 
+        } catch (IOException e) {System.out.println("readline:"+e.getMessage());}
+    }
+    
+    public static void setPublicKey() { 
+        try { 
+            //dataOut.writeUTF("Public key please") ; 
+            int pubKeyLength = dataIn.readInt() ; 
+            byte[] bytesPublicKey = new byte[pubKeyLength] ; 
+            dataIn.readFully(bytesPublicKey, 0, pubKeyLength) ; 
+            
+            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
+            
+            publicKey = keyFactory.generatePublic(pubKeySpec) ; 
+            
+            System.out.println("Public Key from the server: " + publicKey) ; 
+        } catch (IOException e) {System.out.println("readline:"+e.getMessage());
+        } catch (NoSuchAlgorithmException ex) {ex.printStackTrace();
+        } catch (InvalidKeySpecException ex) {ex.printStackTrace();}
+    }
 
-    public int getCustomerId() {
+    public static int getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
+    public static void setCustomerId(int customerIdA) {
+        customerId = customerIdA;
     }
 
-    public String getFirstName() {
+    public static String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public static void setFirstName(String firstNameA) {
+        firstName = firstNameA;
     }
 
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public static void setLastName(String lastNameA) {
+        lastName = lastNameA;
     }
 
-    public String getUsername() {
+    public static String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public static void setUsername(String usernameA) {
+        username = usernameA;
     }
 
     public int getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public static void setPhoneNumber(int phoneNumberA) {
+        phoneNumber = phoneNumberA;
     }
 
     public String getEmailAddress() {
         return emailAddress;
     }
 
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+    public static void setEmailAddress(String emailAddressA) {
+        emailAddress = emailAddressA;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public static void setPassword(String passwordA) {
+        password = passwordA;
     }
 
     public String getDeliveryAddress() {
         return deliveryAddress;
     }
 
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
+    public static void setDeliveryAddress(String deliveryAddressA) {
+        deliveryAddress = deliveryAddressA;
     }
 
     public String getCurrentOrder() {
         return currentOrder;
     }
 
-    public void setCurrentOrder(String currentOrder) {
-        this.currentOrder = currentOrder;
+    public static void setCurrentOrder(String currentOrderA) {
+        currentOrder = currentOrderA;
     }
 
     public int getServerCode() {
         return serverCode;
     }
 
-    public void setServerCode(int serverCode) {
-        this.serverCode = serverCode;
+    public static void setServerCode(int serverCodeA) {
+        serverCode = serverCodeA;
     }
+
+    public static Socket getS() {
+        return s;
+    }
+
+    public static DataOutputStream getDataOut() {
+        return dataOut;
+    }
+
+    public static DataInputStream getDataIn() {
+        return dataIn;
+    }
+    
     
 }
