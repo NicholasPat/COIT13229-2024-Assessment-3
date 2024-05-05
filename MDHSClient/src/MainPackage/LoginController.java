@@ -89,12 +89,24 @@ public class LoginController implements Initializable {
         } 
         
         encryptAndSendPassword() ; 
+        System.out.println("TRACE: Finished with encryptAndSendPasswordException") ; 
         
-        if (validString.equals("Validation Confirmed")) { 
-            try { 
+        try { 
+            validString = dataIn.readUTF() ;
+            System.out.println("Read in validString") ; 
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        if (validString.equalsIgnoreCase("Invalid")) { 
+            System.out.println("Weeee: " + validString) ; 
+        } else { 
+            setCurrentSessionCustomer(validString) ; 
+            try {
                 MdhsClient.setRoot("Orders") ;
-                System.out.println("Weeee: " + validString) ; 
-             } catch (IOException e){System.out.println("IO Exception: " +e.getMessage());}
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
     
@@ -154,16 +166,13 @@ public class LoginController implements Initializable {
             
             System.out.println("TRACE DEBUG: Sent password encrypted: " + Arrays.toString(encodedMessage)) ; 
             
-            validString = dataIn.readUTF() ; 
-            
-            //Remove the close of the socket. Should close upon switching the scene, or keep open somehow 
         }catch (UnknownHostException e){System.out.println("Socket:"+e.getMessage());
         }catch (EOFException e){System.out.println("EOF:"+e.getMessage());
         }catch (IOException e){System.out.println("readline:"+e.getMessage());
         }catch (NoSuchAlgorithmException e) {System.out.println("No Such Algoritm: " + e.getMessage());
         }catch (InvalidKeySpecException e) {System.out.println("Invalid Key Spc: " + e.getMessage());
         }catch (Exception e) {System.out.println("Exception: " + e.getMessage());
-        }finally {if(s!=null) try {s.close();}catch (IOException e){System.out.println("close:"+e.getMessage());}}
+        }//finally {if(s!=null) try {s.close();}catch (IOException e){System.out.println("close:"+e.getMessage());}}
     }
 
     /** 
@@ -191,6 +200,22 @@ public class LoginController implements Initializable {
         }
         
         return message ; 
+    }
+    
+    private void setCurrentSessionCustomer(String data) { 
+        String[] dataSplit = data.split("::") ; 
+        CurrentSession.setFirstName(dataSplit[0]) ; 
+        CurrentSession.setLastName(dataSplit[1]) ; 
+        CurrentSession.setUsername(dataSplit[2]) ; 
+        CurrentSession.setPhoneNumber(Integer.parseInt(dataSplit[3])) ; 
+        CurrentSession.setEmailAddress(dataSplit[4]) ; 
+        
+        //Debug for if all went well
+        System.out.println("First name: " + CurrentSession.getFirstName() 
+                + "\nLastName: " + CurrentSession.getLastName() 
+                + "\nUsername: " + CurrentSession.getUsername() 
+                + "\nPhone Number: " + CurrentSession.getPhoneNumber()
+                + "\nEmail: " + CurrentSession.getEmailAddress()) ; 
     }
     
 }

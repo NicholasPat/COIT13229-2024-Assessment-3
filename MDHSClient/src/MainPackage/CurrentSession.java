@@ -61,10 +61,10 @@ public class CurrentSession {
             dataOut = new DataOutputStream(s.getOutputStream()) ; 
             dataIn = new DataInputStream(s.getInputStream()) ;
             
-            if (publicKey == null) { 
-                dataOut.writeUTF("Public key please") ; 
-                setPublicKey() ; 
-            } 
+            //if (publicKey == null) { 
+               // dataOut.writeUTF("Public key please") ; 
+             //   setPublicKey() ; 
+          //  } 
         } catch (IOException e) {System.out.println("readline:"+e.getMessage());}
     }
     
@@ -102,7 +102,7 @@ public class CurrentSession {
         firstName = firstNameA;
     }
 
-    public String getLastName() {
+    public static String getLastName() {
         return lastName;
     }
 
@@ -118,7 +118,7 @@ public class CurrentSession {
         username = usernameA;
     }
 
-    public int getPhoneNumber() {
+    public static int getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -126,7 +126,7 @@ public class CurrentSession {
         phoneNumber = phoneNumberA;
     }
 
-    public String getEmailAddress() {
+    public static String getEmailAddress() {
         return emailAddress;
     }
 
@@ -134,7 +134,7 @@ public class CurrentSession {
         emailAddress = emailAddressA;
     }
 
-    public String getPassword() {
+    public static String getPassword() {
         return password;
     }
 
@@ -142,7 +142,7 @@ public class CurrentSession {
         password = passwordA;
     }
 
-    public String getDeliveryAddress() {
+    public static String getDeliveryAddress() {
         return deliveryAddress;
     }
 
@@ -150,7 +150,7 @@ public class CurrentSession {
         deliveryAddress = deliveryAddressA;
     }
 
-    public String getCurrentOrder() {
+    public static String getCurrentOrder() {
         return currentOrder;
     }
 
@@ -158,7 +158,7 @@ public class CurrentSession {
         currentOrder = currentOrderA;
     }
 
-    public int getServerCode() {
+    public static int getServerCode() {
         return serverCode;
     }
 
