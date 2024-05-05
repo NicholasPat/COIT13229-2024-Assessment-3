@@ -76,6 +76,14 @@ public class PasswordDetails implements Serializable {
         return new String(cipher.doFinal(encodedMessage)) ; 
     }
     
+    public byte[] encrypt(String message) throws Exception { 
+        Cipher cipher = Cipher.getInstance("RSA") ; 
+        cipher.init(Cipher.ENCRYPT_MODE, privateK) ; 
+        
+        byte[] cipherData = cipher.doFinal(message.getBytes("UTF-8")) ; 
+        return cipherData ; 
+    }
+    
 }
 
 //System.out.println("KSH TRACE: ") ; 

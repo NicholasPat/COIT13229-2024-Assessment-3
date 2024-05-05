@@ -12,9 +12,9 @@ public class Customer {
     private int phoneNumber ; 
     private String emailAddress ; 
     private String password ; //NOTE! PASSWORD WILL BE ENCRYPTED SO THIS WILL CHANGE. THIS IS TEMP 
-    private String deliveryAdress ; 
+    private String deliveryAddress ; 
 
-    public Customer(int customerId, String firstName, String lastName, String userName, int phoneNumber, String emailAddress, String password, String deliveryAdress) {
+    public Customer(int customerId, String firstName, String lastName, String userName, int phoneNumber, String emailAddress, String password, String deliveryAddress) {
         this.customerId = customerId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -22,7 +22,7 @@ public class Customer {
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
         this.password = password;
-        this.deliveryAdress = deliveryAdress;
+        this.deliveryAddress = deliveryAddress;
     }
 
     public Customer() {
@@ -84,17 +84,17 @@ public class Customer {
         this.password = password;
     }
 
-    public String getDeliveryAdress() {
-        return deliveryAdress;
+    public String getDeliveryAddress() {
+        return deliveryAddress;
     }
 
-    public void setDeliveryAdress(String deliveryAdress) {
-        this.deliveryAdress = deliveryAdress;
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 
     @Override
     public String toString() {
-        return "Customer{" + "customerId=" + customerId + ", firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", phoneNumber=" + phoneNumber + ", emailAddress=" + emailAddress + ", password=" + password + ", deliveryAdress=" + deliveryAdress + '}';
+        return "Customer{" + "customerId=" + customerId + ", firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", phoneNumber=" + phoneNumber + ", emailAddress=" + emailAddress + ", password=" + password + ", deliveryAddress=" + deliveryAddress + '}';
     }
     
     

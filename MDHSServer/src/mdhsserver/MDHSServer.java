@@ -81,6 +81,7 @@ class MainConnection extends Thread {
     PublicKey publicKey ; 
     PrivateKey privateKey ; 
     PasswordDetails passwordClass ; 
+    DatabaseConnection databaseConnection ; 
     
     /** 
      * Initialises the current thread with the following parameters. Not sure 
@@ -99,6 +100,7 @@ class MainConnection extends Thread {
         publicKey = key ; 
         privateKey = privKey ; 
         passwordClass = passwordDetails ; 
+        databaseConnection = new DatabaseConnection() ; 
         try { 
             dataIn = new DataInputStream(clientSocket.getInputStream()) ; 
             dataOut = new DataOutputStream(clientSocket.getOutputStream()) ; 
@@ -114,16 +116,21 @@ class MainConnection extends Thread {
      */
     @Override 
     public void run() { 
-        try { 
-            String data1 = dataIn.readUTF() ;  
-            if (data1.equalsIgnoreCase("Password check")) { 
-                //dataOut.writeUTF("All good") ; 
-                passwordMethod(1) ;
-            } 
-            if (data1.equalsIgnoreCase("Public key please")) { 
-                passwordMethod(2) ; 
-            }
-        } catch (IOException ex){System.out.println("Listen: " + ex.getMessage());}
+        while (true) { 
+            try { 
+                String data1 = dataIn.readUTF() ;  
+                if (data1.equalsIgnoreCase("Password check")) { 
+                    //dataOut.writeUTF("All good") ; 
+                    passwordMethod(1) ;
+                } 
+                if (data1.equalsIgnoreCase("Public key please")) { 
+                    passwordMethod(2) ; 
+                } 
+                if (data1.equalsIgnoreCase("Password Check Registration")) { 
+                    passwordMethod(3) ; 
+                }
+            } catch (IOException ex){System.out.println("Listen: " + ex.getMessage());}
+        } 
     }
     
     /** 
@@ -132,10 +139,6 @@ class MainConnection extends Thread {
      * @param i 
      */
     private void passwordMethod(int i) throws IOException { 
-        //DEBUG 
-        System.out.println("Public Key: " + passwordClass.getPublicKey()) ; 
-        System.out.println("Private Key: " + passwordClass.getPrivateKey()) ; 
-        
         String data ; 
         String message = null ; 
         String format = null ; 
@@ -144,6 +147,9 @@ class MainConnection extends Thread {
         String messageString = null ; 
         X509EncodedKeySpec pubKeySpec = null ; 
         String decryptedPassword = null ; 
+        byte[] privEncryptPass = null ; 
+        
+        String username = dataIn.readUTF() ; 
         
         //Generate the encoded key to be used 
         byte[] bytesPubKey = publicKey.getEncoded() ; 
@@ -173,20 +179,53 @@ class MainConnection extends Thread {
 
         try { 
             decryptedPassword = passwordClass.decrypt(encodedMessage) ; 
+            
+            privEncryptPass = passwordClass.encrypt(decryptedPassword) ; 
+            String encryptedPass = Arrays.toString(privEncryptPass) ; 
+            
+            if (i==1) { 
+                checkUser(username, encryptedPass) ;
+            } 
+            if (i==3) { 
+                registerCustomer(encryptedPass) ; 
+            }
         } catch (NoSuchAlgorithmException e) {System.out.println("No Algorithm: " + e.getMessage()) ; 
         } catch (NoSuchPaddingException e) {System.out.println("No Padding: " + e.getMessage()) ; 
         } catch (InvalidKeyException e) {System.out.println("Invalid Key: " + e.getMessage()) ; 
         } catch (InvalidAlgorithmParameterException e) {System.out.println("Invalid Alg Para: " + e.getMessage()) ; 
         } catch (IllegalBlockSizeException e) {System.out.println("Illegal Block Size: " + e.getMessage()) ; 
-        } catch (BadPaddingException e) {System.out.println("Bad Padding: " + e.getMessage()) ; } 
+        } catch (BadPaddingException e) {System.out.println("Bad Padding: " + e.getMessage()) ; 
+        } catch (Exception e) {System.out.println("Exception: " + e.getMessage()); }
         
         System.out.println("Encrypted byte[]: " + Arrays.toString(encodedMessage)) ; 
-        System.out.println("Decrypted password: " + decryptedPassword) ; 
+        System.out.println("Username: " + username + "\nDecrypted password: " + decryptedPassword) ; 
         
-        //This is in no way secure but not sure how to actually handle valid 
-        //sessions 
-        dataOut.writeUTF("Validation Confirmed") ; 
-        
+    }
+    
+    private void checkUser(String username, String password) throws IOException { 
+        Customer customer = databaseConnection.getCustomer(username) ; 
+        if (password.equals(customer.getPassword())) { 
+            String message = customer.getFirstName() + "::" + customer.getLastName() 
+                    + "::" + customer.getUserName() + "::" + customer.getPhoneNumber() 
+                    + "::" + customer.getEmailAddress() + "::" 
+                    + customer.getDeliveryAddress() ; 
+            
+            dataOut.writeUTF(message) ;
+        } else { 
+            dataOut.writeUTF("Invalid") ; 
+        }
+    }
+    
+    private void registerCustomer(String password) throws IOException { 
+        String dataToSend = dataIn.readUTF() ; 
+        String status = databaseConnection.addCustomer(dataToSend, password) ; 
+        if (status.equals("No issues")) { 
+            //dataout all good - remember to add corresponding to client 
+            dataOut.writeUTF("All good") ; 
+        } else { 
+            //dataout error - client will display an error message 
+            dataOut.writeUTF("Invalid") ; 
+        }
     }
 }
 
