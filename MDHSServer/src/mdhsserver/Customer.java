@@ -13,8 +13,11 @@ public class Customer {
     private String emailAddress ; 
     private String password ; //NOTE! PASSWORD WILL BE ENCRYPTED SO THIS WILL CHANGE. THIS IS TEMP 
     private String deliveryAddress ; 
+    private int administrator ; 
 
-    public Customer(int customerId, String firstName, String lastName, String userName, int phoneNumber, String emailAddress, String password, String deliveryAddress) {
+    public Customer(int customerId, String firstName, String lastName, 
+            String userName, int phoneNumber, String emailAddress, 
+            String password, String deliveryAddress, int administrator) {
         this.customerId = customerId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -23,6 +26,7 @@ public class Customer {
         this.emailAddress = emailAddress;
         this.password = password;
         this.deliveryAddress = deliveryAddress;
+        this.administrator = administrator; 
     }
 
     public Customer() {
@@ -92,10 +96,21 @@ public class Customer {
         this.deliveryAddress = deliveryAddress;
     }
 
+    public int getAdministrator() {
+        return administrator;
+    }
+
+    public void setAdministrator(int administrator) {
+        this.administrator = administrator;
+    }
+    
+    
+
     @Override
     public String toString() {
         return "Customer{" + "customerId=" + customerId + ", firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", phoneNumber=" + phoneNumber + ", emailAddress=" + emailAddress + ", password=" + password + ", deliveryAddress=" + deliveryAddress + '}';
     }
+    
     
     
 }

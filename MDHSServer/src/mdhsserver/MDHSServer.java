@@ -116,20 +116,24 @@ class MainConnection extends Thread {
      */
     @Override 
     public void run() { 
-        while (true) { 
+        boolean state = true ; 
+        while (state) { 
             try { 
                 String data1 = dataIn.readUTF() ;  
                 if (data1.equalsIgnoreCase("Password check")) { 
-                    //dataOut.writeUTF("All good") ; 
                     passwordMethod(1) ;
                 } 
                 if (data1.equalsIgnoreCase("Public key please")) { 
-                    passwordMethod(2) ; 
+                    sendPublicKey() ; 
                 } 
                 if (data1.equalsIgnoreCase("Password Check Registration")) { 
-                    passwordMethod(3) ; 
+                    passwordMethod(2) ; 
                 }
-            } catch (IOException ex){System.out.println("Listen: " + ex.getMessage());}
+            } catch (IOException ex){
+                System.out.println("Listen: " + ex.getMessage() 
+                        + ". For thread number: " + threadNumber);
+                state = false ; 
+            }
         } 
     }
     
@@ -151,22 +155,7 @@ class MainConnection extends Thread {
         
         String username = dataIn.readUTF() ; 
         
-        //Generate the encoded key to be used 
-        byte[] bytesPubKey = publicKey.getEncoded() ; 
-        System.out.println("PublicKey in bytes: " + bytesPubKey.length) ; 
-        
-        //Send the size of the key 
-        dataOut.writeInt(bytesPubKey.length) ; 
-        System.out.println("TRACE: Sent out pub key length") ; 
-        
-        //Send the key bytes 
-        dataOut.write(bytesPubKey, 0, bytesPubKey.length) ; 
-        System.out.println("TRACE: Sent the bytesPubeKey") ;
-        
-        /*If identifier equals case 2, then end method here*/
-        if (i == 2) { 
-            return ; 
-        }
+        //If needed, rest of method can go back here 
         
         //Send size of encrypted message to be sent from client 
         int messageLength = dataIn.readInt() ; 
@@ -186,7 +175,7 @@ class MainConnection extends Thread {
             if (i==1) { 
                 checkUser(username, encryptedPass) ;
             } 
-            if (i==3) { 
+            if (i==2) { 
                 registerCustomer(encryptedPass) ; 
             }
         } catch (NoSuchAlgorithmException e) {System.out.println("No Algorithm: " + e.getMessage()) ; 
@@ -200,6 +189,20 @@ class MainConnection extends Thread {
         System.out.println("Encrypted byte[]: " + Arrays.toString(encodedMessage)) ; 
         System.out.println("Username: " + username + "\nDecrypted password: " + decryptedPassword) ; 
         
+    }
+    
+    private void sendPublicKey() throws IOException { 
+        //Generate the encoded key to be used 
+        byte[] bytesPubKey = publicKey.getEncoded() ; 
+        System.out.println("PublicKey in bytes: " + bytesPubKey.length) ; 
+        
+        //Send the size of the key 
+        dataOut.writeInt(bytesPubKey.length) ; 
+        System.out.println("TRACE: Sent out pub key length") ; 
+        
+        //Send the key bytes 
+        dataOut.write(bytesPubKey, 0, bytesPubKey.length) ; 
+        System.out.println("TRACE: Sent the bytesPubeKey") ;
     }
     
     private void checkUser(String username, String password) throws IOException { 
@@ -227,6 +230,14 @@ class MainConnection extends Thread {
             dataOut.writeUTF("Invalid") ; 
         }
     }
+    
+    /** 
+     * Since CSV (Comma Separated Value), just need to split with "," 
+     */
+    private void readProductFile() { 
+        
+    }
+    
 }
 
 //Trace command 

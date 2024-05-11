@@ -62,13 +62,17 @@ public class CurrentSession {
             dataOut = new DataOutputStream(s.getOutputStream()) ; 
             dataIn = new DataInputStream(s.getInputStream()) ;
             
-            //if (publicKey == null) { 
-               // dataOut.writeUTF("Public key please") ; 
-             //   setPublicKey() ; 
-          //  } 
+            if (publicKey == null) { 
+                dataOut.writeUTF("Public key please") ; 
+                setPublicKey() ; 
+            } 
         } catch (IOException e) {System.out.println("readline:"+e.getMessage());}
     }
     
+    /** 
+     * This method just pre-gets the public key so that it won't be tied up later 
+     * on 
+     */
     public static void setPublicKey() { 
         try { 
             //dataOut.writeUTF("Public key please") ; 
@@ -85,6 +89,22 @@ public class CurrentSession {
         } catch (IOException e) {System.out.println("readline:"+e.getMessage());
         } catch (NoSuchAlgorithmException ex) {ex.printStackTrace();
         } catch (InvalidKeySpecException ex) {ex.printStackTrace();}
+    }
+    
+    public static void rest() { 
+        customerId = 0 ; 
+        firstName = null ; 
+        lastName = null ; 
+        username = null ; 
+        phoneNumber = 0 ; 
+        emailAddress = null ; 
+        password = null ; 
+        deliveryAddress = null ; 
+        administrator = 0 ; 
+        currentOrder = null ; 
+        serverCode = 0 ; 
+        //Don't touch the streams and public key since they aren't necessary to 
+        //delete 
     }
 
     public static int getCustomerId() {
@@ -186,6 +206,16 @@ public class CurrentSession {
     public static DataInputStream getDataIn() {
         return dataIn;
     }
+
+    public static PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public static void setPublicKey(PublicKey publicKey) {
+        CurrentSession.publicKey = publicKey;
+    }
+    
+    
     
     
 }

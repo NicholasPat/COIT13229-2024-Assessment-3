@@ -24,9 +24,9 @@ public class MdhsClient extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        //Parent root = FXMLLoader.load(getClass().getResource("/MainPackage/fxml_resources/Login.fxml"));
         CurrentSession.initialiseStream() ; 
         scene = new Scene(loadFXML("Login"));
+        stage.setTitle("MDHS Client-Side Application"); 
         stage.setScene(scene);
         stage.show();
     }

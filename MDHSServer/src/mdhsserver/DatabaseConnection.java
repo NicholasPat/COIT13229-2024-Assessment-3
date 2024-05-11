@@ -1,6 +1,7 @@
 package mdhsserver;
 
 import java.sql.*; 
+import java.util.ArrayList;
 
 /**
  * Note: SQL and Java implementation was learned during COIT12200 Software Design and 
@@ -23,17 +24,34 @@ public class DatabaseConnection {
     
     private PreparedStatement getCustomerDeliverySchedule = null ; 
     private PreparedStatement getAllDeliverySchedules = null ; 
+    private PreparedStatement getCustomerOrderProducts = null ; 
     
     public DatabaseConnection() { 
         try { 
             connection = DriverManager.getConnection(MYSQL_URL, userName, password) ; 
             
             // = connection.prepareStatement("") ; 
+            //Below are all the customer queries 
             addCustomer = connection.prepareStatement("INSERT INTO customers (first_name,"
                     + "last_name, username, mobile, email, address, password_field) "
                     + "VALUES(?, ?, ?, ?, ?, ?, ?)") ; 
             getCustomer = connection.prepareStatement("SELECT * "
                     + "FROM customers WHERE username = ?") ; 
+            
+            //Below are all the product queries 
+            //addProduct = connection.prepareStatement("") ; 
+            //editProduct = connection.prepareStatement("") ; 
+            //deleteProduct = connection.prepareStatement("") ; 
+            getAllProducts = connection.prepareStatement("SELECT * "
+                    + "FROM products") ; 
+            
+            //Delivery Schedule queries 
+            getCustomerDeliverySchedule = connection.prepareStatement(
+                    "SELECT * FROM delivery_schedule WHERE customer_id "
+                            + "= ?") ; 
+            //getAllDeliverySchedules = connection.prepareStatement("") ; 
+            getCustomerOrderProducts = connection.prepareStatement( 
+            "SELECT * FROM order_contents WHERE order_id = ?") ; 
         } catch (SQLException e){System.out.println("SQL Exception: " + e.getMessage());} 
     } 
     
@@ -89,9 +107,49 @@ public class DatabaseConnection {
                 customer.setEmailAddress(results.getString("email")) ; 
                 customer.setDeliveryAddress(results.getString("address")) ; 
                 customer.setPassword(results.getString("password_field")) ; 
+                customer.setAdministrator(results.getInt("administrator")) ; 
             } 
-        } catch (SQLException sqlException) {sqlException.printStackTrace();
-        } finally {try {results.close() ;}catch (SQLException sqlException){sqlException.printStackTrace();}}
+        } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
+        } finally {try {results.close() ;}catch (SQLException sqlException){System.out.println("SQL Exception: " + sqlException.getMessage());}}
         return customer;
     }
+    
+    public ArrayList<OrderInformation> getCustomerDeliverySchedule(int customerId) { 
+        ArrayList<OrderInformation> customerOrders = new ArrayList<>() ; 
+        ResultSet resultSet = null ; 
+        String[] products = null ; 
+        
+        try { 
+            getCustomerDeliverySchedule.setInt(1, customerId) ; 
+            resultSet = getCustomerDeliverySchedule.executeQuery() ; 
+            
+            //This checks if the returned results are null, if it is, send 
+            //a new ArrayList<>() as null would cause issues, learned from 
+            //experience 
+            if (!resultSet.isBeforeFirst()) { 
+                System.out.println("No entries within the order table") ; 
+                return new ArrayList<>() ; 
+            }
+            
+            while (resultSet.next()) { 
+                customerOrders.add(new OrderInformation(
+                    resultSet.getInt("delivery_id"), 
+                    resultSet.getString("delivery_day"),
+                    resultSet.getString("delivery_time"),
+                    resultSet.getDouble("delivery_cost"),
+                    resultSet.getInt("order_id")
+                )) ; 
+            }
+            
+            //Do something with order_id and join order_contents with yada yada
+            //Then just add checks to get those names for the products 
+            
+        }catch (SQLException sqlException) { 
+            System.out.println("SQL Exception: " + sqlException.getMessage()) ; 
+        }
+        return customerOrders ; 
+    }
+    
+    
+    
 }

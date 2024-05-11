@@ -53,6 +53,7 @@ public class LoginController implements Initializable {
             s = CurrentSession.getS() ; 
             dataIn = CurrentSession.getDataIn() ; 
             dataOut = CurrentSession.getDataOut() ; 
+            publicKey = CurrentSession.getPublicKey() ; 
             
             //s = new Socket(hostName, serverPort) ;
             //dataOut = new DataOutputStream(s.getOutputStream()) ; 
@@ -132,25 +133,25 @@ public class LoginController implements Initializable {
             
             //message = dataIn.readUTF() ; 
             //if (message.equalsIgnoreCase("all good")) { 
-                pubKeyLength = dataIn.readInt() ; 
-                System.out.println("TRACE: Took in pubKeyLength " + pubKeyLength) ; 
-                bytesPublicKey = new byte[pubKeyLength] ; 
+                //pubKeyLength = dataIn.readInt() ; 
+                //System.out.println("TRACE: Took in pubKeyLength " + pubKeyLength) ; 
+                //bytesPublicKey = new byte[pubKeyLength] ; 
                 
-                dataIn.readFully(bytesPublicKey, 0, pubKeyLength) ; 
-                System.out.println("TRACE: Read in the public key ") ; 
+                //dataIn.readFully(bytesPublicKey, 0, pubKeyLength) ; 
+                //System.out.println("TRACE: Read in the public key ") ; 
             //}
             
             //Generate key specification for encoding -- SUMMARISE LATER 
-            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
-            System.out.println("TRACE: X509 AND KeyFactory done\n"
-                    + "PubKeySpec: " + pubKeySpec + "\n"
-                            + "KeyFactory: " + keyFactory + "\n") ; 
+            //X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
+            //KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
+            //System.out.println("TRACE: X509 AND KeyFactory done\n"
+                    //+ "PubKeySpec: " + pubKeySpec + "\n"
+                           // + "KeyFactory: " + keyFactory + "\n") ; 
             
             //Extract the public key - EXPLAIN LATER 
-            publicKey = keyFactory.generatePublic(pubKeySpec) ; 
-            System.out.println("TRACE: public key extract") ; 
-            System.out.println("Public Key: " + publicKey + "\n") ; 
+            //publicKey = keyFactory.generatePublic(pubKeySpec) ; 
+            //System.out.println("TRACE: public key extract") ; 
+            //System.out.println("Public Key: " + publicKey + "\n") ; 
             
             //Encrypt the password 
             byte[] encodedMessage = encrypt(password) ; 
