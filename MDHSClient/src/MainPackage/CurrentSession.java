@@ -30,6 +30,7 @@ public class CurrentSession {
     private static String emailAddress ; 
     private static String password ; 
     private static String deliveryAddress ; 
+    private static int administrator ; 
     
     /*Flags and necessary information*/
     private static String currentOrder ; 
@@ -153,6 +154,14 @@ public class CurrentSession {
     public static String getCurrentOrder() {
         return currentOrder;
     }
+
+    public static int getAdministrator() {
+        return administrator;
+    }
+
+    public static void setAdministrator(int administrator) {
+        CurrentSession.administrator = administrator;
+    } 
 
     public static void setCurrentOrder(String currentOrderA) {
         currentOrder = currentOrderA;
