@@ -1,7 +1,11 @@
 package mdhsserver;
 
+import dataclasses.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,10 +17,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
 
 /**
  *
@@ -72,16 +79,16 @@ public class MDHSServer {
  * @author linke
  */
 class MainConnection extends Thread { 
-    DataInputStream dataIn ; 
-    DataOutputStream dataOut ; 
-    ObjectInputStream objIn ; 
-    ObjectOutputStream objOut ; 
-    Socket clientSocket ; 
-    int threadNumber ; 
-    PublicKey publicKey ; 
-    PrivateKey privateKey ; 
-    PasswordDetails passwordClass ; 
-    DatabaseConnection databaseConnection ; 
+    private DataInputStream dataIn ; 
+    private DataOutputStream dataOut ; 
+    private ObjectInputStream objIn ; 
+    private ObjectOutputStream objOut ; 
+    private Socket clientSocket ; 
+    private int threadNumber ; 
+    private PublicKey publicKey ; 
+    private PrivateKey privateKey ; 
+    private PasswordDetails passwordClass ; 
+    private DatabaseConnection databaseConnection ; 
     
     /** 
      * Initialises the current thread with the following parameters. Not sure 
@@ -191,6 +198,10 @@ class MainConnection extends Thread {
         
     }
     
+    /** 
+     * 
+     * @throws IOException 
+     */
     private void sendPublicKey() throws IOException { 
         //Generate the encoded key to be used 
         byte[] bytesPubKey = publicKey.getEncoded() ; 
@@ -205,6 +216,12 @@ class MainConnection extends Thread {
         System.out.println("TRACE: Sent the bytesPubeKey") ;
     }
     
+    /** 
+     * 
+     * @param username
+     * @param password
+     * @throws IOException 
+     */
     private void checkUser(String username, String password) throws IOException { 
         Customer customer = databaseConnection.getCustomer(username) ; 
         if (password.equals(customer.getPassword())) { 
@@ -219,6 +236,11 @@ class MainConnection extends Thread {
         }
     }
     
+    /** 
+     * 
+     * @param password
+     * @throws IOException 
+     */
     private void registerCustomer(String password) throws IOException { 
         String dataToSend = dataIn.readUTF() ; 
         String status = databaseConnection.addCustomer(dataToSend, password) ; 
@@ -233,100 +255,56 @@ class MainConnection extends Thread {
     
     /** 
      * Since CSV (Comma Separated Value), just need to split with "," 
+     * Invoked upon startup. Also place check for if the products are in there already
+     * 
      */
     private void readProductFile() { 
+        String fileName = "A3-products.csv" ; 
+        File file = new File(fileName) ; 
+        ArrayList<Product> productList = new ArrayList<>() ; 
+        String entries ; 
+        String[] splitEntries ; 
+        
+        try { 
+            Scanner fileInput = new Scanner(file) ; 
+            
+            //If nothing read in *if* the file was correctly found, then just 
+            //return an empty ArrayList 
+            if (!fileInput.hasNext()) { 
+                return ; 
+            }
+            
+            //product name, unit, quantity, price, ingredients 
+            //name, unit, (int) quant, (double) price, ingredients
+            
+            while (fileInput.hasNextLine()) { 
+                entries = fileInput.nextLine() ; 
+                splitEntries = entries.split(",") ; 
+                int quantity = Integer.parseInt(splitEntries[2]) ; 
+                double price = Double.parseDouble(splitEntries[3]) ; 
+                
+                try { 
+                    productList.add(new Product( 
+                        splitEntries[0], splitEntries[1], quantity,
+                        price, splitEntries[4]
+                    )) ; 
+                } catch (Exception e) { 
+                    //This should just happen on the first line since it's the 
+                    //definitions of the variables, should skip 
+                } 
+            }
+        } catch (FileNotFoundException e) { 
+            System.out.println("File with name: " + fileName + " does not exist, creating file") ; 
+            //Do nothing because it does not matter. Will just create it as needed 
+        } 
+        
+        
+        //Assumption: Won't check if products exist... if have time will add error 
+        //handling 
+        
+        //Take the ArrayList and send to the method for Writing Products 
+        
         
     }
     
 }
-
-//Trace command 
-//System.out.println("TRACE: ") ; 
-
-//In run() {}
-//String data = null ; 
-/*try {
-data = dataIn.readUTF() ;
-System.out.println(data) ;
-}catch(IOException e){System.out.println("Connection: "+e.getMessage());}
-
-if (data.equalsIgnoreCase("Password Check")) {
-try {
-passwordMethod() ;
-dataOut.writeUTF("All good");
-}catch(IOException e){System.out.println("Connection: "+e.getMessage());}
-        }*/
-
-/* Original while block for the data 
-        while ((data=dataIn.readUTF())!=null){
-            System.out.println("Message from the client: " + data) ; 
-            if (data.equalsIgnoreCase("Public key?")) { 
-                // Send the key size 
-                dataOut.writeInt(bytesPubKey.length) ; 
-                System.out.println("TRACE: Sent out pub key length") ; 
-                
-                //Send the key in bytes 
-                dataOut.write(bytesPubKey, 0, bytesPubKey.length) ; 
-                System.out.println("TRACE: Sent out pub key") ; 
-            } 
-            if (data.equalsIgnoreCase("Password incoming")) { 
-                System.out.println("TRACE: Password incoming ") ; 
-                break ; 
-            }
-        }
-        System.out.println("TRACE: Outside while") ; 
-*/
-
-/* 
-Scrapped serialise key method 
-    public static void readKeyObject() { 
-        String fileName = "passworddetailsObject" ; 
-        FileOutputStream fos ; 
-        ObjectOutputStream oos ; 
-        FileInputStream fis ; 
-        ObjectInputStream ois ; 
-        
-        /*If the keys are null, then attempt to read from file, if that doesn't 
-        exist, then make the keys and serialize the object*/
-/*
-        try { 
-            System.out.println("Reading in the keys") ; 
-            fis = new FileInputStream(fileName) ; 
-            ois = new ObjectInputStream(fis) ; 
-            
-            passwordDetails = (PasswordDetails)ois.readObject() ; 
-            ois.close() ; 
-            
-            System.out.println("Read in the keys") ; 
-            
-            /*Since we are done with this, can return and end the method, 
-            otherwise it would override the old key with a new one as the next
-            try block is invoked*/
-/*
-            return ; 
-        } catch (FileNotFoundException e) {System.out.println("File not found: " + e.getMessage()) ; 
-        } catch (IOException e) {System.out.println("IOException: " + e.getMessage());
-        } catch (ClassNotFoundException e) {System.out.println("Class not found: " + e.getMessage());}
-        
-        try { 
-            System.out.println("Setting new keys since no file exists") ; 
-            /*Create the current key pair plus PasswordDetails object */
-/*
-            passwordDetails = new PasswordDetails() ; 
-            publicK = passwordDetails.getPublicKey() ; 
-            privateK = passwordDetails.getPrivateKey() ; 
-            
-            /*Create the file object output stream*/
-/*
-            fos = new FileOutputStream(fileName) ; 
-            oos = new ObjectOutputStream(fos) ; 
-            
-            /*With the created output stream, serialize the file for use later*/
-/*
-            oos.writeObject(passwordDetails) ; 
-            oos.close() ; 
-        } catch (FileNotFoundException e){System.out.println("File Not Found Exception: " + e.getMessage());
-        } catch (IOException e){System.out.println("IOException: " + e.getMessage());
-        } catch (NoSuchAlgorithmException e){System.out.println("No such algorithm: " + e.getMessage());}
-    }
-*/

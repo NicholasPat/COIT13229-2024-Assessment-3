@@ -1,5 +1,6 @@
 package mdhsserver;
 
+import dataclasses.*;
 import java.sql.*; 
 import java.util.ArrayList;
 
@@ -14,17 +15,29 @@ public class DatabaseConnection {
     final String MYSQL_URL = "jdbc:mysql://localhost:3306/mdhsdb" ; 
     private Connection connection = null ; 
     
+    //Queries regarding customers 
     private PreparedStatement addCustomer = null ; 
     private PreparedStatement getCustomer = null ; 
+    private PreparedStatement getAllCustomers = null ; 
     
+    //Queries regarding products 
+    private PreparedStatement addProductFromFile = null ; 
     private PreparedStatement addProduct = null ; 
     private PreparedStatement editProduct = null ; 
     private PreparedStatement deleteProduct = null ; 
+    private PreparedStatement getProduct = null ; 
     private PreparedStatement getAllProducts = null ; 
     
+    //Queries regarding deliveries 
     private PreparedStatement getCustomerDeliverySchedule = null ; 
     private PreparedStatement getAllDeliverySchedules = null ; 
     private PreparedStatement getCustomerOrderProducts = null ; 
+    
+    //Queries regarding Customer specific deliveries 
+    private PreparedStatement addCustomerDeliverySchedule = null ; 
+    private PreparedStatement addCustomerOrder = null ; 
+    private PreparedStatement getCustomerOrderId = null ; 
+    private PreparedStatement addCustomerOrderProduct = null ; 
     
     public DatabaseConnection() { 
         try { 
@@ -39,6 +52,9 @@ public class DatabaseConnection {
                     + "FROM customers WHERE username = ?") ; 
             
             //Below are all the product queries 
+            addProductFromFile = connection.prepareStatement(
+                    "INSERT INTO pproducts (product_name, unit, quantity, "
+                            + "price, ingredients) VALUES (?, ?, ?, ?, ?)") ; 
             //addProduct = connection.prepareStatement("") ; 
             //editProduct = connection.prepareStatement("") ; 
             //deleteProduct = connection.prepareStatement("") ; 
@@ -52,13 +68,20 @@ public class DatabaseConnection {
             //getAllDeliverySchedules = connection.prepareStatement("") ; 
             getCustomerOrderProducts = connection.prepareStatement( 
             "SELECT * FROM order_contents WHERE order_id = ?") ; 
+            
+            addCustomerOrder = connection.prepareStatement("") ; 
+            getCustomerOrderId = connection.prepareStatement("SELECT order_id"
+                    + "FROM orders WHERE customer_id = ?") ; 
+            addCustomerOrderProduct = connection.prepareStatement("") ; 
+            addCustomerDeliverySchedule = connection.prepareStatement(
+                "") ; 
         } catch (SQLException e){System.out.println("SQL Exception: " + e.getMessage());} 
     } 
     
     public String addCustomer(String dataBlock, String password) { 
         String[] split = dataBlock.split("::") ; 
-        int resultSet = 0 ; 
-        String finalMessage = null ; 
+        int resultSet ; 
+        String finalMessage ; 
         try { 
             addCustomer.setString(1, split[0]) ; 
             addCustomer.setString(2, split[1]) ; 
@@ -89,6 +112,11 @@ public class DatabaseConnection {
         return finalMessage ; 
     }
     
+    /** 
+     * 
+     * @param username
+     * @return 
+     */
     public Customer getCustomer(String username) { 
         //Assumption - 1 result as cannot have two usernames 
         ResultSet results = null ; 
@@ -114,6 +142,11 @@ public class DatabaseConnection {
         return customer;
     }
     
+    /** 
+     * 
+     * @param customerId
+     * @return 
+     */
     public ArrayList<OrderInformation> getCustomerDeliverySchedule(int customerId) { 
         ArrayList<OrderInformation> customerOrders = new ArrayList<>() ; 
         ResultSet resultSet = null ; 
@@ -150,6 +183,154 @@ public class DatabaseConnection {
         return customerOrders ; 
     }
     
+    /** 
+     * Gets all products. Used for initial startup AND when called for by admin 
+     * or the client to get the list 
+     * @return 
+     */
+    public ArrayList<Product> getAllProducts() { 
+        ArrayList<Product> products = null ; 
+        ResultSet resultSet ; 
+        
+        try { 
+            resultSet = getAllProducts.executeQuery() ; 
+            
+            //If the resultSet is null, or no results 
+            if (!resultSet.isBeforeFirst()) { 
+                System.out.println("No entries in products table") ; 
+                return new ArrayList<>() ; 
+            }
+            
+            while (resultSet.next()) { 
+                products.add(new Product(
+                        resultSet.getInt("product_id"),
+                        resultSet.getString("product_name"), 
+                        resultSet.getString("unit"),
+                        resultSet.getInt("quantity"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("Ingredients")
+                )) ; 
+            }
+        } catch (SQLException e) { 
+            System.out.println("Error reading all products \nMessage provided: " + e.getMessage()) ; 
+        }
+        
+        
+        return products ; 
+    }
     
+    /** 
+     * 
+     * @param products 
+     */
+    public void writeProductsFromFile(ArrayList<Product> products) { 
+        int result ; 
+        
+        for (int i = 0; i > products.size(); i++) { 
+            String productName =    products.get(i).getProductName() ; 
+            String unit =           products.get(i).getUnit() ; 
+            int quantity =          products.get(i).getTotalQuantity() ; 
+            double price =          products.get(i).getPrice() ; 
+            String ingredients =    products.get(i).getIngredients() ; 
+            
+            try { 
+                addProductFromFile.setString(1, productName) ; 
+                addProductFromFile.setString(2, unit) ; 
+                addProductFromFile.setInt(3, quantity) ; 
+                addProductFromFile.setDouble(4, price) ; 
+                addProductFromFile.setString(5, ingredients) ; 
+
+                result = addProductFromFile.executeUpdate() ; 
+                System.out.println("Added product with name: " + products.get(0).getProductName()) ; 
+
+            } catch (SQLException e) { 
+                System.out.println("Something went wrong with executing update to add "
+                        + "products from file\nMessage: " + e.getMessage()) ;
+            }
+        }
+        
+    }
+    
+    /** 
+     * 
+     * @param name
+     * @param productId
+     * @return 
+     */
+    public Product getSingularProduct(String name, int productId) { 
+        /* 
+        Baasing check off the name. Make sure names are input correctly first 
+        also maybe implement error handling to ensure no double ups 
+        
+        With error handling: 
+        Get all products, invoke that method. Then get the names and check each 
+            time, have boolean that upon "result.equals(name)" then change to 
+            true. If true, then send back to server string stating "name of product
+            already exists" which will send back to the client as an error message. 
+            Then if flase, get the whole product and return it, since multiple 
+            applications 
+        Then that's it for this method. ID is also given as it will be used for 
+            another method. 0 if using name, null string is using ID 
+        */
+        return new Product() ; 
+    }
+    
+    /** 
+     * 
+     * @param productId 
+     * @param name 
+     * @param unit 
+     * @param quantity 
+     * @param price 
+     * @param ingredients 
+     */
+    public void editProduct(int productId, String name, String unit, int quantity,
+            double price, String ingredients) { 
+        /* 
+        Simply just editing, nothing too fancy. Use the product id gotten from 
+            getSingularProduct(name, ID) method (Probs using ID since would have 
+            gotten them all) 
+        Then pass through actual changes and then commit 
+        */
+    }
+    
+    /** 
+     * 
+     * @param productId 
+     */
+    public void deleteProduct(int productId) { 
+        /* 
+        Just good old delete. Won't bother with product id reshuffling, would 
+        mess things up. Don't implement yet until know we need to since would create
+        a headache upon needing error handlng 
+        */
+    }
+    
+    /** 
+     * Adding customer order. Will take: 
+     * CustomerId, array of ProductId + one for quantity of each, Date, Time, Cost
+     * @param customerId    
+     * @param productId     
+     * @param quantity      
+     * @param date          
+     * @param time          
+     * @param cost          
+     */
+    public void addCustomerOrder(int customerId, int[] productId, int quantity, 
+            String date, String time, double cost) { 
+        /* 
+        Add the order first since it just needs the customerID 
+        Afterwards take the arrays of productIds and quantities and then 
+            add to the orderId that will be gotten via query (would need to go 
+            through the list btw and make sure that the latest order is gotten 
+            if multiple are returned) - This will then make the attached products
+        After that take the CustomerId, OrderId, day, time, cost and then insert 
+            into the database 
+        Send back all good confirmation to the server, which will send it back 
+            to the client which will prompt an info message, if error, then error
+            message 
+        
+        */
+    }
     
 }
