@@ -27,6 +27,7 @@ public class DatabaseConnection {
     private PreparedStatement deleteProduct = null ; 
     private PreparedStatement getProduct = null ; 
     private PreparedStatement getAllProducts = null ; 
+    private PreparedStatement decreaseProductQuantity = null ; 
     
     //Queries regarding deliveries 
     private PreparedStatement getCustomerDeliverySchedule = null ; 
@@ -55,26 +56,35 @@ public class DatabaseConnection {
             addProductFromFile = connection.prepareStatement(
                     "INSERT INTO pproducts (product_name, unit, quantity, "
                             + "price, ingredients) VALUES (?, ?, ?, ?, ?)") ; 
-            //addProduct = connection.prepareStatement("") ; 
+            addProduct = connection.prepareStatement("INSERT INTO products "
+                    + "(product_name, unit, quantity, price, ingredients) "
+                    + "VALUES (?, ?, ?, ?, ?)") ; 
             //editProduct = connection.prepareStatement("") ; 
-            //deleteProduct = connection.prepareStatement("") ; 
+            deleteProduct = connection.prepareStatement("DELETE FROM products "
+                    + "WHERE product_id = ?") ; 
             getAllProducts = connection.prepareStatement("SELECT * "
                     + "FROM products") ; 
+            decreaseProductQuantity = connection.prepareStatement(
+                "") ; 
             
             //Delivery Schedule queries 
             getCustomerDeliverySchedule = connection.prepareStatement(
                     "SELECT * FROM delivery_schedule WHERE customer_id "
                             + "= ?") ; 
-            //getAllDeliverySchedules = connection.prepareStatement("") ; 
+            getAllDeliverySchedules = connection.prepareStatement("SELECT * "
+                    + "FROM delivery_schedule") ; 
             getCustomerOrderProducts = connection.prepareStatement( 
             "SELECT * FROM order_contents WHERE order_id = ?") ; 
             
-            addCustomerOrder = connection.prepareStatement("") ; 
+            addCustomerOrder = connection.prepareStatement("INSERT INTO orders "
+                    + "(customer_id) VALUES (?)") ; 
             getCustomerOrderId = connection.prepareStatement("SELECT order_id"
                     + "FROM orders WHERE customer_id = ?") ; 
-            addCustomerOrderProduct = connection.prepareStatement("") ; 
-            addCustomerDeliverySchedule = connection.prepareStatement(
-                "") ; 
+            addCustomerOrderProduct = connection.prepareStatement(
+                    "INSERT INTO order_contents (order_id, product_id, "
+                            + "quantity) VALUES (?, ?, ?)") ; 
+            //addCustomerDeliverySchedule = connection.prepareStatement(
+               // "") ; 
         } catch (SQLException e){System.out.println("SQL Exception: " + e.getMessage());} 
     } 
     
@@ -318,12 +328,36 @@ public class DatabaseConnection {
      */
     public void addCustomerOrder(int customerId, int[] productId, int quantity, 
             String date, String time, double cost) { 
+        ResultSet resultSet = null ; 
+        int result = 0 ; 
+        
+        try { 
+            addCustomerOrder.setInt(1, customerId) ; 
+        }catch (SQLException e) { 
+                System.out.println("Something went wrong with executing update to add "
+                        + "customer order\nMessage: " + e.getMessage()) ;
+            }
+        
+        /* 
+        //INT CustomerId
+            addCustomerOrder = connection.prepareStatement("INSERT INTO orders "
+                    + "(customer_id) VALUES (?)") ; 
+        
+        //INT OrderID 
+            getCustomerOrderId = connection.prepareStatement("SELECT order_id"
+                    + "FROM orders WHERE customer_id = ?") ; 
+        //INT OrderID, INT ProductID, INT Quantity
+            addCustomerOrderProduct = connection.prepareStatement(
+                    "INSERT INTO order_contents (order_id, product_id, "
+                            + "quantity) VALUES (?, ?, ?)") ; 
+        */
+        
         /* 
         Add the order first since it just needs the customerID 
         Afterwards take the arrays of productIds and quantities and then 
             add to the orderId that will be gotten via query (would need to go 
             through the list btw and make sure that the latest order is gotten 
-            if multiple are returned) - This will then make the attached products
+            if multiple are returned) - This will then make the attached products 
         After that take the CustomerId, OrderId, day, time, cost and then insert 
             into the database 
         Send back all good confirmation to the server, which will send it back 
