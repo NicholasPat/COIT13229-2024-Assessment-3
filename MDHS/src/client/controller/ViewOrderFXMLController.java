@@ -19,7 +19,7 @@ import javafx.scene.layout.AnchorPane;
  *
  * @author lucht
  */
-public class ViewOrderFXMLController implements Initializable {
+public class ViewOrderFXMLController implements Initializable, SceneController {
 
     @FXML
     private AnchorPane contentAnchorPane;
@@ -56,6 +56,10 @@ public class ViewOrderFXMLController implements Initializable {
     @FXML
     private TextField deliveryTimeTextField;
 
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */

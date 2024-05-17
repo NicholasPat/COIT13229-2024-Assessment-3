@@ -18,7 +18,7 @@ import javafx.scene.layout.AnchorPane;
  *
  * @author lucht
  */
-public class ViewScheduleFXMLController implements Initializable {
+public class ViewScheduleFXMLController implements Initializable, SceneController {
 
     @FXML
     private AnchorPane contentAnchorPane;
@@ -35,6 +35,10 @@ public class ViewScheduleFXMLController implements Initializable {
     @FXML
     private TextArea thursdayTextArea;
 
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */

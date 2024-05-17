@@ -19,7 +19,7 @@ import javafx.scene.layout.AnchorPane;
  *
  * @author lucht
  */
-public class RegisterFXMLController implements Initializable {
+public class RegisterFXMLController implements Initializable, SceneController {
 
     @FXML
     private AnchorPane contentAnchorPane;
@@ -44,6 +44,10 @@ public class RegisterFXMLController implements Initializable {
     @FXML
     private Button dashboardButton;
 
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */

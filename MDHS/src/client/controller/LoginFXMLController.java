@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
  *
  * @author lucht
  */
-public class LoginFXMLController implements Initializable {
+public class LoginFXMLController implements Initializable, SceneController {
 
     @FXML
     private Button backButton;
@@ -29,7 +29,11 @@ public class LoginFXMLController implements Initializable {
     private Button loginButton;
     @FXML
     private Button registerButton;
-
+    
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */

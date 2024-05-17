@@ -19,7 +19,7 @@ import javafx.scene.layout.AnchorPane;
  *
  * @author lucht
  */
-public class PlaceOrderFXMLController implements Initializable {
+public class PlaceOrderFXMLController implements Initializable, SceneController {
 
     @FXML
     private AnchorPane contentAnchorPane;
@@ -56,6 +56,10 @@ public class PlaceOrderFXMLController implements Initializable {
     @FXML
     private Button cancelOrderButton;
 
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */

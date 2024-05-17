@@ -19,7 +19,7 @@ import javafx.scene.layout.AnchorPane;
  *
  * @author lucht
  */
-public class ManageProductFXMLController implements Initializable {
+public class ManageProductFXMLController implements Initializable, SceneController {
 
     @FXML
     private AnchorPane contentAnchorPane;
@@ -53,7 +53,11 @@ public class ManageProductFXMLController implements Initializable {
     private Button searchButton;
     @FXML
     private Button newButton;
-
+    
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */

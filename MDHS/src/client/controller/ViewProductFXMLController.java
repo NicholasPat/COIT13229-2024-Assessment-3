@@ -19,7 +19,7 @@ import javafx.scene.layout.AnchorPane;
  *
  * @author lucht
  */
-public class ViewProductFXMLController implements Initializable {
+public class ViewProductFXMLController implements Initializable, SceneController {
 
     @FXML
     private AnchorPane contentAnchorPane;
@@ -44,6 +44,10 @@ public class ViewProductFXMLController implements Initializable {
     @FXML
     private TextField totalIndexTextField;
 
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */

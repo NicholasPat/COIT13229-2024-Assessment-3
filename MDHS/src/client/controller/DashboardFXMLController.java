@@ -16,7 +16,7 @@ import javafx.scene.control.Button;
  *
  * @author lucht
  */
-public class DashboardFXMLController implements Initializable {
+public class DashboardFXMLController implements Initializable, SceneController {
 
     @FXML
     private Button exitButton;
@@ -39,6 +39,10 @@ public class DashboardFXMLController implements Initializable {
     @FXML
     private Button orderRecordsButton;
 
+    @Override
+    public void handleSceneChange() {
+        // TODO
+    }
     /**
      * Initializes the controller class.
      */
