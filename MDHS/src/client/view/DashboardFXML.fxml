@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardFXMLController">
+   <children>
+      <Button fx:id="exitButton" layoutX="283.0" layoutY="361.0" mnemonicParsing="false" onAction="#exitButtonHandler" text="Exit" />
+      <Button fx:id="loginButtton" layoutX="44.0" layoutY="112.0" mnemonicParsing="false" onAction="#loginButtonHandler" text="Login" />
+      <Button fx:id="registerButton" layoutX="44.0" layoutY="157.0" mnemonicParsing="false" onAction="#registerButtonHandler" text="Register" />
+      <Button fx:id="viewScheduleButton" layoutX="272.0" layoutY="112.0" mnemonicParsing="false" onAction="#viewScheduleButtonHandler" text="Schedule" />
+      <Button fx:id="viewProductsButton" layoutX="273.0" layoutY="157.0" mnemonicParsing="false" onAction="#viewProductsButtonHandler" text="Products" />
+      <Button fx:id="placeOrderButton" layoutX="281.0" layoutY="213.0" mnemonicParsing="false" onAction="#placeOrderButtonHandler" text="Order" />
+      <Button fx:id="manageProductsButton" layoutX="446.0" layoutY="112.0" mnemonicParsing="false" onAction="#manageProductsButtonHandler" text="Manage products" />
+      <Button fx:id="manageScheduleButton" layoutX="445.0" layoutY="157.0" mnemonicParsing="false" onAction="#manageScheduleButtonHandler" text="Manage Schedule" />
+      <Button fx:id="customerRecordsButton" layoutX="444.0" layoutY="213.0" mnemonicParsing="false" onAction="#customerRecordsButtonHandler" text="Customer Records" />
+      <Button fx:id="orderRecordsButton" layoutX="463.0" layoutY="269.0" mnemonicParsing="false" onAction="#orderRecordsButtonHandler" text="Order Records" />
+      <Label layoutX="129.0" layoutY="14.0" text="Maleny Dairy to Home System">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="231.0" layoutY="49.0" text="Register" underline="true">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

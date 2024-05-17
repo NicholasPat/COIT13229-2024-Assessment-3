@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ViewScheduleFXMLController">
+   <children>
+      <Label layoutX="130.0" layoutY="8.0" text="Maleny Dairy to Home System">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="225.0" layoutY="43.0" text="Schedule" underline="true">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+      <Button fx:id="dashboardButton" layoutX="24.0" layoutY="347.0" mnemonicParsing="false" onAction="#dashboardButtonHandler" prefHeight="39.0" prefWidth="175.0" text="&lt;&lt; Dashboard">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <GridPane layoutX="23.0" layoutY="112.0" prefHeight="218.0" prefWidth="555.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints maxHeight="68.0" minHeight="0.0" prefHeight="24.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="161.0" minHeight="0.0" prefHeight="146.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <TextArea fx:id="mondayTextArea" editable="false" prefHeight="74.0" prefWidth="139.0" GridPane.rowIndex="1" />
+            <TextArea fx:id="tuesdayTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextArea fx:id="wednesdayTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label text="Monday" />
+            <Label text="Tuesday" GridPane.columnIndex="1" />
+            <Label text="Wednesday" GridPane.columnIndex="2" />
+            <Label text="Thursday" GridPane.columnIndex="3" />
+            <Label text="Friday" GridPane.columnIndex="4" />
+            <TextArea fx:id="fridayTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <TextArea fx:id="thursdayTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>
