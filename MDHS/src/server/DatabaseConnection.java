@@ -2,7 +2,6 @@
 package server;
 
 import java.sql.*;
-import javafx.scene.control.Alert;
 
 /**
  *
@@ -19,8 +18,7 @@ public class DatabaseConnection {
             // attempt to establish dmbs connection
             connection = DriverManager.getConnection( URL,USERNAME,PASSWORD );
         } catch (SQLException sqlException ) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Database connection failure. \nPlease check your dbms password.");   
-            alert.showAndWait();
+            System.out.println("Database connection failure. \nPlease check your dbms password.");   
             sqlException.printStackTrace();
             System.exit( 1 ); // exit if couldnt connect to db
         }
