@@ -3,26 +3,41 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.LoginFXMLController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.LoginFXMLController">
    <children>
-      <Button fx:id="backButton" layoutX="283.0" layoutY="361.0" mnemonicParsing="false" onAction="#backButtonHandler" text="Back" />
-      <TextField fx:id="emailTextField" layoutX="226.0" layoutY="149.0" />
-      <TextField fx:id="passwordTextField" layoutX="226.0" layoutY="218.0" />
-      <Label layoutX="151.0" layoutY="161.0" text="Email" />
-      <Label layoutX="140.0" layoutY="222.0" text="Password" />
-      <Button fx:id="loginButton" layoutX="340.0" layoutY="294.0" mnemonicParsing="false" onAction="#loginButtonHandler" text="Login" />
-      <Button fx:id="registerButton" layoutX="187.0" layoutY="294.0" mnemonicParsing="false" onAction="#registerButtonHandler" text="Register" />
-      <Label layoutX="129.0" layoutY="19.0" text="Maleny Dairy to Home System">
+      <Button fx:id="backButton" layoutX="17.0" layoutY="359.0" mnemonicParsing="false" onAction="#backButtonHandler" text="&lt; Back">
          <font>
-            <Font name="System Bold" size="24.0" />
+            <Font size="14.0" />
+         </font></Button>
+      <TextField fx:id="emailTextField" layoutX="238.0" layoutY="188.0" />
+      <TextField fx:id="passwordTextField" layoutX="238.0" layoutY="218.0" />
+      <Label layoutX="199.0" layoutY="192.0" text="Email" />
+      <Label layoutX="179.0" layoutY="222.0" text="Password" />
+      <Button fx:id="loginButton" layoutX="290.0" layoutY="259.0" mnemonicParsing="false" onAction="#loginButtonHandler" style="-fx-background-color: #9fb96c;" text="Login" />
+      <Button fx:id="registerButton" layoutX="281.0" layoutY="334.0" mnemonicParsing="false" onAction="#registerButtonHandler" text="Register" />
+      <Label layoutX="113.0" layoutY="88.0" text="Maleny Dairy to Home System">
+         <font>
+            <Font name="System Bold" size="28.0" />
          </font>
       </Label>
-      <Label layoutX="230.0" layoutY="54.0" text="Register" underline="true">
+      <Label layoutX="278.0" layoutY="128.0" text="Login" underline="true">
          <font>
-            <Font name="System Bold" size="36.0" />
+            <Font name="System Bold" size="26.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="99.0" fitWidth="179.0" layoutX="223.0">
+         <image>
+            <Image url="@../resources/mfd.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="197.0" layoutY="305.0" text="New user? Click here to register an account!" underline="true">
+         <font>
+            <Font name="System Italic" size="12.0" />
          </font>
       </Label>
    </children>

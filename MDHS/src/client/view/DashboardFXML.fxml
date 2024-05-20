@@ -2,30 +2,89 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardFXMLController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardFXMLController">
    <children>
-      <Button fx:id="exitButton" layoutX="283.0" layoutY="361.0" mnemonicParsing="false" onAction="#exitButtonHandler" text="Exit" />
-      <Button fx:id="loginButtton" layoutX="44.0" layoutY="112.0" mnemonicParsing="false" onAction="#loginButtonHandler" text="Login" />
-      <Button fx:id="registerButton" layoutX="44.0" layoutY="157.0" mnemonicParsing="false" onAction="#registerButtonHandler" text="Register" />
-      <Button fx:id="viewScheduleButton" layoutX="272.0" layoutY="112.0" mnemonicParsing="false" onAction="#viewScheduleButtonHandler" text="Schedule" />
-      <Button fx:id="viewProductsButton" layoutX="273.0" layoutY="157.0" mnemonicParsing="false" onAction="#viewProductsButtonHandler" text="Products" />
-      <Button fx:id="placeOrderButton" layoutX="281.0" layoutY="213.0" mnemonicParsing="false" onAction="#placeOrderButtonHandler" text="Order" />
-      <Button fx:id="manageProductsButton" layoutX="446.0" layoutY="112.0" mnemonicParsing="false" onAction="#manageProductsButtonHandler" text="Manage products" />
-      <Button fx:id="manageScheduleButton" layoutX="445.0" layoutY="157.0" mnemonicParsing="false" onAction="#manageScheduleButtonHandler" text="Manage Schedule" />
-      <Button fx:id="customerRecordsButton" layoutX="444.0" layoutY="213.0" mnemonicParsing="false" onAction="#customerRecordsButtonHandler" text="Customer Records" />
-      <Button fx:id="orderRecordsButton" layoutX="463.0" layoutY="269.0" mnemonicParsing="false" onAction="#orderRecordsButtonHandler" text="Order Records" />
-      <Label layoutX="129.0" layoutY="14.0" text="Maleny Dairy to Home System">
+      <Button fx:id="exitButton" layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#exitButtonHandler" text="&lt; Exit">
          <font>
-            <Font name="System Bold" size="24.0" />
+            <Font size="14.0" />
+         </font></Button>
+      <Button fx:id="loginButtton" layoutX="242.0" layoutY="349.0" mnemonicParsing="false" onAction="#loginButtonHandler" text="Login" />
+      <Button fx:id="registerButton" layoutX="305.0" layoutY="349.0" mnemonicParsing="false" onAction="#registerButtonHandler" text="Register" />
+      <Button fx:id="viewScheduleButton" contentDisplay="TOP" layoutX="163.0" layoutY="107.0" mnemonicParsing="false" onAction="#viewScheduleButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Schedule">
+         <graphic>
+            <ImageView fitHeight="70.0" fitWidth="70.0">
+               <image>
+                  <Image url="@../resources/sched.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="viewProductsButton" alignment="BOTTOM_CENTER" contentDisplay="TOP" layoutX="22.0" layoutY="107.0" mnemonicParsing="false" onAction="#viewProductsButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Products" textAlignment="CENTER">
+         <graphic>
+            <ImageView fitHeight="65.0" fitWidth="40.0">
+               <image>
+                  <Image url="@../resources/milk.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="placeOrderButton" contentDisplay="TOP" layoutX="305.0" layoutY="107.0" mnemonicParsing="false" onAction="#placeOrderButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Order">
+         <graphic>
+            <ImageView fitHeight="70.0" fitWidth="70.0">
+               <image>
+                  <Image url="@../resources/clip.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="manageProductsButton" contentDisplay="TOP" layoutX="22.0" layoutY="219.0" mnemonicParsing="false" onAction="#manageProductsButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Manage products">
+         <graphic>
+            <ImageView fitHeight="65.0" fitWidth="40.0">
+               <image>
+                  <Image url="@../resources/milkmanage.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="manageScheduleButton" contentDisplay="TOP" layoutX="163.0" layoutY="219.0" mnemonicParsing="false" onAction="#manageScheduleButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Manage Schedule">
+         <graphic>
+            <ImageView fitHeight="70.0" fitWidth="70.0">
+               <image>
+                  <Image url="@../resources/schedmanage.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="customerRecordsButton" contentDisplay="TOP" layoutX="446.0" layoutY="107.0" mnemonicParsing="false" onAction="#customerRecordsButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Customer Records">
+         <graphic>
+            <ImageView fitHeight="71.0" fitWidth="71.0">
+               <image>
+                  <Image url="@../resources/cust.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="orderRecordsButton" contentDisplay="TOP" layoutX="305.0" layoutY="219.0" mnemonicParsing="false" onAction="#orderRecordsButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Order Records">
+         <graphic>
+            <ImageView fitHeight="71.0" fitWidth="71.0">
+               <image>
+                  <Image url="@../resources/cliprecord.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Label layoutX="171.0" layoutY="1.0" text="Maleny Dairy to Home System">
+         <font>
+            <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label layoutX="231.0" layoutY="49.0" text="Register" underline="true">
+      <Label layoutX="234.0" layoutY="28.0" text="Dashboard" underline="true">
          <font>
-            <Font name="System Bold" size="36.0" />
+            <Font name="System Bold" size="26.0" />
          </font>
       </Label>
+      <ImageView fitHeight="53.0" fitWidth="105.0" layoutX="7.0" layoutY="5.0">
+         <image>
+            <Image url="@../resources/mfd.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

@@ -5,46 +5,48 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.PlaceOrderFXMLController">
+<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.PlaceOrderFXMLController">
    <children>
-      <Label layoutX="130.0" layoutY="8.0" text="Maleny Dairy to Home System">
+      <Label layoutX="154.0" layoutY="8.0" text="Maleny Dairy to Home System">
          <font>
-            <Font name="System Bold" size="24.0" />
+            <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label layoutX="199.0" layoutY="43.0" text="Place Orders" underline="true">
+      <Label layoutX="223.0" layoutY="35.0" text="Place Orders" underline="true">
          <font>
-            <Font name="System Bold" size="36.0" />
+            <Font name="System Bold" size="26.0" />
          </font>
       </Label>
-      <Button fx:id="dashboardButton" layoutX="24.0" layoutY="347.0" mnemonicParsing="false" onAction="#dashboardButtonHandler" prefHeight="39.0" prefWidth="175.0" text="&lt;&lt; Dashboard">
+      <Button fx:id="dashboardButton" layoutX="14.0" layoutY="353.0" mnemonicParsing="false" onAction="#dashboardButtonHandler" prefHeight="27.0" prefWidth="115.0" text="&lt; Dashboard">
          <font>
-            <Font size="18.0" />
+            <Font size="14.0" />
          </font>
       </Button>
-      <GridPane layoutX="44.0" layoutY="114.0" prefHeight="91.0" prefWidth="303.0">
+      <GridPane layoutX="58.0" layoutY="110.0" prefHeight="79.0" prefWidth="271.0">
          <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="155.0" minWidth="10.0" prefWidth="128.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="10.0" prefWidth="209.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="155.0" minWidth="10.0" prefWidth="69.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="10.0" prefWidth="202.0" />
          </columnConstraints>
          <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="41.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
             <Label text="Quantity" GridPane.rowIndex="1" />
             <Label text="Product" />
             <ChoiceBox fx:id="productChoiseBox" prefWidth="150.0" GridPane.columnIndex="1" />
-            <TextField fx:id="quantityTextField" prefHeight="25.0" prefWidth="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="quantityTextField" prefHeight="25.0" prefWidth="170.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
-      <GridPane layoutX="91.0" layoutY="202.0" prefHeight="53.0" prefWidth="192.0">
+      <GridPane layoutX="215.0" layoutY="365.0" prefHeight="30.0" prefWidth="171.0">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="81.0" minWidth="10.0" prefWidth="45.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="32.0" />
@@ -67,27 +69,32 @@
             <Label prefHeight="17.0" prefWidth="21.0" text="  of" GridPane.columnIndex="2" />
          </children>
       </GridPane>
-      <Button fx:id="addOrderItemButton" layoutX="305.0" layoutY="209.0" mnemonicParsing="false" onAction="#addOrderItemButtonHandler" prefHeight="39.0" prefWidth="42.0" text="+">
+      <Button fx:id="addOrderItemButton" layoutX="412.0" layoutY="275.0" mnemonicParsing="false" onAction="#addOrderItemButtonHandler" prefHeight="39.0" prefWidth="42.0" text="+">
          <font>
             <Font size="18.0" />
          </font>
       </Button>
-      <Button fx:id="removeOrderItemButton" layoutX="24.0" layoutY="209.0" mnemonicParsing="false" onAction="#removeOrderItemButtonHandler" prefHeight="35.0" prefWidth="41.0" text="-">
+      <Button fx:id="removeOrderItemButton" layoutX="146.0" layoutY="275.0" mnemonicParsing="false" onAction="#removeOrderItemButtonHandler" prefHeight="35.0" prefWidth="41.0" text="-">
          <font>
             <Font size="18.0" />
          </font>
       </Button>
-      <Label layoutX="47.0" layoutY="270.0" text="Delivery Time" />
-      <Label layoutX="408.0" layoutY="143.0" text="Subtotal" />
-      <Label layoutX="398.0" layoutY="183.0" text="Delivery Fee" />
-      <Label layoutX="412.0" layoutY="220.0" text="Tax" />
-      <Label layoutX="404.0" layoutY="262.0" text="Total Cost" />
-      <Button fx:id="placeOrderButton" layoutX="344.0" layoutY="314.0" mnemonicParsing="false" onAction="#placeOrderButtonHandler" prefHeight="39.0" prefWidth="212.0" text="Place Order" />
-      <TextField fx:id="subtotalTextField" layoutX="477.0" layoutY="139.0" prefHeight="25.0" prefWidth="115.0" />
-      <TextField fx:id="deliveryCostTextField" layoutX="477.0" layoutY="179.0" prefHeight="25.0" prefWidth="115.0" />
-      <TextField fx:id="taxTextField" layoutX="477.0" layoutY="216.0" prefHeight="25.0" prefWidth="115.0" />
-      <TextField fx:id="deliveryTimeTextField" layoutX="151.0" layoutY="266.0" />
-      <TextField fx:id="totalCostTextField" layoutX="477.0" layoutY="258.0" prefHeight="25.0" prefWidth="115.0" />
-      <Button fx:id="cancelOrderButton" layoutX="407.0" layoutY="367.0" mnemonicParsing="false" onAction="#cancelOrderButtonHandler" text="Cancel Order" />
+      <Label layoutX="36.0" layoutY="191.0" text="Delivery Time" />
+      <Label layoutX="388.0" layoutY="108.0" text="Subtotal" />
+      <Label layoutX="366.0" layoutY="143.0" text="Delivery Fee" />
+      <Label layoutX="409.0" layoutY="177.0" text="Tax" />
+      <Label layoutX="372.0" layoutY="214.0" text="Total Cost" />
+      <Button fx:id="placeOrderButton" layoutX="194.0" layoutY="275.0" mnemonicParsing="false" onAction="#placeOrderButtonHandler" prefHeight="39.0" prefWidth="212.0" style="-fx-background-color: #9fb96c;" text="Place Order" />
+      <TextField fx:id="subtotalTextField" layoutX="445.0" layoutY="104.0" prefHeight="25.0" prefWidth="115.0" />
+      <TextField fx:id="deliveryCostTextField" layoutX="445.0" layoutY="139.0" prefHeight="25.0" prefWidth="115.0" />
+      <TextField fx:id="taxTextField" layoutX="445.0" layoutY="173.0" prefHeight="25.0" prefWidth="115.0" />
+      <TextField fx:id="deliveryTimeTextField" layoutX="126.0" layoutY="187.0" prefHeight="25.0" prefWidth="202.0" />
+      <TextField fx:id="totalCostTextField" layoutX="445.0" layoutY="210.0" prefHeight="25.0" prefWidth="115.0" />
+      <Button fx:id="cancelOrderButton" layoutX="257.0" layoutY="328.0" mnemonicParsing="false" onAction="#cancelOrderButtonHandler" text="Cancel Order" />
+      <ImageView fitHeight="53.0" fitWidth="105.0" layoutX="6.0" layoutY="8.0">
+         <image>
+            <Image url="@../resources/mfd.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>
