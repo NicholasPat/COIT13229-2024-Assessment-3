@@ -4,7 +4,8 @@
  */
 package client.controller;
 
-import client.MDHSClient;
+import client.*;
+import common.model.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -22,8 +23,6 @@ public class DashboardFXMLController implements Initializable, SceneController {
     @FXML
     private Button exitButton;
     @FXML
-    private Button loginButtton;
-    @FXML
     private Button registerButton;
     @FXML
     private Button viewScheduleButton;
@@ -40,16 +39,69 @@ public class DashboardFXMLController implements Initializable, SceneController {
     @FXML
     private Button orderRecordsButton;
 
+    private Session session; 
+    @FXML
+    private Button loginButton;
+    @FXML
+    private Button logoutButton;
+    
     @Override
     public void handleSceneChange() {
-        // TODO
+        session = Session.getSession();
+        Account user = session.getUser();
+        
+        if (user instanceof Customer) {
+            loginButton.setDisable(true);
+            registerButton.setDisable(true);
+            logoutButton.setDisable(false);
+            viewScheduleButton.setDisable(false);
+            viewProductsButton.setDisable(false);
+            placeOrderButton.setDisable(false);
+            manageProductsButton.setDisable(true);
+            manageScheduleButton.setDisable(true);
+            customerRecordsButton.setDisable(true);
+            orderRecordsButton.setDisable(true);
+        } else if (user instanceof Administrator) {
+            loginButton.setDisable(true);
+            registerButton.setDisable(true);
+            logoutButton.setDisable(false);
+            viewScheduleButton.setDisable(true);
+            viewProductsButton.setDisable(true);
+            placeOrderButton.setDisable(true);
+            manageProductsButton.setDisable(false);
+            manageScheduleButton.setDisable(false);
+            customerRecordsButton.setDisable(false);
+            orderRecordsButton.setDisable(false);
+        } else {
+            loginButton.setDisable(false);
+            registerButton.setDisable(false);
+            logoutButton.setDisable(true);
+            viewScheduleButton.setDisable(true);
+            viewProductsButton.setDisable(true);
+            placeOrderButton.setDisable(true);
+            manageProductsButton.setDisable(true);
+            manageScheduleButton.setDisable(true);
+            customerRecordsButton.setDisable(true);
+            orderRecordsButton.setDisable(true);
+        }
     }
+    
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        // Disable all but login buttons
+        loginButton.setDisable(false);
+        registerButton.setDisable(false);
+        logoutButton.setDisable(true);
+        viewScheduleButton.setDisable(true);
+        viewProductsButton.setDisable(true);
+        placeOrderButton.setDisable(true);
+        manageProductsButton.setDisable(true);
+        manageScheduleButton.setDisable(true);
+        customerRecordsButton.setDisable(true);
+        orderRecordsButton.setDisable(true);
     }    
 
     @FXML
@@ -100,6 +152,13 @@ public class DashboardFXMLController implements Initializable, SceneController {
     @FXML
     private void orderRecordsButtonHandler(ActionEvent event) {
         MDHSClient.changeScene(MDHSClient.SceneType.VIEW_ORDERS);
+    }
+
+    @FXML
+    private void logoutButtonHandler(ActionEvent event) {
+        Session session = Session.getSession();
+        session.setUser(null);
+        MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
     
 }

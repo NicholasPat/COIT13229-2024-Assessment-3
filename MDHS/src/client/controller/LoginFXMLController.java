@@ -4,7 +4,8 @@
  */
 package client.controller;
 
-import client.MDHSClient;
+import client.*;
+import common.model.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -50,6 +51,9 @@ public class LoginFXMLController implements Initializable, SceneController {
 
     @FXML
     private void loginButtonHandler(ActionEvent event) {
+        Session session = Session.getSession();
+        session.setUser(new Customer());
+        MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
 
     @FXML

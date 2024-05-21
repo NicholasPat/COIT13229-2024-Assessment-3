@@ -7,15 +7,15 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardFXMLController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardFXMLController">
    <children>
       <Button fx:id="exitButton" layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#exitButtonHandler" text="&lt; Exit">
          <font>
             <Font size="14.0" />
          </font></Button>
-      <Button fx:id="loginButtton" layoutX="242.0" layoutY="349.0" mnemonicParsing="false" onAction="#loginButtonHandler" text="Login" />
+      <Button fx:id="loginButton" layoutX="242.0" layoutY="349.0" mnemonicParsing="false" onAction="#loginButtonHandler" text="Login" />
       <Button fx:id="registerButton" layoutX="305.0" layoutY="349.0" mnemonicParsing="false" onAction="#registerButtonHandler" text="Register" />
-      <Button fx:id="viewScheduleButton" contentDisplay="TOP" layoutX="163.0" layoutY="107.0" mnemonicParsing="false" onAction="#viewScheduleButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Schedule">
+      <Button fx:id="viewScheduleButton" contentDisplay="TOP" layoutX="446.0" layoutY="107.0" mnemonicParsing="false" onAction="#viewScheduleButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Schedule">
          <graphic>
             <ImageView fitHeight="70.0" fitWidth="70.0">
                <image>
@@ -31,7 +31,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="placeOrderButton" contentDisplay="TOP" layoutX="305.0" layoutY="107.0" mnemonicParsing="false" onAction="#placeOrderButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Order">
+      <Button fx:id="placeOrderButton" contentDisplay="TOP" layoutX="163.0" layoutY="107.0" mnemonicParsing="false" onAction="#placeOrderButtonHandler" prefHeight="100.0" prefWidth="267.0" text="Order">
          <graphic>
             <ImageView fitHeight="70.0" fitWidth="70.0">
                <image>
@@ -47,7 +47,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="manageScheduleButton" contentDisplay="TOP" layoutX="163.0" layoutY="219.0" mnemonicParsing="false" onAction="#manageScheduleButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Manage Schedule">
+      <Button fx:id="manageScheduleButton" contentDisplay="TOP" layoutX="446.0" layoutY="219.0" mnemonicParsing="false" onAction="#manageScheduleButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Manage Schedule">
          <graphic>
             <ImageView fitHeight="70.0" fitWidth="70.0">
                <image>
@@ -55,7 +55,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="customerRecordsButton" contentDisplay="TOP" layoutX="446.0" layoutY="107.0" mnemonicParsing="false" onAction="#customerRecordsButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Customer Records">
+      <Button fx:id="customerRecordsButton" contentDisplay="TOP" layoutX="163.0" layoutY="219.0" mnemonicParsing="false" onAction="#customerRecordsButtonHandler" prefHeight="100.0" prefWidth="125.0" text="Customer Records">
          <graphic>
             <ImageView fitHeight="71.0" fitWidth="71.0">
                <image>
@@ -86,5 +86,6 @@
             <Image url="@../resources/mfd.png" />
          </image>
       </ImageView>
+      <Button fx:id="logoutButton" layoutX="525.0" layoutY="349.0" mnemonicParsing="false" onAction="#logoutButtonHandler" text="Logout" />
    </children>
 </AnchorPane>

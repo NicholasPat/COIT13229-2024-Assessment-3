@@ -16,16 +16,16 @@ import common.model.Account;
  */
 public class Session {
     /* Session Information */
-    private static Account user;
-    private static PublicKey publicKey;
+    private Account user;
+    private PublicKey publicKey;
     
     /* Connection */
     private static final int serverPort = 6811;
     private static final String hostName = "localhost" ; 
     
-    private static Socket socket ; 
-    private static ObjectOutputStream objOut; 
-    private static ObjectInputStream objIn; 
+    private Socket socket ; 
+    private ObjectOutputStream objOut; 
+    private ObjectInputStream objIn; 
     
     
     
@@ -42,7 +42,7 @@ public class Session {
         initialiseConnection();
     }
     
-    public static void initialiseConnection() { 
+    public void initialiseConnection() { 
         try {
             socket = new Socket(hostName, serverPort);
             objOut =new ObjectOutputStream( socket.getOutputStream() );
@@ -59,7 +59,7 @@ public class Session {
         }
     }
     
-    public static void setPublicKey() { 
+    private void setPublicKey() { 
         try { 
             //dataOut.writeUTF("Public key please") ; 
             int pubKeyLength = objIn.readInt() ; 
@@ -76,5 +76,12 @@ public class Session {
         } catch (NoSuchAlgorithmException ex) {ex.printStackTrace();
         } catch (InvalidKeySpecException ex) {ex.printStackTrace();}
     }
-    
+
+    public Account getUser() {
+        return user;
+    }
+
+    public void setUser(Account user) {
+        this.user = user;
+    }
 }
