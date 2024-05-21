@@ -4,6 +4,7 @@
  */
 package client.controller;
 
+import client.MDHSClient;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -53,42 +54,52 @@ public class DashboardFXMLController implements Initializable, SceneController {
 
     @FXML
     private void exitButtonHandler(ActionEvent event) {
+        System.exit(0);
     }
 
     @FXML
     private void loginButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.LOGIN);
     }
 
     @FXML
     private void registerButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.REGISTER);
     }
 
     @FXML
     private void viewScheduleButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.VIEW_SCHEDULE);
     }
 
     @FXML
     private void viewProductsButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.VIEW_PRODUCTS);
     }
 
     @FXML
     private void placeOrderButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.PLACE_ORDER);
     }
 
     @FXML
     private void manageProductsButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.MANAGE_PRODUCTS);
     }
 
     @FXML
     private void manageScheduleButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.MANAGE_SCHEDULE);
     }
 
     @FXML
     private void customerRecordsButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.VIEW_CUSTOMERS);
     }
 
     @FXML
     private void orderRecordsButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.VIEW_ORDERS);
     }
     
 }

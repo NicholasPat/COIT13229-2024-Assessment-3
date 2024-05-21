@@ -4,6 +4,7 @@
  */
 package client.controller;
 
+import client.MDHSClient;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -62,6 +63,7 @@ public class ViewCustomerFXMLController implements Initializable, SceneControlle
 
     @FXML
     private void dashboardButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
 
     @FXML

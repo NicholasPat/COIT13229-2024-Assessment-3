@@ -4,6 +4,7 @@
  */
 package client.controller;
 
+import client.MDHSClient;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -44,6 +45,7 @@ public class LoginFXMLController implements Initializable, SceneController {
 
     @FXML
     private void backButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
 
     @FXML
@@ -52,6 +54,7 @@ public class LoginFXMLController implements Initializable, SceneController {
 
     @FXML
     private void registerButtonHandler(ActionEvent event) {
+        MDHSClient.changeScene(MDHSClient.SceneType.REGISTER);
     }
     
 }
