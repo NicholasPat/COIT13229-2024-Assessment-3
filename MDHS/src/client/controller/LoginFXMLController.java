@@ -37,14 +37,14 @@ public class LoginFXMLController implements Initializable, SceneController {
     
     @Override
     public void handleSceneChange() {
-        // TODO
+        clear();
     }
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        clear();
+        // TODO
     }    
 
     @FXML
