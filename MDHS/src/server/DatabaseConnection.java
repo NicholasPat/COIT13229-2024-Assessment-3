@@ -61,8 +61,8 @@ public class DatabaseConnection {
         
         //Account related queries
         addAccount = connection.prepareStatement("INSERT INTO Account "
-                + "(firstName, lastName, emailAddress, `password`, phoneNumber, deliveryAddress, isAdmin)"
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+                + "(firstName, lastName, emailAddress, `password`, phoneNumber, deliveryAddress, postcode, isAdmin)"
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         getAccountByEmail = connection.prepareStatement("SELECT * "
                 + "FROM Account "
                 + "WHERE emailAddress = ?");
@@ -146,5 +146,44 @@ public class DatabaseConnection {
         } finally {try {results.close() ;}catch (SQLException sqlException){System.out.println("SQL Exception: " + sqlException.getMessage());}}
         //System.out.println(acc);
         return acc;
+    }
+    
+    public Boolean addAccount(Account acc) { 
+        try { 
+            String password = new String(acc.getPassword(), StandardCharsets.UTF_8);
+            
+            addAccount.setString(1, acc.getFirstName());
+            addAccount.setString(2, acc.getLastName());
+            addAccount.setString(3, acc.getEmailAddress());
+            addAccount.setString(4, password);
+                
+            if (acc instanceof Administrator) {
+                addAccount.setNull(5, Types.INTEGER);
+                addAccount.setNull(6, Types.VARCHAR); 
+                addAccount.setNull(7, Types.INTEGER);
+                addAccount.setInt(8, 1);
+            } else if (acc instanceof Customer) {
+                Customer customer = (Customer) acc;
+                addAccount.setInt(5, customer.getPhoneNumber());
+                addAccount.setString(6, customer.getDeliveryAddress());
+                addAccount.setInt(7, customer.getPostcode());
+                addAccount.setInt(8, 0); 
+            } else {
+                return null;
+            }
+           
+            int resultSet = addAccount.executeUpdate() ; 
+            
+            //0 is thrown if no rows are updated, so if successful, should result in a number that is not 0
+            if (resultSet != 0) { 
+                return true;
+            } else { 
+                return false; 
+            }
+            
+        } catch (SQLException ex) { 
+            System.out.println("SQL Exception: " + ex.getMessage()) ; 
+            return false;
+        }
     }
 }

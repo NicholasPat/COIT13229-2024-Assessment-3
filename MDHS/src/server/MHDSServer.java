@@ -105,6 +105,32 @@ class ConnectionThread extends Thread {
                     }
                     
                 } else if (option.equalsIgnoreCase("Register")){ 
+                    System.out.println("Register");
+                    
+                    Account acc = (Account) objIn.readObject();
+                    
+                    try {
+                        String pwd = Authenticator.decrypt(authenticator.getPrivateKey(), acc.getPassword());
+                        byte[] passwordBytes = pwd.getBytes(StandardCharsets.UTF_8);
+                        acc.setPassword(passwordBytes);
+                        
+                        // insert account
+                        Boolean accAdded = database.addAccount(acc);
+                        if (accAdded) {
+                            acc.setPassword(null); // clear password before transmitting
+                            objOut.writeObject(acc);
+                            System.out.println("Registration successful: " + acc.getEmailAddress());
+                        } else {
+                            objOut.writeObject(null);
+                            System.out.println("Registration failed.");
+                        }
+                    } catch (NoSuchAlgorithmException ex) {System.out.println("Algorithm: " + ex.getMessage());
+                    } catch (NoSuchPaddingException ex) {System.out.println("Padding: " + ex.getMessage());
+                    } catch (InvalidKeyException ex) {System.out.println("Invalid key: " + ex.getMessage());
+                    } catch (InvalidAlgorithmParameterException ex) {System.out.println("Invalid parameter: " + ex.getMessage());
+                    } catch (IllegalBlockSizeException ex) {System.out.println("Block size: " + ex.getMessage());
+                    } catch (BadPaddingException ex) {System.out.println("Bad padding: " + ex.getMessage());
+                    }
                     
                 } else if (option.equalsIgnoreCase("AllOrders")){ 
                     
