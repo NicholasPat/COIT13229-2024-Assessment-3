@@ -67,6 +67,7 @@ public class MDHSClient extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Session session = Session.getSession(); // initialise session (server connection)
         launch(args);
     }
     

@@ -3,11 +3,7 @@ package client;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.*;
 
 import common.model.Account;
 /**
@@ -24,8 +20,8 @@ public class Session {
     private static final String hostName = "localhost" ; 
     
     private Socket socket ; 
-    private ObjectOutputStream objOut; 
-    private ObjectInputStream objIn; 
+    public ObjectOutputStream objOut; 
+    public ObjectInputStream objIn; 
     
     
     
@@ -61,20 +57,20 @@ public class Session {
     
     private void setPublicKey() { 
         try { 
+            publicKey = (PublicKey) objIn.readObject();
+            
             //dataOut.writeUTF("Public key please") ; 
-            int pubKeyLength = objIn.readInt() ; 
-            byte[] bytesPublicKey = new byte[pubKeyLength] ; 
-            objIn.readFully(bytesPublicKey, 0, pubKeyLength) ; 
+            //int pubKeyLength = objIn.readInt() ; 
+            //byte[] bytesPublicKey = new byte[pubKeyLength] ; 
+            //objIn.readFully(bytesPublicKey, 0, pubKeyLength) ; 
             
-            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
+            //X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
+            //KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
             
-            publicKey = keyFactory.generatePublic(pubKeySpec) ; 
-            
-            System.out.println("Public Key from the server: " + publicKey) ; 
-        } catch (IOException e) {System.out.println("readline:"+e.getMessage());
-        } catch (NoSuchAlgorithmException ex) {ex.printStackTrace();
-        } catch (InvalidKeySpecException ex) {ex.printStackTrace();}
+            //publicKey = keyFactory.generatePublic(pubKeySpec) ; 
+        } catch (IOException e) {System.out.println("IO:"+e.getMessage());
+        } catch (ClassNotFoundException e) {System.out.println("CNF:"+e.getMessage());
+        }
     }
 
     public Account getUser() {
@@ -84,4 +80,8 @@ public class Session {
     public void setUser(Account user) {
         this.user = user;
     }
+
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }  
 }

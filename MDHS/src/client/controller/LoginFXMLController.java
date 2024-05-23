@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package client.controller;
 
 import client.*;
@@ -9,8 +6,6 @@ import common.Authenticator;
 import common.model.*;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -72,7 +67,7 @@ public class LoginFXMLController implements Initializable, SceneController {
             if (response instanceof Account) {
                 Account user = (Account) response;
                 System.out.println("Login successful: " + user.getEmailAddress());
-                session.setUser(user);
+                session.setUser(user); // login (set user to session) & return to dashboard
                 MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
             } else if (response == null) {
                 System.out.println("Login failed: Invalid credentials");

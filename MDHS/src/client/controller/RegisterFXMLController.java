@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package client.controller;
 
 import client.MDHSClient;
@@ -95,7 +92,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
             if (response instanceof Account) {
                 Account user = (Account) response;
                 System.out.println("Registration successful: " + user.getEmailAddress());
-                session.setUser(user);
+                session.setUser(user);  // login (set user to session) & return to dashboard
                 MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
             } else if (response == null) {
                 System.out.println("Registration Failed.");
