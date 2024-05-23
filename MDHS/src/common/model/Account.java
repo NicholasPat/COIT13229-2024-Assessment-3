@@ -1,28 +1,35 @@
 
 package common.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author lucht
  */
-public abstract class Account {
+public class Account implements Serializable {
     private int accountId;
     private String firstName ; 
     private String lastName ; 
     private String emailAddress ;
-    private String password ; //NOTE! PASSWORD WILL BE ENCRYPTED SO THIS WILL CHANGE. THIS IS TEMP 
+    private byte[] password ;
 
     public Account() {
     }
 
-    public Account(String firstName, String lastName, String emailAddress, String password) {
+    public Account(String emailAddress, byte[] password) {
+        this.emailAddress = emailAddress;
+        this.password = password;
+    }
+    
+    public Account(String firstName, String lastName, String emailAddress, byte[] password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.password = password;
     }
     
-    public Account(int accountId, String firstName, String lastName, String emailAddress, String password) {
+    public Account(int accountId, String firstName, String lastName, String emailAddress, byte[] password) {
         this.accountId = accountId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -46,7 +53,7 @@ public abstract class Account {
         this.emailAddress = emailAddress;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(byte[] password) {
         this.password = password;
     }
 
@@ -66,7 +73,7 @@ public abstract class Account {
         return emailAddress;
     }
 
-    public String getPassword() {
+    public byte[] getPassword() {
         return password;
     }
     

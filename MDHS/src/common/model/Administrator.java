@@ -11,12 +11,12 @@ public class Administrator extends Account{
     public Administrator() {
     }
 
-    public Administrator(boolean isAdmin, String firstName, String lastName, String emailAddress, String password) {
+    public Administrator(boolean isAdmin, String firstName, String lastName, String emailAddress, byte[] password) {
         super(firstName, lastName, emailAddress, password);
         this.isAdmin = isAdmin;
     }
     
-    public Administrator(boolean isAdmin, int accountId, String firstName, String lastName, String emailAddress, String password) {
+    public Administrator(boolean isAdmin, int accountId, String firstName, String lastName, String emailAddress, byte[] password) {
         super(accountId, firstName, lastName, emailAddress, password);
         this.isAdmin = isAdmin;
     }

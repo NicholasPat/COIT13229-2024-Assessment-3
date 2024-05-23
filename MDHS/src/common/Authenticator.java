@@ -1,9 +1,8 @@
 
 package common;
 
+import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.*;
 
 /**
@@ -32,20 +31,20 @@ public class Authenticator {
         return publicK;
     }
     
-    public String decrypt(byte[] encodedMessage) throws NoSuchAlgorithmException, 
+    public static String decrypt(PrivateKey prK, byte[] encodedMessage) throws NoSuchAlgorithmException, 
             NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, 
             IllegalBlockSizeException, BadPaddingException 
     { 
         Cipher cipher = Cipher.getInstance("RSA") ; 
-        cipher.init(Cipher.DECRYPT_MODE, privateK, cipher.getParameters()) ; 
+        cipher.init(Cipher.DECRYPT_MODE, prK, cipher.getParameters()) ; 
         return new String(cipher.doFinal(encodedMessage)) ; 
     }
     
-    public byte[] encrypt(String message) throws Exception { 
+    public static byte[] encrypt(PublicKey puK, String message) throws Exception { 
         Cipher cipher = Cipher.getInstance("RSA") ; 
-        cipher.init(Cipher.ENCRYPT_MODE, privateK) ; 
+        cipher.init(Cipher.ENCRYPT_MODE, puK) ; 
         
-        byte[] cipherData = cipher.doFinal(message.getBytes("UTF-8")) ; 
+        byte[] cipherData = cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)) ; 
         return cipherData ; 
     }
 }

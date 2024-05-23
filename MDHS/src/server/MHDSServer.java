@@ -2,8 +2,17 @@
 package server;
 
 import common.Authenticator;
+import common.model.*;
 import java.net.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  *
@@ -59,8 +68,41 @@ class ConnectionThread extends Thread {
                 String option = (String) objIn.readObject();
                 
                 if (option.equalsIgnoreCase("PublicKey")){ 
-                
+                    PublicKey publicK = authenticator.getPublicKey();
+                    System.out.println(publicK.toString());
+                    objOut.writeObject(publicK);
+                    
                 } else if (option.equalsIgnoreCase("Login")){ 
+                    System.out.println("Login");
+                    
+                    Account user = (Account) objIn.readObject();
+                    Account acc = database.getAccountByEmail(user.getEmailAddress());
+
+                    if (acc != null) {
+                        try {
+                            String pwd = Authenticator.decrypt(authenticator.getPrivateKey(), user.getPassword());
+                            byte[] passwordBytes = pwd.getBytes(StandardCharsets.UTF_8);
+
+                            if (Arrays.equals(passwordBytes, acc.getPassword())) {
+                                acc.setPassword(null); // clear password before transmitting
+                                objOut.writeObject(acc);
+                                System.out.println("Login successful: " + acc.getEmailAddress());
+                            } else {
+                                objOut.writeObject(null);
+                                System.out.println("Login failed: Password mismatch");
+                            }
+
+                        } catch (NoSuchAlgorithmException ex) {System.out.println("Algorithm: " + ex.getMessage());
+                        } catch (NoSuchPaddingException ex) {System.out.println("Padding: " + ex.getMessage());
+                        } catch (InvalidKeyException ex) {System.out.println("Invalid key: " + ex.getMessage());
+                        } catch (InvalidAlgorithmParameterException ex) {System.out.println("Invalid parameter: " + ex.getMessage());
+                        } catch (IllegalBlockSizeException ex) {System.out.println("Block size: " + ex.getMessage());
+                        } catch (BadPaddingException ex) {System.out.println("Bad padding: " + ex.getMessage());
+                        }
+                    } else {
+                        System.out.println("Login failed: Account not found.");
+                        objOut.writeObject(null);
+                    }
                     
                 } else if (option.equalsIgnoreCase("Register")){ 
                     

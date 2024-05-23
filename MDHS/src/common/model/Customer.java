@@ -7,20 +7,23 @@ package common.model;
 public class Customer extends Account {
     private int phoneNumber ;  
     private String deliveryAddress ; 
+    private int postcode;
 
     public Customer() {
     }
 
-    public Customer(int phoneNumber, String deliveryAddress, String firstName, String lastName, String emailAddress, String password) {
+    public Customer(int phoneNumber, String deliveryAddress, int postcode, String firstName, String lastName, String emailAddress, byte[] password) {
         super(firstName, lastName, emailAddress, password);
         this.phoneNumber = phoneNumber;
         this.deliveryAddress = deliveryAddress;
+        this.postcode = postcode;
     }
-    
-    public Customer(int phoneNumber, String deliveryAddress, int accountId, String firstName, String lastName, String emailAddress, String password) {
+
+    public Customer(int phoneNumber, String deliveryAddress, int postcode, int accountId, String firstName, String lastName, String emailAddress, byte[] password) {
         super(accountId, firstName, lastName, emailAddress, password);
         this.phoneNumber = phoneNumber;
         this.deliveryAddress = deliveryAddress;
+        this.postcode = postcode;
     }
 
     public void setPhoneNumber(int phoneNumber) {
@@ -31,6 +34,10 @@ public class Customer extends Account {
         this.deliveryAddress = deliveryAddress;
     }
 
+    public void setPostcode(int postcode) {
+        this.postcode = postcode;
+    }
+
     public int getPhoneNumber() {
         return phoneNumber;
     }
@@ -39,8 +46,9 @@ public class Customer extends Account {
         return deliveryAddress;
     }
 
-    
-    
-    
+    public int getPostcode() {
+        return postcode;
+    }
 
+    
 }

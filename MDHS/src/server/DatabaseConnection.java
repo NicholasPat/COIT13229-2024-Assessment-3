@@ -1,7 +1,8 @@
 package server;
 
 import java.sql.*;
-
+import common.model.*;
+import java.nio.charset.StandardCharsets;
 /**
  * 
  * @author lucht
@@ -64,7 +65,7 @@ public class DatabaseConnection {
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)");
         getAccountByEmail = connection.prepareStatement("SELECT * "
                 + "FROM Account "
-                + "WHERE email = ?");
+                + "WHERE emailAddress = ?");
         getAllAccounts = connection.prepareStatement("SELECT * "
                 + "FROM account");
         
@@ -104,5 +105,46 @@ public class DatabaseConnection {
                 + "VALUES(?, ?, ?)"); 
         getAllDeliverySchedules = connection.prepareStatement("SELECT * "
                 + "FROM DeliverySchedule");
+    }
+    
+    public Account getAccountByEmail(String email) { 
+        //Assumption - 1 result as cannot have two usernames 
+        ResultSet results = null ; 
+        Account acc = null ; 
+        
+        try{ 
+            getAccountByEmail.setString(1, email) ; 
+            results = getAccountByEmail.executeQuery() ; 
+            
+            while (results.next()) { 
+                int isAdmin = results.getInt("isAdmin");
+                if (isAdmin == 1) {
+                    acc = new Administrator();
+                } else {
+                    acc = new Customer();
+                }
+                
+                acc.setAccountId(results.getInt("accountId"));
+                acc.setFirstName(results.getString("firstName"));
+                acc.setLastName(results.getString("lastName"));
+                acc.setEmailAddress(results.getString("emailAddress"));
+                // Convert the password to byte array
+                String passwordString = results.getString("password");
+                byte[] passwordBytes = passwordString.getBytes(StandardCharsets.UTF_8);
+                acc.setPassword(passwordBytes);
+                
+                if (isAdmin == 1) {
+                    ((Administrator) acc).setIsAdmin(true);
+                } else {
+                    ((Customer) acc).setPhoneNumber(results.getInt("phoneNumber"));
+                    ((Customer) acc).setDeliveryAddress(results.getString("deliveryAddress"));
+                    ((Customer) acc).setPostcode(results.getInt("postcode"));
+                }
+
+            } 
+        } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
+        } finally {try {results.close() ;}catch (SQLException sqlException){System.out.println("SQL Exception: " + sqlException.getMessage());}}
+        //System.out.println(acc);
+        return acc;
     }
 }
