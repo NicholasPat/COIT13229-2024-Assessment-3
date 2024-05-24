@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -205,10 +206,12 @@ class ConnectionThread extends Thread {
                     
                 } else if (option.equalsIgnoreCase("AllProducts")){ 
                     System.out.println("AllProducts");
+                    List<Product> productlist = database.getAllProducts();
+                    objOut.writeObject(productlist);
                     
                 } else if (option.equalsIgnoreCase("DeliverySchedule")){ 
                     System.out.println("DeliverySchedule");
-                    ArrayList<DeliverySchedule> deliverySchedules = database.loadDeliverySchedules();
+                    ArrayList<DeliverySchedule> deliverySchedules = database.getDeliverySchedules();
                     objOut.writeObject(deliverySchedules);
 
                     

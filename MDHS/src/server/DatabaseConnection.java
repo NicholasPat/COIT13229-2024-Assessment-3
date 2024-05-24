@@ -4,6 +4,7 @@ import java.sql.*;
 import common.model.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 /**
  * 
  * @author lucht
@@ -79,7 +80,7 @@ public class DatabaseConnection {
                 + "SET productName = ?, quantity = ?, unit = ?, price = ?, ingredients = ? "
                 + "WHERE productId = ?"); //productName is another option, but error handle uniqueness 
         getAllProducts = connection.prepareStatement("SELECT * "
-                + "FROM Products");
+                + "FROM Product");
         getProductById = connection.prepareStatement("SELECT * "
                 + "FROM Product "
                 + "WHERE productId = ?");
@@ -252,7 +253,7 @@ public class DatabaseConnection {
         return false;
     }
     
-   public ArrayList<DeliverySchedule> loadDeliverySchedules() {
+   public ArrayList<DeliverySchedule> getDeliverySchedules() {
         ArrayList<DeliverySchedule> deliverySchedules = new ArrayList<>();
 
         try (ResultSet resultSet = getAllDeliverySchedules.executeQuery()) {
@@ -268,5 +269,26 @@ public class DatabaseConnection {
         }
 
         return deliverySchedules;
+    }
+   
+   public List<Product> getAllProducts() {
+        List<Product> products = new ArrayList<>();
+
+        try (ResultSet resultSet = getAllProducts.executeQuery()) {
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("productId");
+                String productName = resultSet.getString("productName");
+                int quantity = resultSet.getInt("quantity");
+                String unit = resultSet.getString("unit");
+                double price = resultSet.getDouble("price");
+                String ingredients = resultSet.getString("ingredients");
+
+                products.add(new Product(productId, productName, quantity, unit, price, ingredients));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading delivery schedules: " + e.getMessage());
+        }
+
+        return products;
     }
 }
