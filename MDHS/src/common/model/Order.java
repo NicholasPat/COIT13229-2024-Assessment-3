@@ -1,16 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package common.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author lucht
  */
-public class Order {
+public class Order implements Serializable {
     private int orderID;
     private int customerID;
     private int postcode;

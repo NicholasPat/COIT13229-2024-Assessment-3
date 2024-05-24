@@ -1,10 +1,12 @@
 package common.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author linke
  */
-public class Product {
+public class Product  implements Serializable {
     private int productId ; 
     private String productName ; 
     private int quantity;
