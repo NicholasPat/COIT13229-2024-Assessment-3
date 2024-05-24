@@ -3,6 +3,7 @@ package server;
 import java.sql.*;
 import common.model.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 /**
  * 
  * @author lucht
@@ -25,6 +26,7 @@ public class DatabaseConnection {
     private PreparedStatement getAllProducts = null; 
     private PreparedStatement getProductById = null; 
     private PreparedStatement deleteProduct = null; 
+    private PreparedStatement productExists = null;
     
     //Database Queries -- Order related 
     private PreparedStatement addOrder = null; 
@@ -81,6 +83,9 @@ public class DatabaseConnection {
         getProductById = connection.prepareStatement("SELECT * "
                 + "FROM Product "
                 + "WHERE productId = ?");
+        productExists = connection.prepareStatement("SELECT COUNT(*) "
+                + "FROM Product "
+                + "WHERE productName = ? AND quantity = ? AND unit = ? AND price = ? AND ingredients = ?");
         //Don't know how to handle delete product right now, so will leave for later 
         
         
@@ -186,4 +191,66 @@ public class DatabaseConnection {
             return false;
         }
     }
+    
+    /** 
+     * Adds a list of products to the database from a given ArrayList.
+     * @param products ArrayList of products to be added to the database
+     */
+    public void addProductsFromFile(ArrayList<Product> products) { 
+        for (Product product : products) {
+            String productName = product.getProductName();
+            String unit = product.getUnit();
+            int quantity = product.getQuantity();
+            double price = product.getPrice();
+            String ingredients = product.getIngredients();
+            
+            if (!productExists(product)) {
+                try{ 
+                    addProduct.setString(1, productName);
+                    addProduct.setInt(2, quantity);
+                    addProduct.setString(3, unit);
+                    addProduct.setDouble(4, price);
+                    addProduct.setString(5, ingredients);
+
+                    int result = addProduct.executeUpdate();
+                    System.out.println("Added product with name: " + productName);
+                } catch (SQLException e) {
+                    System.out.println("Error executing update to add product: " + productName + "\nMessage: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Product: " + product.toString() + " already exists. Skipping insertion.");
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @param product to check if already in database
+     * @return true if the product exists, false otherwise
+     */
+    private boolean productExists(Product product) {
+        String productName = product.getProductName();
+        String unit = product.getUnit();
+        int quantity = product.getQuantity();
+        double price = product.getPrice();
+        String ingredients = product.getIngredients();
+        
+        try {
+            productExists.setString(1, productName);
+            productExists.setInt(2, quantity);
+            productExists.setString(3, unit);
+            productExists.setDouble(4, price);
+            productExists.setString(5, ingredients);
+            try (ResultSet resultSet = productExists.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking product existence for: " + productName + "\nMessage: " + e.getMessage());
+        }
+        return false;
+    }
+    
+   
 }

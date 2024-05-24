@@ -7,7 +7,7 @@ package common.model;
 public class Product {
     private int productId ; 
     private String productName ; 
-    private int quanity;
+    private int quantity;
     private String unit ; 
     private double price ; 
     private String ingredients ; 
@@ -15,18 +15,18 @@ public class Product {
     public Product() {
     }
 
-    public Product(String productName, int quanity, String unit, double price, String ingredients) {
+    public Product(String productName, int quantity, String unit, double price, String ingredients) {
         this.productName = productName;
-        this.quanity = quanity;
+        this.quantity = quantity;
         this.unit = unit;
         this.price = price;
         this.ingredients = ingredients;
     }
 
-    public Product(int productId, String productName, int quanity, String unit, double price, String ingredients) {
+    public Product(int productId, String productName, int quantity, String unit, double price, String ingredients) {
         this.productId = productId;
         this.productName = productName;
-        this.quanity = quanity;
+        this.quantity = quantity;
         this.unit = unit;
         this.price = price;
         this.ingredients = ingredients;
@@ -40,8 +40,8 @@ public class Product {
         this.productName = productName;
     }
 
-    public void setQuanity(int quanity) {
-        this.quanity = quanity;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public void setUnit(String unit) {
@@ -64,8 +64,8 @@ public class Product {
         return productName;
     }
 
-    public int getQuanity() {
-        return quanity;
+    public int getQuantity() {
+        return quantity;
     }
 
     public String getUnit() {

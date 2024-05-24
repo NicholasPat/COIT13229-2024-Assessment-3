@@ -7,7 +7,9 @@ import java.net.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
@@ -27,6 +29,7 @@ public class MHDSServer {
         try{
             int serverPort = 6811; 
             DatabaseConnection database = new DatabaseConnection();
+            loadProductFile(database);
             ServerSocket listenSocket = new ServerSocket(serverPort);
             while(true) {
                 Socket clientSocket = listenSocket.accept();
@@ -35,6 +38,68 @@ public class MHDSServer {
         } catch(IOException e){ System.out.println("Socket Error: "+e.getMessage());}
     }
     
+    
+    /** 
+     * Loads products from a CSV file and inserts into database.
+     * Invoked upon startup.
+     * 
+     */
+    private static void loadProductFile(DatabaseConnection database) { 
+        String fileName = "A3-products.csv" ; 
+        File file = new File(fileName) ; 
+        
+        ArrayList<Product> productList = new ArrayList<>() ; 
+        String[] splitEntries ; 
+        
+        try (Scanner fileInput = new Scanner(file)) {
+            while (fileInput.hasNextLine()) {
+                String line = fileInput.nextLine();
+
+                // Skip empty lines
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                
+                Product product = parseProductLine(line);
+                if (product != null) {
+                    productList.add(product);
+                }
+            }
+            
+            database.addProductsFromFile(productList);
+        } catch (FileNotFoundException e) { 
+            System.out.println("File with name: " + fileName + " does not exist, creating file") ; 
+        } 
+    }
+    
+    /**
+     * Parses a line from the CSV file into a Product object.
+     *
+     * @param line the CSV line to parse
+     * @return a Product object, or null if the line is invalid
+     */
+    private static Product parseProductLine(String line) {
+        String[] splitEntries = line.split(",");
+
+        // Ensure the line has the correct number of entries
+        if (splitEntries.length != 5) {
+            System.out.println("Invalid line format: " + line);
+            return null;
+        }
+
+        try {
+            String name = splitEntries[0].trim();
+            String unit = splitEntries[1].trim();
+            int quantity = Integer.parseInt(splitEntries[2].trim());
+            double price = Double.parseDouble(splitEntries[3].trim());
+            String ingredients = splitEntries[4].trim();
+
+            return new Product(name, quantity, unit, price, ingredients);
+        } catch (NumberFormatException e) {
+            System.out.println("Error parsing line: " + line + " - " + e.getMessage());
+            return null;
+        }
+    }
 }
 
 class ConnectionThread extends Thread {
@@ -160,4 +225,5 @@ class ConnectionThread extends Thread {
         } catch(ClassNotFoundException ex){System.out.println("CNF Error:"+ex.getMessage());
         } finally{ try {objIn.close();clientSocket.close();}catch (IOException e){/*close failed*/}}
     }
+    
 }
