@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `mdhsDB`.`Product` (
   `quantity` INT NOT NULL,
   `unit` VARCHAR(10) NOT NULL,
   `price` VARCHAR(45) NOT NULL,
-  `ingredients` VARCHAR(200) NOT NULL,
+  `ingredients` VARCHAR(200) NULL,
   PRIMARY KEY (`productId`))
 ENGINE = InnoDB;
 
