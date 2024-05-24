@@ -252,5 +252,21 @@ public class DatabaseConnection {
         return false;
     }
     
-   
+   public ArrayList<DeliverySchedule> loadDeliverySchedules() {
+        ArrayList<DeliverySchedule> deliverySchedules = new ArrayList<>();
+
+        try (ResultSet resultSet = getAllDeliverySchedules.executeQuery()) {
+            while (resultSet.next()) {
+                int postcode = resultSet.getInt("postcode");
+                String deliveryDay = resultSet.getString("deliveryDay");
+                double deliveryCost = resultSet.getDouble("deliveryCost");
+
+                deliverySchedules.add(new DeliverySchedule(postcode, deliveryDay, deliveryCost));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading delivery schedules: " + e.getMessage());
+        }
+
+        return deliverySchedules;
+    }
 }

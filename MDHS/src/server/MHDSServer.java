@@ -198,26 +198,40 @@ class ConnectionThread extends Thread {
                     }
                     
                 } else if (option.equalsIgnoreCase("AllOrders")){ 
+                    System.out.println("AllOrders");
                     
                 } else if (option.equalsIgnoreCase("AllCustomers")){ 
+                    System.out.println("AllCustomers");
                     
                 } else if (option.equalsIgnoreCase("AllProducts")){ 
+                    System.out.println("AllProducts");
                     
                 } else if (option.equalsIgnoreCase("DeliverySchedule")){ 
+                    System.out.println("DeliverySchedule");
+                    ArrayList<DeliverySchedule> deliverySchedules = database.loadDeliverySchedules();
+                    objOut.writeObject(deliverySchedules);
+
                     
                 } else if (option.equalsIgnoreCase("Placeorder")){ 
+                    System.out.println("Placeorder");
                     
                 } else if (option.equalsIgnoreCase("NewProduct")){ 
+                    System.out.println("NewProduct");
                     
                 } else if (option.equalsIgnoreCase("EditProduct")){ 
+                    System.out.println("EditProduct");
                     
                 } else if (option.equalsIgnoreCase("RemoveProduct")){ 
+                    System.out.println("RemoveProduct");
                     
                 } else if (option.equalsIgnoreCase("NewSchedule")){ 
+                    System.out.println("NewSchedule");
                     
                 } else if (option.equalsIgnoreCase("EditSchedule")){ 
+                    System.out.println("EditSchedule");
                     
                 } else if (option.equalsIgnoreCase("RemoveSchedule")){ 
+                    System.out.println("RemoveSchedule");
                     
                 } 
             }

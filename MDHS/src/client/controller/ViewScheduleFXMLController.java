@@ -5,7 +5,12 @@
 package client.controller;
 
 import client.MDHSClient;
+import client.Session;
+import common.Authenticator;
+import common.model.Account;
+import common.model.DeliverySchedule;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -38,7 +43,8 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
 
     @Override
     public void handleSceneChange() {
-        // TODO
+        clear();
+        loadSchedule();
     }
     /**
      * Initializes the controller class.
@@ -53,4 +59,48 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
         MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
     
+    private void loadSchedule() {
+        Session session = Session.getSession();
+        try {
+            session.objOut.writeObject("DeliverySchedule");
+
+            ArrayList<DeliverySchedule> deliverySchedules = (ArrayList<DeliverySchedule>) session.objIn.readObject();
+                    
+            deliverySchedules.forEach(this::appendToTextArea);
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("Exception while loading Delivery Schedule: " + ex.getMessage());
+            session.setUser(null);
+        }
+    }
+    private void appendToTextArea(DeliverySchedule schedule) {
+        String entry = schedule.getPostcode() + "   ($" + schedule.getDeliveryCost() + ")\n";
+
+        switch (schedule.getDeliveryDay().toLowerCase()) {
+            case "monday":
+                mondayTextArea.appendText(entry);
+                break;
+            case "tuesday":
+                tuesdayTextArea.appendText(entry);
+                break;
+            case "wednesday":
+                wednesdayTextArea.appendText(entry);
+                break;
+            case "thursday":
+                thursdayTextArea.appendText(entry);
+                break;
+            case "friday":
+                fridayTextArea.appendText(entry);
+                break;
+        }
+    }
+    
+    private void clear() {
+        mondayTextArea.clear();
+        tuesdayTextArea.clear();
+        wednesdayTextArea.clear();
+        thursdayTextArea.clear();
+        fridayTextArea.clear();
+    }
 }
