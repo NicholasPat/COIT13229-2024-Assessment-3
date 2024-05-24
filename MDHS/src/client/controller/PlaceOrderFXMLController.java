@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package client.controller;
 
 import client.MDHSClient;
@@ -12,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
@@ -26,8 +24,6 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     private AnchorPane contentAnchorPane;
     @FXML
     private Button dashboardButton;
-    @FXML
-    private ChoiceBox<?> productChoiseBox;
     @FXML
     private TextField quantityTextField;
     @FXML
@@ -51,11 +47,19 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     @FXML
     private TextField taxTextField;
     @FXML
-    private TextField deliveryTimeTextField;
-    @FXML
     private TextField totalCostTextField;
     @FXML
     private Button cancelOrderButton;
+    @FXML
+    private TextField productPriceTextField;
+    @FXML
+    private ComboBox<?> hourComboBox;
+    @FXML
+    private ComboBox<?> minuteComboBox;
+    @FXML
+    private TextField deliveryDayTextField;
+    @FXML
+    private ChoiceBox<?> productChoiceBox;
 
     @Override
     public void handleSceneChange() {
