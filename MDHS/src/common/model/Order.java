@@ -11,7 +11,6 @@ import java.util.ArrayList;
 public class Order implements Serializable {
     private int orderID;
     private int customerID;
-    private int postcode;
     private String deliveryTime;
     private ArrayList<OrderItem> productList;
     private double totalCost;
@@ -19,25 +18,22 @@ public class Order implements Serializable {
     public Order() {
     }
 
-    public Order(int customerID, int postcode, String deliveryTime, ArrayList<OrderItem> productList) {
+    public Order(int customerID, String deliveryTime, ArrayList<OrderItem> productList) {
         this.customerID = customerID;
-        this.postcode = postcode;
         this.deliveryTime = deliveryTime;
         this.productList = productList;
     }
     
-    public Order(int customerID, int postcode, String deliveryTime, ArrayList<OrderItem> productList, double totalCost) {
+    public Order(int customerID, String deliveryTime, ArrayList<OrderItem> productList, double totalCost) {
         this.customerID = customerID;
-        this.postcode = postcode;
         this.deliveryTime = deliveryTime;
         this.productList = productList;
         this.totalCost = totalCost;
     }
 
-    public Order(int orderID, int customerID, int postcode, String deliveryTime, ArrayList<OrderItem> productList, double totalCost) {
+    public Order(int orderID, int customerID, String deliveryTime, ArrayList<OrderItem> productList, double totalCost) {
         this.orderID = orderID;
         this.customerID = customerID;
-        this.postcode = postcode;
         this.deliveryTime = deliveryTime;
         this.productList = productList;
         this.totalCost = totalCost;
@@ -49,10 +45,6 @@ public class Order implements Serializable {
 
     public void setCustomerID(int customerID) {
         this.customerID = customerID;
-    }
-
-    public void setPostcode(int postcode) {
-        this.postcode = postcode;
     }
 
     public void setDeliveryTime(String deliveryTime) {
@@ -73,10 +65,6 @@ public class Order implements Serializable {
 
     public int getCustomerID() {
         return customerID;
-    }
-
-    public int getPostcode() {
-        return postcode;
     }
 
     public String getDeliveryTime() {
