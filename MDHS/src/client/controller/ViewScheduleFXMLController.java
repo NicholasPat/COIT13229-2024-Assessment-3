@@ -57,7 +57,7 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
     private void loadSchedule() {
         Session session = Session.getSession();
         try {
-            session.objOut.writeObject("DeliverySchedule");
+            session.objOut.writeObject("FullDeliverySchedule");
 
             ArrayList<DeliverySchedule> deliverySchedules = (ArrayList<DeliverySchedule>) session.objIn.readObject();
                     
@@ -66,7 +66,6 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Exception while loading Delivery Schedule: " + ex.getMessage());
-            session.setUser(null);
         }
     }
     private void appendToTextArea(DeliverySchedule schedule) {

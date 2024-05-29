@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package client.controller;
 
 import client.MDHSClient;
@@ -106,7 +103,6 @@ public class ViewProductFXMLController implements Initializable, SceneController
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Exception while loading product list: " + ex.getMessage());
-            session.setUser(null);
         }
     }
     
