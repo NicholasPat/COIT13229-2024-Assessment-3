@@ -82,5 +82,9 @@ public class Product  implements Serializable {
         return ingredients;
     }
 
-    
+    @Override
+    public String toString() {
+        return productName + " (" + quantity + unit + ')';
+    }
+
 }
