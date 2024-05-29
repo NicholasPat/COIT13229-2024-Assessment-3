@@ -148,9 +148,20 @@ class ConnectionThread extends Thread {
                     
                 } else if (option.equalsIgnoreCase("AllOrders")){ 
                     System.out.println("AllOrders");
+                    List<Order> allOrders = database.getAllOrders(); 
+                    objOut.writeObject(allOrders); 
+                    
+                    //Including all relevant customers, and products 
+                    List<Account> allAccounts = database.getAllAccounts(); 
+                    objOut.writeObject(allAccounts); 
+                    
+                    List<Product> allProducts = database.getAllProducts(); 
+                    objOut.writeObject(allProducts); 
                     
                 } else if (option.equalsIgnoreCase("AllCustomers")){ 
                     System.out.println("AllCustomers");
+                    List<Account> allAccounts = database.getAllAccounts();
+                    objOut.writeObject(allAccounts); 
                     
                 } else if (option.equalsIgnoreCase("AllProducts")){ 
                     System.out.println("AllProducts");
