@@ -3,48 +3,49 @@ package common.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author lucht
  */
 public class Order implements Serializable {
-    private int orderID;
-    private int customerID;
+    private int orderId;
+    private int customerId;
     private String deliveryTime;
-    private ArrayList<OrderItem> productList;
+    private List<OrderItem> productList;
     private double totalCost;
 
     public Order() {
     }
 
-    public Order(int customerID, String deliveryTime, ArrayList<OrderItem> productList) {
-        this.customerID = customerID;
+    public Order(int customerId, String deliveryTime, List<OrderItem> productList) {
+        this.customerId = customerId;
         this.deliveryTime = deliveryTime;
         this.productList = productList;
     }
     
-    public Order(int customerID, String deliveryTime, ArrayList<OrderItem> productList, double totalCost) {
-        this.customerID = customerID;
+    public Order(int customerId, String deliveryTime, List<OrderItem> productList, double totalCost) {
+        this.customerId = customerId;
         this.deliveryTime = deliveryTime;
         this.productList = productList;
         this.totalCost = totalCost;
     }
 
-    public Order(int orderID, int customerID, String deliveryTime, ArrayList<OrderItem> productList, double totalCost) {
-        this.orderID = orderID;
-        this.customerID = customerID;
+    public Order(int orderId, int customerId, String deliveryTime, List<OrderItem> productList, double totalCost) {
+        this.orderId = orderId;
+        this.customerId = customerId;
         this.deliveryTime = deliveryTime;
         this.productList = productList;
         this.totalCost = totalCost;
     }
 
-    public void setOrderID(int orderID) {
-        this.orderID = orderID;
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
-    public void setCustomerID(int customerID) {
-        this.customerID = customerID;
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public void setDeliveryTime(String deliveryTime) {
@@ -59,19 +60,19 @@ public class Order implements Serializable {
         this.totalCost = totalCost;
     }
 
-    public int getOrderID() {
-        return orderID;
+    public int getOrderId() {
+        return orderId;
     }
 
-    public int getCustomerID() {
-        return customerID;
+    public int getCustomerId() {
+        return customerId;
     }
 
     public String getDeliveryTime() {
         return deliveryTime;
     }
 
-    public ArrayList<OrderItem> getProductList() {
+    public List<OrderItem> getProductList() {
         return productList;
     }
 

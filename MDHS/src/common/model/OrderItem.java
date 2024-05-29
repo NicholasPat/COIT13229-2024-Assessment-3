@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author lucht
  */
-public class OrderItem implements Serializable {
+public class OrderItem implements Serializable, Cloneable {
     private int orderId;
     private int productId;
     private int quantity;
@@ -16,6 +16,12 @@ public class OrderItem implements Serializable {
     public OrderItem() {
     }
 
+    public OrderItem(int productId, int quantity, double cost) {
+        this.productId = productId;
+        this.quantity = quantity;
+        this.cost = cost;
+    }
+    
     public OrderItem(int orderId, int productId, int quantity, double cost) {
         this.orderId = orderId;
         this.productId = productId;
@@ -54,6 +60,5 @@ public class OrderItem implements Serializable {
     public double getCost() {
         return cost;
     }
-    
-    
+
 }

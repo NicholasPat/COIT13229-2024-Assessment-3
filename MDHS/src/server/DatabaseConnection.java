@@ -36,10 +36,15 @@ public class DatabaseConnection {
     private PreparedStatement getOrderByPostcode = null; 
     private PreparedStatement addOrderItem = null; 
     private PreparedStatement getOrderitemsByOrderId = null; 
+    private PreparedStatement deleteOrder = null;
+    private PreparedStatement deleteOrderItems = null;
+    private PreparedStatement updateOrder = null;
+    private PreparedStatement updateOrderItem = null;
     
     //Database Queries -- DeliverySchedule related 
     private PreparedStatement addDeliverySchedule = null; 
     private PreparedStatement getAllDeliverySchedules = null; 
+    private PreparedStatement getDeliveryScheduleByPostcode = null;
     
     public DatabaseConnection () {
         try {
@@ -87,30 +92,42 @@ public class DatabaseConnection {
         productExists = connection.prepareStatement("SELECT COUNT(*) "
                 + "FROM Product "
                 + "WHERE productName = ? AND quantity = ? AND unit = ? AND price = ? AND ingredients = ?");
-        //Don't know how to handle delete product right now, so will leave for later 
+        // TODO: handle delete product right now, so will leave for later 
         
         
         //Order related queries 
         addOrder = connection.prepareStatement("INSERT INTO `Order` "
-                + "(deliveryTime, totalCost, postcode, accountId) "
-                + "VALUES(?, ?, ?, ?)");
-        getAllOrders = connection.prepareStatement("SELECT * FROM `Order`");
-        getOrderByCustomerId = connection.prepareStatement("SELECT * "
-                + "FROM `Order` "
-                + "WHERE customerId = ?");
-        getOrderByPostcode = connection.prepareStatement("SELECT * "
-                + "FROM `Order` "
-                + "WHERE postcode = ?"); 
+                + "(accountId, deliveryTime, totalCost) "
+                + "VALUES(?, ?, ?)", 
+                Statement.RETURN_GENERATED_KEYS);
         addOrderItem = connection.prepareStatement("INSERT INTO OrderItems "
                 + "(orderId, productId, quantity, cost) "
                 + "VALUES(?, ?, ?, ?)");
         
+        getAllOrders = connection.prepareStatement("SELECT * FROM `Order`");
+        getOrderByCustomerId = connection.prepareStatement("SELECT * "
+                + "FROM `Order` "
+                + "WHERE accountId = ?"); 
+        getOrderitemsByOrderId = connection.prepareStatement("SELECT * "
+                + "FROM `OrderItems` "
+                + "WHERE orderId = ?"); 
+        
+        deleteOrder = connection.prepareStatement("DELETE FROM `Order` WHERE orderId = ?");
+        deleteOrderItems = connection.prepareStatement("DELETE FROM `OrderItems` WHERE orderId = ?");
+
+        updateOrder = connection.prepareStatement("UPDATE `Order` SET accountId = ?, deliveryTime = ?, totalCost = ? WHERE orderId = ?");
+        updateOrderItem = connection.prepareStatement("UPDATE `OrderItems` SET productId = ?, quantity = ?, cost = ? WHERE orderId = ? AND productId = ?");
+
+
         //Delivery Schedule related queries 
         addDeliverySchedule = connection.prepareStatement("INSERT INTO DeliverySchedule "
                 + "(postcode, deliveryDay, deliveryCost)"
                 + "VALUES(?, ?, ?)"); 
         getAllDeliverySchedules = connection.prepareStatement("SELECT * "
                 + "FROM DeliverySchedule");
+        getDeliveryScheduleByPostcode = connection.prepareStatement("SELECT * "
+                + "FROM `DeliverySchedule` "
+                + "WHERE postcode = ? ");
     }
     
     public Account getAccountByEmail(String email) { 
@@ -253,7 +270,7 @@ public class DatabaseConnection {
         return false;
     }
     
-   public ArrayList<DeliverySchedule> getDeliverySchedules() {
+    public ArrayList<DeliverySchedule> getDeliverySchedules() {
         ArrayList<DeliverySchedule> deliverySchedules = new ArrayList<>();
 
         try (ResultSet resultSet = getAllDeliverySchedules.executeQuery()) {
@@ -271,7 +288,28 @@ public class DatabaseConnection {
         return deliverySchedules;
     }
    
-   public List<Product> getAllProducts() {
+    public DeliverySchedule getDeliveryScheduleByPostcode(int postcode) {
+        ResultSet resultSet = null ; 
+        DeliverySchedule schedule = null ; 
+        
+        try{ 
+            getDeliveryScheduleByPostcode.setInt(1, postcode) ; 
+            resultSet = getDeliveryScheduleByPostcode.executeQuery() ; 
+            
+            while (resultSet.next()) { 
+                String deliveryDay = resultSet.getString("deliveryDay");
+                double deliveryCost = resultSet.getDouble("deliveryCost");
+
+                schedule = new DeliverySchedule(postcode, deliveryDay, deliveryCost);
+
+            } 
+        } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
+        } 
+        
+        return schedule;
+   }
+   
+    public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
 
         try (ResultSet resultSet = getAllProducts.executeQuery()) {
@@ -290,5 +328,111 @@ public class DatabaseConnection {
         }
 
         return products;
+    }
+   
+    public Order getOrderByCustomerId(int custId){
+        ResultSet resultSet = null ; 
+        Order order = null ; 
+        List<OrderItem> orderItems = new ArrayList<>();
+        
+        int orderId = -1;
+        int accountId = -1;
+        String deliveryTime = null;
+        double totalCost = -1;
+        
+        try{ 
+            getOrderByCustomerId.setInt(1, custId) ; 
+            resultSet = getOrderByCustomerId.executeQuery() ; 
+            
+            while (resultSet.next()) { 
+                orderId = resultSet.getInt("orderId");
+                accountId = resultSet.getInt("accountId");
+                deliveryTime = resultSet.getString("deliveryTime");
+                totalCost = resultSet.getDouble("totalCost");
+            } 
+            
+            if (orderId != -1) {
+                getOrderitemsByOrderId.setInt(1, orderId);
+                resultSet = getOrderitemsByOrderId.executeQuery() ; 
+
+                while (resultSet.next()) { 
+                    int productId = resultSet.getInt("productId");
+                    int quantity = resultSet.getInt("quantity");
+                    double cost = resultSet.getDouble("cost");
+                    
+                    orderItems.add(new OrderItem(orderId, productId, quantity, cost));
+                } 
+                
+                order = new Order(orderId, accountId, deliveryTime, orderItems, totalCost);
+            }
+            
+        } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
+        } 
+        
+        return order;
+   }
+   
+    public void deleteOrder(int orderId) {
+       try {
+            // Delete all order items associated with the order
+            deleteOrderItems.setInt(1, orderId);
+            deleteOrderItems.executeUpdate();
+
+            // Delete the order
+            deleteOrder.setInt(1, orderId);
+            deleteOrder.executeUpdate();
+        } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
+        } 
+   }
+
+    public void saveOrder(Order order) {
+        try {
+            if (order.getOrderId() != 0) {
+                // Update existing order
+                updateOrder.setInt(1, order.getCustomerId());
+                updateOrder.setString(2, order.getDeliveryTime());
+                updateOrder.setDouble(3, order.getTotalCost());
+                
+                updateOrder.setInt(4, order.getOrderId());
+                updateOrder.executeUpdate();
+
+                // Delete existing order items
+                deleteOrderItems.setInt(1, order.getOrderId());
+                deleteOrderItems.executeUpdate();
+
+                // Insert updated order items
+                for (OrderItem item : order.getProductList()) {
+                    addOrderItem.setInt(1, order.getOrderId());
+                    addOrderItem.setInt(2, item.getProductId());
+                    addOrderItem.setInt(3, item.getQuantity());
+                    addOrderItem.setDouble(4, item.getCost());
+                    addOrderItem.executeUpdate();
+                }
+                
+            } else {
+                // Insert new order
+                addOrder.setInt(1, order.getCustomerId());
+                addOrder.setString(2, order.getDeliveryTime());
+                addOrder.setDouble(3, order.getTotalCost());
+                addOrder.executeUpdate();
+
+                ResultSet generatedKeys = addOrder.getGeneratedKeys(); // Get the generated order ID
+                if (generatedKeys.next()) {
+                    int orderId = generatedKeys.getInt(1);
+
+                    // Insert order items
+                    for (OrderItem item : order.getProductList()) {
+                        addOrderItem.setInt(1, orderId);
+                        addOrderItem.setInt(2, item.getProductId());
+                        addOrderItem.setInt(3, item.getQuantity());
+                        addOrderItem.setDouble(4, item.getCost());
+                        addOrderItem.executeUpdate();
+                    }
+                } else {
+                    throw new SQLException("Creating order failed, no ID obtained.");
+                }
+            }
+        } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
+        } 
     }
 }

@@ -140,63 +140,11 @@ class ConnectionThread extends Thread {
                     
                 } else if (option.equalsIgnoreCase("Login")){ 
                     System.out.println("Login");
-                    
-                    Account user = (Account) objIn.readObject();
-                    Account acc = database.getAccountByEmail(user.getEmailAddress());
-
-                    if (acc != null) {
-                        try {
-                            String pwd = Authenticator.decrypt(authenticator.getPrivateKey(), user.getPassword());
-                            byte[] passwordBytes = pwd.getBytes(StandardCharsets.UTF_8);
-
-                            if (Arrays.equals(passwordBytes, acc.getPassword())) {
-                                acc.setPassword(null); // clear password before transmitting
-                                objOut.writeObject(acc);
-                                System.out.println("Login successful: " + acc.getEmailAddress());
-                            } else {
-                                objOut.writeObject(null);
-                                System.out.println("Login failed: Password mismatch");
-                            }
-
-                        } catch (NoSuchAlgorithmException ex) {System.out.println("Algorithm: " + ex.getMessage());
-                        } catch (NoSuchPaddingException ex) {System.out.println("Padding: " + ex.getMessage());
-                        } catch (InvalidKeyException ex) {System.out.println("Invalid key: " + ex.getMessage());
-                        } catch (InvalidAlgorithmParameterException ex) {System.out.println("Invalid parameter: " + ex.getMessage());
-                        } catch (IllegalBlockSizeException ex) {System.out.println("Block size: " + ex.getMessage());
-                        } catch (BadPaddingException ex) {System.out.println("Bad padding: " + ex.getMessage());
-                        }
-                    } else {
-                        System.out.println("Login failed: Account not found.");
-                        objOut.writeObject(null);
-                    }
+                    login();
                     
                 } else if (option.equalsIgnoreCase("Register")){ 
                     System.out.println("Register");
-                    
-                    Account acc = (Account) objIn.readObject();
-                    
-                    try {
-                        String pwd = Authenticator.decrypt(authenticator.getPrivateKey(), acc.getPassword());
-                        byte[] passwordBytes = pwd.getBytes(StandardCharsets.UTF_8);
-                        acc.setPassword(passwordBytes);
-                        
-                        // insert account
-                        Boolean accAdded = database.addAccount(acc);
-                        if (accAdded) {
-                            acc.setPassword(null); // clear password before transmitting
-                            objOut.writeObject(acc);
-                            System.out.println("Registration successful: " + acc.getEmailAddress());
-                        } else {
-                            objOut.writeObject(null);
-                            System.out.println("Registration failed.");
-                        }
-                    } catch (NoSuchAlgorithmException ex) {System.out.println("Algorithm: " + ex.getMessage());
-                    } catch (NoSuchPaddingException ex) {System.out.println("Padding: " + ex.getMessage());
-                    } catch (InvalidKeyException ex) {System.out.println("Invalid key: " + ex.getMessage());
-                    } catch (InvalidAlgorithmParameterException ex) {System.out.println("Invalid parameter: " + ex.getMessage());
-                    } catch (IllegalBlockSizeException ex) {System.out.println("Block size: " + ex.getMessage());
-                    } catch (BadPaddingException ex) {System.out.println("Bad padding: " + ex.getMessage());
-                    }
+                    register();
                     
                 } else if (option.equalsIgnoreCase("AllOrders")){ 
                     System.out.println("AllOrders");
@@ -209,14 +157,34 @@ class ConnectionThread extends Thread {
                     List<Product> productlist = database.getAllProducts();
                     objOut.writeObject(productlist);
                     
-                } else if (option.equalsIgnoreCase("DeliverySchedule")){ 
-                    System.out.println("DeliverySchedule");
+                } else if (option.equalsIgnoreCase("FullDeliverySchedule")){ 
+                    System.out.println("FullDeliverySchedule");
                     ArrayList<DeliverySchedule> deliverySchedules = database.getDeliverySchedules();
                     objOut.writeObject(deliverySchedules);
-
                     
-                } else if (option.equalsIgnoreCase("Placeorder")){ 
+                } else if (option.equalsIgnoreCase("DeliveryScheduleByPostcode")) {
+                    System.out.println("DeliveryScheduleByPostcode");
+                    int postcode = (Integer) objIn.readObject();
+                    DeliverySchedule schedule = database.getDeliveryScheduleByPostcode(postcode);
+                    objOut.writeObject(schedule);
+                 
+                } else if (option.equalsIgnoreCase("PlaceOrder")){ 
                     System.out.println("Placeorder");
+                    Order order = (Order) objIn.readObject();
+                    database.saveOrder(order);
+                    
+                } else if (option.equalsIgnoreCase("GetCustomerOrder")){ 
+                    System.out.println("GetCustomerOrder");
+                    int customerId = (Integer) objIn.readObject();
+                    Order order = database.getOrderByCustomerId(customerId);
+                    objOut.writeObject(order);
+                    
+                } else if (option.equalsIgnoreCase("CancelOrder")){ 
+                    System.out.println("CancelOrder");
+                    int customerId = (Integer) objIn.readObject();
+                    Order order = database.getOrderByCustomerId(customerId);
+                    int orderId = order.getOrderId(); // TODO: Order not null
+                    database.deleteOrder(orderId);
                     
                 } else if (option.equalsIgnoreCase("NewProduct")){ 
                     System.out.println("NewProduct");
@@ -243,4 +211,62 @@ class ConnectionThread extends Thread {
         } finally{ try {objIn.close();clientSocket.close();}catch (IOException e){/*close failed*/}}
     }
     
+    private void login() throws IOException, ClassNotFoundException {
+        Account user = (Account) objIn.readObject();
+        Account acc = database.getAccountByEmail(user.getEmailAddress());
+
+        if (acc != null) {
+            try {
+                String pwd = Authenticator.decrypt(authenticator.getPrivateKey(), user.getPassword());
+                byte[] passwordBytes = pwd.getBytes(StandardCharsets.UTF_8);
+
+                if (Arrays.equals(passwordBytes, acc.getPassword())) {
+                    acc.setPassword(null); // clear password before transmitting
+                    objOut.writeObject(acc);
+                    System.out.println("Login successful: " + acc.getEmailAddress());
+                } else {
+                    objOut.writeObject(null);
+                    System.out.println("Login failed: Password mismatch");
+                }
+
+            } catch (NoSuchAlgorithmException ex) {System.out.println("Algorithm: " + ex.getMessage());
+            } catch (NoSuchPaddingException ex) {System.out.println("Padding: " + ex.getMessage());
+            } catch (InvalidKeyException ex) {System.out.println("Invalid key: " + ex.getMessage());
+            } catch (InvalidAlgorithmParameterException ex) {System.out.println("Invalid parameter: " + ex.getMessage());
+            } catch (IllegalBlockSizeException ex) {System.out.println("Block size: " + ex.getMessage());
+            } catch (BadPaddingException ex) {System.out.println("Bad padding: " + ex.getMessage());
+            } catch (IOException ex) {System.out.println("IO: " + ex.getMessage());
+            } 
+        } else {
+            System.out.println("Login failed: Account not found.");
+            objOut.writeObject(null);
+        }
+    }
+    
+    private void register() throws IOException, ClassNotFoundException {        
+        Account acc = (Account) objIn.readObject();
+        try {
+            String pwd = Authenticator.decrypt(authenticator.getPrivateKey(), acc.getPassword());
+            byte[] passwordBytes = pwd.getBytes(StandardCharsets.UTF_8);
+            acc.setPassword(passwordBytes);
+
+            // insert account
+            Boolean accAdded = database.addAccount(acc);
+            if (accAdded) {
+                acc.setPassword(null); // clear password before transmitting
+                objOut.writeObject(acc);
+                System.out.println("Registration successful: " + acc.getEmailAddress());
+            } else {
+                objOut.writeObject(null);
+                System.out.println("Registration failed.");
+            }
+        } catch (NoSuchAlgorithmException ex) {System.out.println("Algorithm: " + ex.getMessage());
+        } catch (NoSuchPaddingException ex) {System.out.println("Padding: " + ex.getMessage());
+        } catch (InvalidKeyException ex) {System.out.println("Invalid key: " + ex.getMessage());
+        } catch (InvalidAlgorithmParameterException ex) {System.out.println("Invalid parameter: " + ex.getMessage());
+        } catch (IllegalBlockSizeException ex) {System.out.println("Block size: " + ex.getMessage());
+        } catch (BadPaddingException ex) {System.out.println("Bad padding: " + ex.getMessage());
+        } catch (IOException ex) {System.out.println("IO: " + ex.getMessage());
+        }
+    }
 }
