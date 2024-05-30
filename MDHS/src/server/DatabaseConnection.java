@@ -20,6 +20,7 @@ public class DatabaseConnection {
     private PreparedStatement addAccount = null; 
     private PreparedStatement getAccountByEmail = null; 
     private PreparedStatement getAllAccounts = null; 
+    private PreparedStatement getCustomerById = null; 
     
     //Database Queries -- Product related 
     private PreparedStatement addProduct = null; 
@@ -76,6 +77,9 @@ public class DatabaseConnection {
                 + "WHERE emailAddress = ?");
         getAllAccounts = connection.prepareStatement("SELECT * "
                 + "FROM account");
+        getCustomerById = connection.prepareStatement("SELECT * "
+                + "FROM account "
+                + "WHERE accountId = ?");
         
         //Product related queries
         addProduct = connection.prepareStatement("INSERT INTO Product "
@@ -435,4 +439,128 @@ public class DatabaseConnection {
         } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
         } 
     }
+    
+    /** 
+    * 
+    * @return 
+    */
+   public List<Account> getAllAccounts() { 
+       List<Account> accounts = new ArrayList<>(); 
+       
+       try (ResultSet resultSet = getAllAccounts.executeQuery()) { 
+           while (resultSet.next()) { 
+               int accountId = resultSet.getInt("accountId"); 
+               String firstName = resultSet.getString("firstName"); 
+               String lastName = resultSet.getString("lastName"); 
+               String emailAddress = resultSet.getString("emailAddress"); 
+               //Not bothering with password, not a proper value to pass 
+               int phoneNumber = resultSet.getInt("phoneNumber"); 
+               String address = resultSet.getString("deliveryAddress"); 
+               int postcode = resultSet.getInt("postcode");
+               int isAdmin = resultSet.getInt("isAdmin"); 
+               
+               if (isAdmin == 1) {
+                   accounts.add(new Administrator(true, accountId, firstName, 
+                       lastName, emailAddress, null)); 
+               } else {
+                   accounts.add(new Customer(phoneNumber, address, postcode, accountId,
+                       firstName, lastName, emailAddress, null)); 
+               } 
+           }
+       } catch (SQLException e) {
+            System.err.println("Error loading delivery schedules: " + e.getMessage());
+        }
+       
+       return accounts;
+   }
+   
+   public List<Order> getAllOrders() { 
+       List<Order> orders = new ArrayList<>();
+       
+       try (ResultSet resultSet = getAllOrders.executeQuery()) {
+           while (resultSet.next()) { 
+               //Getting initial order information
+               int orderId = resultSet.getInt("orderId"); 
+               int customerId = resultSet.getInt("customerId");
+               String deliveryTime = resultSet.getString("deliveryTime");
+               double totalCost = resultSet.getDouble("totalCost"); 
+               
+               //Getting orderItems 
+               List<OrderItem> orderItems = null; 
+               getOrderitemsByOrderId.setInt(1, orderId);
+               ResultSet orderItemsResults = getOrderitemsByOrderId.executeQuery();
+               
+               //Assuming always have an OrderItem. Should also iterate over all the 
+               //OrderItems that exist 
+               while (orderItemsResults.next()) { 
+                   int productId = orderItemsResults.getInt("productId"); 
+                   int quantity = orderItemsResults.getInt("quantity"); 
+                   double cost = orderItemsResults.getDouble("cost"); 
+                   orderItems.add(new OrderItem(orderId, productId, quantity, cost)); 
+               }
+               orders.add(new Order(customerId, deliveryTime, orderItems, totalCost)); 
+           }
+       }catch (SQLException e) {
+            System.err.println("Error in `getAllOrders()`: " + e.getMessage());
+        }
+       
+       return orders; 
+   }
+   
+   public Product getProductById(int productId) { 
+       Product currentProduct = null; 
+       
+       try { 
+           getProductById.setInt(1, productId);
+           ResultSet resultSet = getProductById.executeQuery(); 
+           
+           //No results. Return an empty object which will error handle 
+           if (!resultSet.isBeforeFirst()) { 
+               return currentProduct;
+           }
+           
+           //Should return just 1 result, or none, error handle none done above
+           while (resultSet.next()) { 
+               String productName = resultSet.getString("productName"); 
+               int quantity = resultSet.getInt("quantity"); 
+               String unit = resultSet.getString("unit"); 
+               double price = resultSet.getDouble("price"); 
+               String ingredients = resultSet.getString("ingredients"); 
+               
+               currentProduct = new Product(productId, productName, quantity, 
+                       unit, price, ingredients); 
+           }
+       }catch (SQLException e) {
+            System.err.println("Error in `getProductById`: " + e.getMessage());
+        }
+       
+       return currentProduct; 
+   }
+   
+   public Customer getCustomerById(int customerId) { 
+       Customer currentCustomer = null; 
+       
+       try { 
+           getCustomerById.setInt(1, customerId); 
+           ResultSet resultSet = getCustomerById.executeQuery(); 
+           
+           //Should always return a valid customer 
+           while (resultSet.next()) { 
+               String firstName = resultSet.getString("firstName"); 
+               String lastName = resultSet.getString("lastName"); 
+               String email = resultSet.getString("emailAddress"); 
+               byte[] password = null; 
+               int phoneNumber = resultSet.getInt("phoneNumber"); 
+               String deliveryAddress = resultSet.getString("deliveryAddress");
+               int postcode = resultSet.getInt("postcode"); 
+               
+               currentCustomer = new Customer(phoneNumber, deliveryAddress, postcode, 
+                       customerId, firstName, lastName, email, password);
+           }
+       }catch (SQLException e) {
+            System.err.println("Error in `getCustomerById()`: " + e.getMessage());
+        }
+       
+       return currentCustomer; 
+   }
 }
