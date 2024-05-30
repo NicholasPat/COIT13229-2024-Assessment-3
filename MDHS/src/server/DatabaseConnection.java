@@ -5,6 +5,8 @@ import common.model.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  * 
  * @author lucht
@@ -46,6 +48,10 @@ public class DatabaseConnection {
     private PreparedStatement addDeliverySchedule = null; 
     private PreparedStatement getAllDeliverySchedules = null; 
     private PreparedStatement getDeliveryScheduleByPostcode = null;
+    private PreparedStatement checkDeliverySchedule = null;
+    private PreparedStatement insertDeliverySchedule = null;
+    private PreparedStatement updateDeliverySchedule = null;
+    private PreparedStatement deleteDeliverySchedule = null;
     
     public DatabaseConnection () {
         try {
@@ -132,6 +138,10 @@ public class DatabaseConnection {
         getDeliveryScheduleByPostcode = connection.prepareStatement("SELECT * "
                 + "FROM `DeliverySchedule` "
                 + "WHERE postcode = ? ");
+        checkDeliverySchedule = connection.prepareStatement("SELECT COUNT(*) FROM DeliverySchedule WHERE postcode = ?");
+        insertDeliverySchedule = connection.prepareStatement("INSERT INTO DeliverySchedule (postcode, deliveryDay, deliveryCost) VALUES (?, ?, ?)");
+        updateDeliverySchedule = connection.prepareStatement("UPDATE DeliverySchedule SET deliveryDay = ?, deliveryCost = ? WHERE postcode = ?");
+        deleteDeliverySchedule = connection.prepareStatement("DELETE FROM DeliverySchedule WHERE postcode = ?");
     }
     
     public Account getAccountByEmail(String email) { 
@@ -444,7 +454,7 @@ public class DatabaseConnection {
     * 
     * @return 
     */
-   public List<Account> getAllAccounts() { 
+    public List<Account> getAllAccounts() { 
        List<Account> accounts = new ArrayList<>(); 
        
        try (ResultSet resultSet = getAllAccounts.executeQuery()) { 
@@ -472,9 +482,9 @@ public class DatabaseConnection {
         }
        
        return accounts;
-   }
+    }
    
-   public List<Order> getAllOrders() { 
+    public List<Order> getAllOrders() { 
        List<Order> orders = new ArrayList<>();
        
        try (ResultSet resultSet = getAllOrders.executeQuery()) {
@@ -505,9 +515,9 @@ public class DatabaseConnection {
         }
        
        return orders; 
-   }
+    }
    
-   public Product getProductById(int productId) { 
+    public Product getProductById(int productId) { 
        Product currentProduct = null; 
        
        try { 
@@ -535,9 +545,9 @@ public class DatabaseConnection {
         }
        
        return currentProduct; 
-   }
+    }
    
-   public Customer getCustomerById(int customerId) { 
+    public Customer getCustomerById(int customerId) { 
        Customer currentCustomer = null; 
        
        try { 
@@ -562,5 +572,45 @@ public class DatabaseConnection {
         }
        
        return currentCustomer; 
-   }
+    }
+   
+    public void recordDeliverySchedule(DeliverySchedule schedule) {
+        try {
+            checkDeliverySchedule.setInt(1, schedule.getPostcode());
+            ResultSet resultSet = checkDeliverySchedule.executeQuery();
+
+            boolean exists = false;
+            if (resultSet.next()) {
+                exists = resultSet.getInt(1) > 0;
+            }
+
+            if (exists) {
+                System.out.println("Update: " + schedule.getPostcode());
+                updateDeliverySchedule.setString(1, schedule.getDeliveryDay());
+                updateDeliverySchedule.setDouble(2, schedule.getDeliveryCost());
+                updateDeliverySchedule.setInt(3, schedule.getPostcode());
+                updateDeliverySchedule.executeUpdate();
+            } else {
+                System.out.println("Insert: " + schedule.getPostcode());
+                insertDeliverySchedule.setInt(1, schedule.getPostcode());
+                insertDeliverySchedule.setString(2, schedule.getDeliveryDay());
+                insertDeliverySchedule.setDouble(3, schedule.getDeliveryCost());
+                insertDeliverySchedule.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error in `recordDeliverySchedule()`: " + ex.getMessage());
+        }
+    }
+   
+    public void deleteDeliverySchedule(DeliverySchedule schedule) {
+        try {
+            checkDeliverySchedule.setInt(1, schedule.getPostcode());
+            ResultSet resultSet = checkDeliverySchedule.executeQuery();
+            if (resultSet.next()) {
+                deleteDeliverySchedule.setInt(1, schedule.getPostcode());
+                deleteDeliverySchedule.executeUpdate();
+            }
+        } catch (SQLException ex) {System.err.println("Error in `deleteDeliverySchedule()`: " + ex.getMessage());
+        }
+    }
 }

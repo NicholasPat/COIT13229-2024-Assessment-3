@@ -209,14 +209,19 @@ class ConnectionThread extends Thread {
                 } else if (option.equalsIgnoreCase("RemoveProduct")){ 
                     System.out.println("RemoveProduct");
                     
-                } else if (option.equalsIgnoreCase("NewSchedule")){ 
-                    System.out.println("NewSchedule");
+                } else if (option.equalsIgnoreCase("AddSchedule")){ 
+                    System.out.println("AddSchedule");
+                    DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
+                    database.recordDeliverySchedule(schedule);
                     
-                } else if (option.equalsIgnoreCase("EditSchedule")){ 
+                } else if (option.equalsIgnoreCase("UpdateSchedule")){ 
                     System.out.println("EditSchedule");
+                    DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
+                    database.recordDeliverySchedule(schedule);
                     
-                } else if (option.equalsIgnoreCase("RemoveSchedule")){ 
-                    System.out.println("RemoveSchedule");
+                } else if (option.equalsIgnoreCase("DeleteSchedule")){ 
+                    System.out.println("DeleteSchedule");
+                    DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
                     
                 } 
             }

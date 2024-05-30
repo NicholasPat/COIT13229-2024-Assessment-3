@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ManageScheduleFXMLController">
+<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ManageScheduleFXMLController">
    <children>
       <Label layoutX="171.0" layoutY="8.0" text="Maleny Dairy to Home System">
          <font>
@@ -33,7 +33,7 @@
       <Label layoutX="157.0" layoutY="151.0" text="Postcode" />
       <Label layoutX="159.0" layoutY="188.0" text="Day" />
       <Label layoutX="158.0" layoutY="225.0" text="Cost ($)" />
-      <TextField fx:id="postcodeTextField" layoutX="228.0" layoutY="147.0" />
+      <TextField fx:id="postcodeTextField" editable="false" layoutX="228.0" layoutY="147.0" />
       <TextField fx:id="costTextField" layoutX="228.0" layoutY="221.0" />
       <ChoiceBox fx:id="deliveryDayChoiceBox" layoutX="228.0" layoutY="184.0" prefWidth="150.0" />
       <GridPane layoutX="181.0" layoutY="323.0" prefHeight="17.0" prefWidth="238.0">
@@ -85,12 +85,7 @@
       </Button>
       <Button fx:id="updateButton" layoutX="420.0" layoutY="183.0" mnemonicParsing="false" onAction="#updateButtonHandler" prefHeight="27.0" prefWidth="76.0" text="Update" />
       <Button fx:id="deleteButton" layoutX="420.0" layoutY="221.0" mnemonicParsing="false" onAction="#deleteButtonHandler" prefHeight="27.0" prefWidth="76.0" text="Delete" />
-      <Button fx:id="searchButton" layoutX="181.0" layoutY="356.0" mnemonicParsing="false" onAction="#searchButtonHandler" prefHeight="30.0" prefWidth="99.0" text="Search">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
-      <Button fx:id="newButton" layoutX="303.0" layoutY="356.0" mnemonicParsing="false" onAction="#newButtonHandler" prefHeight="30.0" prefWidth="116.0" text="New">
+      <Button fx:id="newButton" layoutX="181.0" layoutY="356.0" mnemonicParsing="false" onAction="#newButtonHandler" prefHeight="30.0" prefWidth="238.0" text="New">
          <font>
             <Font size="14.0" />
          </font>
