@@ -1,16 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package client.controller;
 
 import client.MDHSClient;
 import client.Session;
-import common.model.Account;
-import common.model.Customer;
-import common.model.Order;
-import common.model.OrderItem;
-import common.model.Product;
+import common.model.*;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -65,13 +58,19 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
     private TextField deliveryTimeTextField;
     
     private List<Order> orderList; 
+    private List<Account> allAccounts;
+    private List<Product> allProducts;
+    private List<DeliverySchedule> deliverySchedules;
     private Order currentOrder; 
     private int currentOrderIndex; 
     private int numberOfOrders; 
+    @FXML
+    private TextField deliveryDayTextField;
 
     @Override
     public void handleSceneChange() {
-        loadOrders(); 
+        clear();
+        loadAllData(); 
     }
     /**
      * Initializes the controller class.
@@ -88,104 +87,149 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
 
     @FXML
     private void previousIndexButtonHandler(ActionEvent event) {
+        currentOrderIndex--;
+        if (currentOrderIndex < 0 && numberOfOrders > 0)
+            currentOrderIndex = numberOfOrders-1; // if index went below 0 cycle back to end of list
+        currentOrder = orderList.get(currentOrderIndex);
+        populateForm();
         
     }
 
     @FXML
     private void nextIndexButtonHandler(ActionEvent event) {
-        
+        currentOrderIndex++;
+        if ( currentOrderIndex >= numberOfOrders ) // if index went above total number, then cycle back to first entry
+            currentOrderIndex = 0;
+        currentOrder = orderList.get(currentOrderIndex);
+        populateForm();
     }
     
-    private void loadOrders() {
+    private void loadAllData() {
         Session session = Session.getSession(); 
-        List<Integer> customerIdList = null; 
-        List<OrderItem> orderItemList = null;  
-        
+
         try {
             session.objOut.writeObject("AllOrders");
             orderList = (List<Order>) session.objIn.readObject(); 
+            allAccounts = (List<Account>) session.objIn.readObject(); 
+            allProducts = (List<Product>) session.objIn.readObject(); 
+            deliverySchedules = (List<DeliverySchedule>) session.objIn.readObject(); 
             
-            if (!orderList.isEmpty()) {
-                //Assigning to a list all the Customer IDs, so that they can be 
-                //iterated upon to get them in order 
-                for (int i=0; i< orderList.size(); i++) { 
-                    customerIdList.add(orderList.get(i).getCustomerId()); 
-                    List<OrderItem> listOfOrderItems = orderList.get(i).getProductList(); 
-                    //orderItemList.add(listOfOrderItems); 
-                }
-                
-                //Assigning to a list all the Product Ids, also OrderIds so that 
-                //Can be matched up 
-                
-                numberOfOrders = orderList.size(); 
-                currentOrderIndex = 0; 
-                currentOrder = orderList.get(currentOrderIndex); 
-                
-                //Iterate on this once 
-                totalIndexTextField.setText(Integer.toString(numberOfOrders+1)); 
-                
-                //Hard coding this value since assuming always positon 1
-                currentIndexTextField.setText("1"); 
-                populateForm(session); 
+            if ( orderList.size() != 0 ) {
+                numberOfOrders = orderList.size();
+                currentOrderIndex = 0;
+                currentOrder = orderList.get(currentOrderIndex);
+                populateForm(); // display current order
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println("Exception while loading product list: " + ex.getMessage());
+            System.out.println("Exception while loading order information: " + ex.getMessage());
             session.setUser(null);
         }
     }
     
-    private void populateForm(Session session) throws Exception { 
-        //Set list of products ordered then tabulate cost 
-        List<OrderItem> currentOrderItem = currentOrder.getProductList(); 
-        String listOfProducts = ""; 
-        double itemTotal = 0; 
-        
-        
-        
-        
-        //Get Customers 
-        session.objOut.writeObject("CustomerById"); 
-        Customer cCustomer = (Customer) session.objIn.readObject(); 
-        
-        //Get OrderItems (Product Name and Price) via the productId
-        //CONSIDER: Bundle ProductIDs together and sending in one stream, server 
-        //can process into a bundle of product names + cost 
-        for (int i=0; i < currentOrderItem.size(); i++) {
-            session.objOut.writeObject("ProductById"); 
-            session.objOut.writeObject(currentOrderItem.get(i).getProductId()); 
-            Product cProduct = (Product) session.objIn.readObject(); 
+    private void populateForm() { 
+        clear();
+        try {
+            // order items
+            for (OrderItem item: currentOrder.getProductList()) {
+                for (Product prod : allProducts) {
+                    if (prod.getProductId() == item.getProductId()) {
+                        orderItemsTextArea.appendText(prod.toString() + "\n");
+                    }
+                }
+            }
             
-            //If product was deleted, thus no result 
-            if (cProduct == null) { 
-                //Do nothing, won't add to it
-            } else { 
-                listOfProducts += cProduct.getProductName() + "\n";
-                //Assumption: Always at least one quantity 
-                itemTotal = itemTotal + (cProduct.getPrice() * cProduct.getQuantity());
-            } 
+            // customer
+            for (Account acc : allAccounts) {
+                if (acc.getAccountId() == currentOrder.getCustomerId()) {
+                    //Finally, populate the tables 
+                    firstNameTextField.setText(acc.getFirstName()); 
+                    lastNameTextField.setText(acc.getLastName()); 
+                    emailTextField.setText(acc.getEmailAddress()); 
+                    phonenumberTextField.setText(((Customer) acc).getPhoneNumber()+""); 
+                    addressTextField.setText(((Customer) acc).getDeliveryAddress()); 
+                    
+                    // delivery info
+                    for (DeliverySchedule schedule : deliverySchedules) {
+                        if (schedule.getPostcode() == ((Customer) acc).getPostcode()) {
+                            deliveryCostTextField.setText(schedule.getDeliveryCost()+""); 
+                            deliveryDayTextField.setText(schedule.getDeliveryDay()); 
+                            deliveryTimeTextField.setText(currentOrder.getDeliveryTime()); 
+                        }
+                    }
+                }
+            }
+            
+            // cost update
+            costUpdate();
+            
+            currentIndexTextField.setText(currentOrderIndex+1+"");
+            totalIndexTextField.setText(numberOfOrders+"");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("Exception while populating the form: " + ex.getMessage());
         }
-        
-        //Get tax value and total value 
-        double taxValue = itemTotal * 0.1; 
-        double totalCost = itemTotal + taxValue; 
-        
-        //Finally, populate the tables 
-        firstNameTextField.setText(cCustomer.getFirstName()); 
-        lastNameTextField.setText(cCustomer.getLastName()); 
-        emailTextField.setText(cCustomer.getEmailAddress()); 
-        phonenumberTextField.setText(Integer.toString(cCustomer.getPhoneNumber())); 
-        addressTextField.setText(cCustomer.getDeliveryAddress()); 
-        deliveryTimeTextField.setText(currentOrder.getDeliveryTime()); 
-        orderItemsTextArea.setText(listOfProducts); 
-        deliveryCostTextField.setText("Unimplemented for now"); 
-        subtotalTextField.setText("$"+Double.toString(itemTotal)); 
-        taxTextField.setText("$"+Double.toString(taxValue));
-        totalCostTextField.setText("$"+Double.toString(totalCost));
     }
     
     private void clear() { 
-        
+        firstNameTextField.clear(); 
+        lastNameTextField.clear(); 
+        emailTextField.clear(); 
+        phonenumberTextField.clear(); 
+        addressTextField.clear();
+        deliveryCostTextField.clear(); 
+        deliveryDayTextField.clear(); 
+        deliveryTimeTextField.clear();
+        orderItemsTextArea.setText("");
+        subtotalTextField.clear();
+        taxTextField.clear();
+        totalCostTextField.clear();
+        currentIndexTextField.clear();
+        totalIndexTextField.clear();
     }
     
+    private double costUpdate() {
+        double subtotal = 0;
+        double delivery = 0;
+        double tax = 0;
+        double total = 0;
+
+        // get delivery cost
+        for (Account acc : allAccounts) {
+            if (acc.getAccountId() == currentOrder.getCustomerId()) {
+                for (DeliverySchedule schedule : deliverySchedules) {
+                    if (schedule.getPostcode() == ((Customer) acc).getPostcode()) {
+                       delivery = schedule.getDeliveryCost();
+                    }
+                }
+            }
+        }
+        
+        // Calculate subtotal
+        for (OrderItem item : currentOrder.getProductList()) {
+            double itemPrice = 0;
+            for (Product product : allProducts) {
+                if (product.getProductId() == item.getProductId()) {
+                    itemPrice = product.getPrice();
+                    break;
+                }
+            }
+            subtotal += itemPrice * item.getQuantity();
+        }
+        subtotal = Math.round(subtotal * 100.0) / 100.0;
+
+        subtotalTextField.setText("$" + subtotal);
+
+        // Calculate tax
+        tax = (subtotal + delivery) * 0.1;
+        tax = Math.round(tax * 100.0) / 100.0;
+        taxTextField.setText("$" + tax);
+
+        // Calculate total cost
+        total = subtotal + delivery + tax;
+        total = Math.round(total * 100.0) / 100.0;
+        totalCostTextField.setText("$" + total);
+        
+        return total;
+    }
 }

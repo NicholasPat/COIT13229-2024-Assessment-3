@@ -41,10 +41,10 @@
             <Label text="Subtotal" GridPane.rowIndex="2" />
             <Label text="Tax" GridPane.rowIndex="3" />
             <Label text="Total Cost" GridPane.rowIndex="4" />
-            <TextField fx:id="totalCostTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <TextField fx:id="taxTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <TextField fx:id="subtotalTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField fx:id="deliveryCostTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="totalCostTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="taxTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="subtotalTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="deliveryCostTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextArea fx:id="orderItemsTextArea" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" />
          </children>
       </GridPane>
@@ -107,20 +107,23 @@
             <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <TextField fx:id="firstNameTextField" GridPane.columnIndex="1" />
-            <TextField fx:id="lastNameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="emailTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="firstNameTextField" editable="false" GridPane.columnIndex="1" />
+            <TextField fx:id="lastNameTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="emailTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="First Name" />
             <Label text="Last Name" GridPane.rowIndex="1" />
             <Label text="Email" GridPane.rowIndex="2" />
             <Label text="Delivery Address" GridPane.rowIndex="4" />
             <Label text="Phone Number" GridPane.rowIndex="3" />
-            <TextField fx:id="phonenumberTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <TextField fx:id="addressTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <Label text="Delivery Time" GridPane.rowIndex="5" />
-            <TextField fx:id="deliveryTimeTextField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="phonenumberTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="addressTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label text="Delivery Time" GridPane.rowIndex="6" />
+            <TextField fx:id="deliveryTimeTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <Label text="Delivery Day" GridPane.rowIndex="5" />
+            <TextField fx:id="deliveryDayTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
       </GridPane>
    </children>

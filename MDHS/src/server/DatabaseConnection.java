@@ -481,12 +481,12 @@ public class DatabaseConnection {
            while (resultSet.next()) { 
                //Getting initial order information
                int orderId = resultSet.getInt("orderId"); 
-               int customerId = resultSet.getInt("customerId");
+               int customerId = resultSet.getInt("accountId");
                String deliveryTime = resultSet.getString("deliveryTime");
                double totalCost = resultSet.getDouble("totalCost"); 
                
                //Getting orderItems 
-               List<OrderItem> orderItems = null; 
+               List<OrderItem> orderItems = new ArrayList<>(); 
                getOrderitemsByOrderId.setInt(1, orderId);
                ResultSet orderItemsResults = getOrderitemsByOrderId.executeQuery();
                
