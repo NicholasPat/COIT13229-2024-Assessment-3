@@ -190,6 +190,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         String deliveryTime = hourComboBox.getValue() +":"+minuteComboBox.getValue();
         double totalCost = costUpdate();
         try {
+            // TODO: Update Order
             session.objOut.writeObject("PlaceOrder");
             int currentOrderId = 0;
             if (currentOrder != null) {

@@ -1,14 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package client.controller;
 
 import client.MDHSClient;
 import client.Session;
-import common.model.Account;
-import common.model.Administrator;
-import common.model.Customer;
+import common.model.*;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;

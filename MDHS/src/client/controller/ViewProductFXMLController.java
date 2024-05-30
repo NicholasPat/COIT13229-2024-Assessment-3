@@ -97,7 +97,7 @@ public class ViewProductFXMLController implements Initializable, SceneController
                 numberOfProducts = productlist.size();
                 currentProductIndex = 0;
                 currentProduct = productlist.get(currentProductIndex);
-                populateForm(); // display current complaint
+                populateForm(); // display current product
             }
             
         } catch (Exception ex) {

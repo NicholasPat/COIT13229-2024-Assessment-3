@@ -158,6 +158,9 @@ class ConnectionThread extends Thread {
                     List<Product> allProducts = database.getAllProducts(); 
                     objOut.writeObject(allProducts); 
                     
+                    ArrayList<DeliverySchedule> deliverySchedules = database.getDeliverySchedules();
+                    objOut.writeObject(deliverySchedules);
+                    
                 } else if (option.equalsIgnoreCase("AllCustomers")){ 
                     System.out.println("AllCustomers");
                     List<Account> allAccounts = database.getAllAccounts();
