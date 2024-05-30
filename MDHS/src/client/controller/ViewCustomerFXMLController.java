@@ -55,7 +55,9 @@ public class ViewCustomerFXMLController implements Initializable, SceneControlle
 
     @Override
     public void handleSceneChange() {
+        clear();
         loadAccounts(); 
+        adminCheckbox.setDisable(true);
     }
     /**
      * Initializes the controller class.
@@ -100,9 +102,6 @@ public class ViewCustomerFXMLController implements Initializable, SceneControlle
                 numberOfAccounts = accountList.size(); 
                 currentAccountIndex = 0; 
                 currentAccount = accountList.get(currentAccountIndex); 
-                //Doing here because only needs to be iterated on once 
-                totalIndexTextField.setText(Integer.toString(numberOfAccounts));
-                currentIndexTextField.setText("1"); //No need to be dynamic, should always be once 
                 populateForm();
             } else { 
                 //Information message, but should never be called, just an edge 
@@ -117,20 +116,25 @@ public class ViewCustomerFXMLController implements Initializable, SceneControlle
     }
     
     private void populateForm() { 
+        clear();
         firstNameTextField.setText(currentAccount.getFirstName()+""); 
         lastNameTextField.setText(currentAccount.getLastName()+""); 
         emailTextField.setText(currentAccount.getEmailAddress()+""); 
         
         if (currentAccount instanceof Administrator) { 
-            phonenumberTextField.setText("Administrators have no phone number linked"); 
-            addressTextField.setText("Administrators have no address linked"); 
-            adminCheckbox.selectedProperty();
+            phonenumberTextField.setText("n/a"); 
+            addressTextField.setText("n/a"); 
+            adminCheckbox.setSelected(true);
         } else if (currentAccount instanceof Customer) { 
             //Unsure if it will work so will see 
-            Customer currentCustomer = Customer.class.cast(currentAccount);
+            Customer currentCustomer = (Customer) currentAccount;
             phonenumberTextField.setText(currentCustomer.getPhoneNumber()+"");
             addressTextField.setText(currentCustomer.getDeliveryAddress()+""); 
+            adminCheckbox.setSelected(false);
         }
+        
+        totalIndexTextField.setText(numberOfAccounts+1+"");
+        currentIndexTextField.setText(currentAccountIndex+"");
     }
     
     private void clear() { 
@@ -139,6 +143,9 @@ public class ViewCustomerFXMLController implements Initializable, SceneControlle
         emailTextField.clear();
         phonenumberTextField.clear();
         addressTextField.clear(); 
+        totalIndexTextField.clear();
+        currentIndexTextField.clear();
+        adminCheckbox.setSelected(false);
     }
     
 }

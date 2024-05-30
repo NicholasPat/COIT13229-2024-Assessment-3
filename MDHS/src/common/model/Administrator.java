@@ -28,6 +28,9 @@ public class Administrator extends Account{
     public boolean isAdmin() {
         return isAdmin;
     }
-    
+
+    public boolean getIsAdmin() {
+        return isAdmin;
+    }
     
 }
