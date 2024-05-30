@@ -4,7 +4,7 @@ package client.controller;
 import client.MDHSClient;
 import client.Session;
 import common.UserInputException;
-import common.model.*;
+import common.model.DeliverySchedule;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +110,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     private void addButtonHandler(ActionEvent event) {
         recordDeliverySchedule();
         try {
-            session.objOut.writeObject("AddSchedule");
+            session.objOut.writeObject("RecordSchedule");
             session.objOut.writeObject(currentSchedule);
             
         } catch (Exception ex) {
@@ -128,7 +128,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         recordDeliverySchedule();
         
         try {
-            session.objOut.writeObject("UpdateSchedule");
+            session.objOut.writeObject("RecordSchedule");
             session.objOut.writeObject(currentSchedule);
             
         } catch (Exception ex) {

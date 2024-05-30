@@ -200,22 +200,14 @@ class ConnectionThread extends Thread {
                     int orderId = order.getOrderId(); // TODO: Order not null
                     database.deleteOrder(orderId);
                     
-                } else if (option.equalsIgnoreCase("NewProduct")){ 
-                    System.out.println("NewProduct");
-                    
-                } else if (option.equalsIgnoreCase("EditProduct")){ 
-                    System.out.println("EditProduct");
+                } else if (option.equalsIgnoreCase("RecordProduct")){ 
+                    System.out.println("RecordProduct");
                     
                 } else if (option.equalsIgnoreCase("RemoveProduct")){ 
                     System.out.println("RemoveProduct");
                     
-                } else if (option.equalsIgnoreCase("AddSchedule")){ 
-                    System.out.println("AddSchedule");
-                    DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
-                    database.recordDeliverySchedule(schedule);
-                    
-                } else if (option.equalsIgnoreCase("UpdateSchedule")){ 
-                    System.out.println("EditSchedule");
+                } else if (option.equalsIgnoreCase("RecordSchedule")){ 
+                    System.out.println("RecordSchedule");
                     DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
                     database.recordDeliverySchedule(schedule);
                     
