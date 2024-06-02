@@ -5,11 +5,9 @@ import common.model.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  * 
- * @author lucht
+ * @author lucht, linke
  */
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost/mdhsDB";
@@ -29,7 +27,7 @@ public class DatabaseConnection {
     private PreparedStatement editProduct = null; 
     private PreparedStatement getAllProducts = null; 
     private PreparedStatement getProductById = null; 
-    private PreparedStatement deleteProduct = null; 
+    private PreparedStatement deleteProductById = null; 
     private PreparedStatement productExists = null;
     
     //Database Queries -- Order related 
@@ -68,7 +66,7 @@ public class DatabaseConnection {
     }
     
     /** 
-     * This method prepares the queries for use with program
+     * This method prepares the queries for use with the program 
      * @throws SQLException 
      */
     private void prepareDatabaseQueries() throws SQLException{ 
@@ -102,7 +100,10 @@ public class DatabaseConnection {
         productExists = connection.prepareStatement("SELECT COUNT(*) "
                 + "FROM Product "
                 + "WHERE productName = ? AND quantity = ? AND unit = ? AND price = ? AND ingredients = ?");
-        // TODO: handle delete product right now, so will leave for later 
+        deleteProductById = connection.prepareStatement("DELETE FROM Product WHERE productId = ?"); 
+        editProduct = connection.prepareStatement("UPDATE `Product` "
+                + "SET productName = ?, quantity = ?, unit = ?, price = ?, ingredients = ? "
+                + "WHERE productId = ?"); 
         
         
         //Order related queries 
@@ -144,6 +145,11 @@ public class DatabaseConnection {
         deleteDeliverySchedule = connection.prepareStatement("DELETE FROM DeliverySchedule WHERE postcode = ?");
     }
     
+    /** 
+     * 
+     * @param email Searching for user via their email 
+     * @return an Account with the linked email, or if no match simply returns a null object
+     */
     public Account getAccountByEmail(String email) { 
         //Assumption - 1 result as cannot have two usernames 
         ResultSet results = null ; 
@@ -185,6 +191,11 @@ public class DatabaseConnection {
         return acc;
     }
     
+    /** 
+     * 
+     * @param acc Account object being added to the DB 
+     * @return TRUE - Successful addition of Account / FALSE - Unsuccessful addition of Account
+     */
     public Boolean addAccount(Account acc) { 
         try { 
             String password = new String(acc.getPassword(), StandardCharsets.UTF_8);
@@ -256,7 +267,7 @@ public class DatabaseConnection {
     }
     
     /**
-     * 
+     * Checks if the product in question exists already or not 
      * @param product to check if already in database
      * @return true if the product exists, false otherwise
      */
@@ -284,6 +295,10 @@ public class DatabaseConnection {
         return false;
     }
     
+    /** 
+     * Creates an ArrayList with all of the Delivery Schedules 
+     * @return ArrayList of the Delivery Schedules 
+     */
     public ArrayList<DeliverySchedule> getDeliverySchedules() {
         ArrayList<DeliverySchedule> deliverySchedules = new ArrayList<>();
 
@@ -301,7 +316,12 @@ public class DatabaseConnection {
 
         return deliverySchedules;
     }
-   
+    
+    /** 
+     * 
+     * @param postcode
+     * @return 
+     */
     public DeliverySchedule getDeliveryScheduleByPostcode(int postcode) {
         ResultSet resultSet = null ; 
         DeliverySchedule schedule = null ; 
@@ -321,8 +341,12 @@ public class DatabaseConnection {
         } 
         
         return schedule;
-   }
-   
+    }
+    
+    /** 
+     * 
+     * @return 
+     */
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
 
@@ -343,7 +367,12 @@ public class DatabaseConnection {
 
         return products;
     }
-   
+    
+    /** 
+     * 
+     * @param custId
+     * @return 
+     */
     public Order getOrderByCustomerId(int custId){
         ResultSet resultSet = null ; 
         Order order = null ; 
@@ -385,7 +414,11 @@ public class DatabaseConnection {
         
         return order;
    }
-   
+    
+    /** 
+     * 
+     * @param orderId 
+     */
     public void deleteOrder(int orderId) {
        try {
             // Delete all order items associated with the order
@@ -397,8 +430,12 @@ public class DatabaseConnection {
             deleteOrder.executeUpdate();
         } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
         } 
-   }
-
+    }
+    
+    /** 
+     * 
+     * @param order 
+     */
     public void saveOrder(Order order) {
         try {
             if (order.getOrderId() != 0) {
@@ -452,7 +489,7 @@ public class DatabaseConnection {
     
     /** 
     * 
-    * @return 
+    * @return List of all Accounts 
     */
     public List<Account> getAllAccounts() { 
        List<Account> accounts = new ArrayList<>(); 
@@ -483,7 +520,11 @@ public class DatabaseConnection {
        
        return accounts;
     }
-   
+    
+    /** 
+     * 
+     * @return List of all Orders 
+     */
     public List<Order> getAllOrders() { 
        List<Order> orders = new ArrayList<>();
        
@@ -516,7 +557,12 @@ public class DatabaseConnection {
        
        return orders; 
     }
-   
+    
+    /** 
+     * 
+     * @param productId ID to be used for the entry search 
+     * @return Singular Product object 
+     */
     public Product getProductById(int productId) { 
        Product currentProduct = null; 
        
@@ -546,7 +592,12 @@ public class DatabaseConnection {
        
        return currentProduct; 
     }
-   
+    
+    /** 
+     * 
+     * @param customerId 
+     * @return 
+     */
     public Customer getCustomerById(int customerId) { 
        Customer currentCustomer = null; 
        
@@ -573,7 +624,11 @@ public class DatabaseConnection {
        
        return currentCustomer; 
     }
-   
+    
+    /** 
+     * 
+     * @param schedule 
+     */
     public void recordDeliverySchedule(DeliverySchedule schedule) {
         try {
             checkDeliverySchedule.setInt(1, schedule.getPostcode());
@@ -601,7 +656,11 @@ public class DatabaseConnection {
             System.err.println("Error in `recordDeliverySchedule()`: " + ex.getMessage());
         }
     }
-   
+    
+    /** 
+     * 
+     * @param schedule 
+     */
     public void deleteDeliverySchedule(DeliverySchedule schedule) {
         try {
             checkDeliverySchedule.setInt(1, schedule.getPostcode());
@@ -610,7 +669,112 @@ public class DatabaseConnection {
                 deleteDeliverySchedule.setInt(1, schedule.getPostcode());
                 deleteDeliverySchedule.executeUpdate();
             }
-        } catch (SQLException ex) {System.err.println("Error in `deleteDeliverySchedule()`: " + ex.getMessage());
+        } catch (SQLException ex) {
+            System.err.println("Error in `deleteDeliverySchedule()`: " + ex.getMessage());
+        }
+    }
+    
+    /**
+     * Adds product to DB. Used Add function in the client ManageProductController.java 
+     * @param product Product to be added to the DB
+     * @return Identifier for if addition was successful 
+     */
+    public boolean addProduct(Product product) { 
+        String productName = product.getProductName(); 
+        String unit = product.getUnit(); 
+        int quantity = product.getQuantity(); 
+        double price = product.getPrice(); 
+        String ingredients = product.getIngredients(); 
+        
+        int result; 
+        
+        try { 
+            addProduct.setString(1, productName); 
+            addProduct.setInt(2, quantity); 
+            addProduct.setString(3, unit); 
+            addProduct.setDouble(4, price); 
+            addProduct.setString(5, ingredients); 
+            
+            result = addProduct.executeUpdate(); 
+            
+            if (result == 1) { 
+                System.out.println("Successfully added product (code: " + result + ")");
+                return true; 
+            } else { 
+                System.out.println("Unsuccessfully added product (code: " + result + ")"); 
+                return false; 
+            }
+        } catch (SQLException e) {
+            System.err.println("Error adding Product: " + e.getMessage());
+            return false; 
+        }
+    }
+    
+    /** 
+     * Received product ID from the client and then actions deletion of the 
+     * product from the DB 
+     * @param productId 
+     * @return 
+     */
+    public boolean deleteProduct(int productId) {
+        int result; 
+        try { 
+            deleteProductById.setInt(1, productId); 
+            result = deleteProductById.executeUpdate(); 
+            
+            if (result == 1) { 
+                System.out.println("Successfully deleted product (code: " + result + ")");
+                return true; 
+            } else { 
+                System.out.println("Unsuccessfully deleted product (code: " + result + ")"); 
+                return false; 
+            }
+            
+        } catch (SQLException ex) {
+            System.err.println("Error in `deleteProduct()`: " + ex.getMessage());
+            return false; 
+        }
+    }
+    
+    /** 
+     * Edits the product completely, won't bother checking if values are varied.
+     * This is so the server won't be bogged down trying to figure out what is 
+     * different as well. Plus saves prepared statement space as would need one 
+     * for each table column.
+     * @param product Product object with variables to allow for update 
+     * @return 
+     */
+    public boolean updateProduct(Product product) { 
+        String productName = product.getProductName(); 
+        int quantity = product.getQuantity(); 
+        String unit = product.getUnit(); 
+        double price = product.getPrice(); 
+        String ingredients = product.getIngredients(); 
+        int productId = product.getProductId(); 
+        
+        int result = 0; 
+        
+        try { 
+            editProduct.setString(1, productName); 
+            editProduct.setInt(2, quantity); 
+            editProduct.setString(3, unit); 
+            editProduct.setDouble(4, price); 
+            editProduct.setString(5, ingredients); 
+            editProduct.setInt(6, productId);
+            
+            result = editProduct.executeUpdate(); 
+            
+            if (result == 1) { 
+                System.out.println("Successfully edited product (code: " + result + ")");
+                return true; 
+            } else { 
+                System.out.println("Unsuccessfully edited product (code: " + result + ")"); 
+                return false; 
+            }
+            
+        }catch (SQLException e) {
+            System.err.println("Error varying Product: " + e.getMessage());
+            return false; 
         }
     }
 }

@@ -11,22 +11,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 /**
  *
- * @author lucht
+ * @author lucht, linke
  */
 public class MHDSServer {
 
     /**
+     * 
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        int threadCount = 0; 
         try{
             int serverPort = 6811; 
             DatabaseConnection database = new DatabaseConnection();
@@ -34,7 +34,7 @@ public class MHDSServer {
             ServerSocket listenSocket = new ServerSocket(serverPort);
             while(true) {
                 Socket clientSocket = listenSocket.accept();
-                ConnectionThread c = new ConnectionThread(clientSocket, database);
+                ConnectionThread c = new ConnectionThread(clientSocket, database, threadCount++);
             }
         } catch(IOException e){ System.out.println("Socket Error: "+e.getMessage());}
     }
@@ -43,7 +43,7 @@ public class MHDSServer {
     /** 
      * Loads products from a CSV file and inserts into database.
      * Invoked upon startup.
-     * 
+     * @param database 
      */
     private static void loadProductFile(DatabaseConnection database) { 
         String fileName = "A3-products.csv" ; 
@@ -103,24 +103,30 @@ public class MHDSServer {
     }
 }
 
+/** 
+ * 
+ * @author linke
+ */
 class ConnectionThread extends Thread {
     ObjectInputStream objIn;
     ObjectOutputStream objOut;
     Socket clientSocket;
     DatabaseConnection database;
     Authenticator authenticator;
+    int threadCount; 
     
     /**
     * Constructor for Connection
     * @param aClientSocket socket client is connecting on
     */
-    public ConnectionThread (Socket aClientSocket, DatabaseConnection db) {
+    public ConnectionThread (Socket aClientSocket, DatabaseConnection db, int threadCount) {
         try {
             clientSocket = aClientSocket;
             database = db;
             objIn = new ObjectInputStream( clientSocket.getInputStream());
             objOut = new ObjectOutputStream( clientSocket.getOutputStream());
             authenticator = new Authenticator();
+            this.threadCount = threadCount;
             this.start();
         } catch(IOException e) {System.out.println("Connection:"+e.getMessage());}
     }
@@ -201,10 +207,24 @@ class ConnectionThread extends Thread {
                     database.deleteOrder(orderId);
                     
                 } else if (option.equalsIgnoreCase("RecordProduct")){ 
-                    System.out.println("RecordProduct");
+                    System.out.println("RecordProduct"); 
+                    Product product = (Product) objIn.readObject();
+                    boolean check = database.addProduct(product); 
+                    if (check) { 
+                        objOut.writeObject("RecordProductSuccess");
+                    } else { 
+                        objOut.writeObject("RecordProductFail");
+                    }
                     
-                } else if (option.equalsIgnoreCase("RemoveProduct")){ 
-                    System.out.println("RemoveProduct");
+                } else if (option.equalsIgnoreCase("DeleteProduct")){ 
+                    System.out.println("DeleteProduct");
+                    int productId = (Integer) objIn.readObject(); 
+                    boolean check = database.deleteProduct(productId);
+                    if (check) { 
+                        objOut.writeObject("DeleteProductSuccess");
+                    } else { 
+                        objOut.writeObject("DeleteProductFail");
+                    }
                     
                 } else if (option.equalsIgnoreCase("RecordSchedule")){ 
                     System.out.println("RecordSchedule");
@@ -215,13 +235,28 @@ class ConnectionThread extends Thread {
                     System.out.println("DeleteSchedule");
                     DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
                     
-                } 
+                } else if (option.equalsIgnoreCase("EditProduct")) { 
+                    System.out.println("EditProduct"); 
+                    Product product = (Product) objIn.readObject();
+                    boolean check = database.updateProduct(product); 
+                    if (check) { 
+                        objOut.writeObject("UpdateProductSuccess");
+                    } else { 
+                        objOut.writeObject("UpdateProductFail");
+                    }
+                }
             }
         } catch (IOException e){ System.out.println(/*close failed*/);
         } catch(ClassNotFoundException ex){System.out.println("CNF Error:"+ex.getMessage());
         } finally{ try {objIn.close();clientSocket.close();}catch (IOException e){/*close failed*/}}
     }
     
+    /** 
+     * Beings in the user account for Login and checks the password after decrypting 
+     * with the password from the same email account from the DB 
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
     private void login() throws IOException, ClassNotFoundException {
         Account user = (Account) objIn.readObject();
         Account acc = database.getAccountByEmail(user.getEmailAddress());
@@ -254,6 +289,13 @@ class ConnectionThread extends Thread {
         }
     }
     
+    /** 
+     * Used during registration. Will create the account and add it to the DB. 
+     * After adding it will set a null password for the account and send it back 
+     * to the client. 
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
     private void register() throws IOException, ClassNotFoundException {        
         Account acc = (Account) objIn.readObject();
         try {
