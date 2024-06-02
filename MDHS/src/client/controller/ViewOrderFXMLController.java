@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -56,6 +57,8 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
     private TextField addressTextField;
     @FXML
     private TextField deliveryTimeTextField;
+    @FXML
+    private TextField deliveryDayTextField;
     
     private List<Order> orderList; 
     private List<Account> allAccounts;
@@ -64,14 +67,17 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
     private Order currentOrder; 
     private int currentOrderIndex; 
     private int numberOfOrders; 
-    @FXML
-    private TextField deliveryDayTextField;
-
+    
+    
+    /** 
+     * When changing scene from the Dashboard, perform these two methods 
+     */
     @Override
     public void handleSceneChange() {
         clear();
         loadAllData(); 
     }
+    
     /**
      * Initializes the controller class.
      */
@@ -79,12 +85,23 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }    
-
+    
+    /** 
+     * On clicking the "Dashboard" button, return to the dashboard interface. 
+     * 
+     * @param event 
+     */
     @FXML
     private void dashboardButtonHandler(ActionEvent event) {
         MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
-
+    
+    /** 
+     * On clicking the button, go back an entry. If it 0 already, roll over 
+     * to the top of the list. 
+     * 
+     * @param event 
+     */
     @FXML
     private void previousIndexButtonHandler(ActionEvent event) {
         currentOrderIndex--;
@@ -92,9 +109,14 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
             currentOrderIndex = numberOfOrders-1; // if index went below 0 cycle back to end of list
         currentOrder = orderList.get(currentOrderIndex);
         populateForm();
-        
     }
-
+    
+    /** 
+     * On clicking the button, go forward an entry. If it is max number already, 
+     * then cycle back to the bottom of the list. 
+     * 
+     * @param event 
+     */
     @FXML
     private void nextIndexButtonHandler(ActionEvent event) {
         currentOrderIndex++;
@@ -104,15 +126,23 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
         populateForm();
     }
     
+    /** 
+     * Ping the server and receive the information for all Orders, also get the 
+     * information for all Accounts, all Products, and all DeliverySchedules. 
+     * This all gets matched up via the populateForm() method. 
+     */
     private void loadAllData() {
         Session session = Session.getSession(); 
 
         try {
+            //Send server String of what is desired
             session.objOut.writeObject("AllOrders");
+            
+            //These should not have errors, due to coming from DB / server
             orderList = (List<Order>) session.objIn.readObject(); 
             allAccounts = (List<Account>) session.objIn.readObject(); 
             allProducts = (List<Product>) session.objIn.readObject(); 
-            deliverySchedules = (List<DeliverySchedule>) session.objIn.readObject(); 
+            deliverySchedules = (List<DeliverySchedule>) session.objIn.readObject();
             
             if ( orderList.size() != 0 ) {
                 numberOfOrders = orderList.size();
@@ -121,12 +151,25 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
                 populateForm(); // display current order
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             System.out.println("Exception while loading order information: " + ex.getMessage());
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, 
+                    "Exception while loading order information: \n" + ex.getMessage()
+                    + ".\nReturning to dashboard.");
+            alert.showAndWait();
+            
             session.setUser(null);
+            MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
         }
     }
     
+    /** 
+     * Responsible for inputting Object details into the text fields and text 
+     * areas. This is using the Object(s) returned from the server, being the 
+     * getting all of the information. 
+     * Matches up information gathered from the server. 
+     */
     private void populateForm() { 
         clear();
         try {
@@ -166,11 +209,21 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
             currentIndexTextField.setText(currentOrderIndex+1+"");
             totalIndexTextField.setText(numberOfOrders+"");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             System.out.println("Exception while populating the form: " + ex.getMessage());
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, 
+                    "Exception occured while populating the form: \n" + ex.getMessage()
+                    + ".\nReturning to the Dashboard.");
+            alert.showAndWait();
+            
+            MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
         }
     }
     
+    /** 
+     * Responsible for clearing all text fields and text areas. 
+     */
     private void clear() { 
         firstNameTextField.clear(); 
         lastNameTextField.clear(); 
@@ -188,6 +241,13 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
         totalIndexTextField.clear();
     }
     
+    /** 
+     * Updates the total cost when gathered from the server. This is so that if 
+     * there were changes to products, it would be able to update the cost with 
+     * that new information 
+     * 
+     * @return totalCost as a Double variable
+     */
     private double costUpdate() {
         double subtotal = 0;
         double delivery = 0;

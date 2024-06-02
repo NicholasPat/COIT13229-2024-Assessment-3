@@ -11,10 +11,19 @@ public class DeliverySchedule implements Serializable {
     private int postcode;
     private String deliveryDay;
     private double deliveryCost;
-
+    
+    /** 
+     * Empty constructor, makes an object with no properties 
+     */
     public DeliverySchedule() {
     }
-
+    
+    /** 
+     * Used to set a day's Delivery Schedule. 
+     * @param postcode
+     * @param deliveryDay
+     * @param deliveryCost 
+     */
     public DeliverySchedule(int postcode, String deliveryDay, double deliveryCost) {
         this.postcode = postcode;
         this.deliveryDay = deliveryDay;

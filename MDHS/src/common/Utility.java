@@ -22,6 +22,9 @@ public class Utility {
     /**
      * Check if a string is valid
      * @param str String to check
+     * @param minLength Minimum length allowed
+     * @param maxLength Maximum length allowed
+     * @param canContainNumbers Is allowed to have integer values 
      * @return TRUE - valid string / FALSE - invalid string
     */
     public static boolean isValidString(String str, int minLength, int maxLength, boolean canContainNumbers) {
@@ -37,6 +40,12 @@ public class Utility {
 	}
         return valid;
     }
+    
+    /** 
+     * Check if a string is an email (contains '@')
+     * @param str String to check 
+     * @return TRUE - valid email / FALSE - invalid email 
+     */
     public static boolean isValidEmail(String str) {      
 	boolean valid = false;
         for (int i = 0; i < str.length(); i++) {
@@ -47,7 +56,7 @@ public class Utility {
     }
     
    /**
-     * Check if a string is numeric.
+     * Check if a string is numeric
      * @param str String to check
      * @return TRUE - is numeric / FALSE - not numeric
      */
@@ -59,8 +68,9 @@ public class Utility {
 	}
         return valid;
     }
+    
     /**
-     * Check if Number is between 2 values.
+     * Check if Number is between 2 values
      * Number is parsed as long as to check it is less than max int
      * @param num long to check
      * @param lower Lower limit
@@ -94,6 +104,12 @@ public class Utility {
         return valid;        
     }
     
+    /** 
+     * 
+     * @param e
+     * @param arr
+     * @return 
+     */
     public static int indexOf(String e, String[] arr) {
         int index = -1;
         for (int i = 0; i < arr.length; i++) {
@@ -110,14 +126,17 @@ public class Utility {
         String regex = "(0?[1-9]|1[0-2]):[0-5][0-9]\\s?[AaPp][Mm]";
         return time.matches(regex);
     }
+    
     private static boolean isValid24HourFormat(String time) {
         // Regular expression to match the 24-hour format (HH:MM)
         String regex = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
         return time.matches(regex);
     }
+    
     public static boolean isValidTime(String time) {
         return isValid12HourFormat(time) || isValid24HourFormat(time);
     }
+    
     public static String convertTo24HourFormat(String time) throws UserInputException{
         if (isValid12HourFormat(time)) {
              // Convert 12-hour format to 24-hour format
