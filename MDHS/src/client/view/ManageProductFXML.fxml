@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ManageProductFXMLController">
+<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ManageProductFXMLController">
    <children>
       <Label layoutX="171.0" layoutY="8.0" text="Maleny Dairy to Home System">
          <font>
@@ -38,15 +38,15 @@
             <RowConstraints maxHeight="113.0" minHeight="10.0" prefHeight="95.20001220703126" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <TextField fx:id="nameTextField" GridPane.columnIndex="1" />
-            <TextField fx:id="quantityTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="priceTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="nameTextField" promptText="Product Name" GridPane.columnIndex="1" />
+            <TextField fx:id="quantityTextField" promptText="Max Quantity Available" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="priceTextField" promptText="Input Price ($)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="Product Name" />
             <Label text="Details" GridPane.rowIndex="1" />
-            <Label text="Price" GridPane.rowIndex="2" />
+            <Label text="Price ($)" GridPane.rowIndex="2" />
             <Label text="Ingredients" GridPane.rowIndex="3" />
-            <TextArea fx:id="ingredientsTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <TextField fx:id="unitTextField" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <TextArea fx:id="ingredientsTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" promptText="Input Ingredients List" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="unitTextField" promptText="Units" GridPane.columnIndex="2" GridPane.rowIndex="1" />
          </children>
       </GridPane>
       <Button fx:id="dashboardButton" layoutX="14.0" layoutY="359.0" mnemonicParsing="false" onAction="#dashboardButtonHandler" prefHeight="17.0" prefWidth="116.0" text="&lt; Dashboard">
@@ -79,12 +79,12 @@
                   <Font size="18.0" />
                </font>
             </Button>
-            <TextField fx:id="currentIndexTextField" editable="false" prefHeight="25.0" prefWidth="34.0" GridPane.columnIndex="1">
+            <TextField fx:id="currentIndexTextField" editable="false" prefHeight="25.0" prefWidth="34.0" promptText="Current" GridPane.columnIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </TextField>
-            <TextField fx:id="totalIndexTextField" editable="false" prefHeight="27.0" prefWidth="54.0" GridPane.columnIndex="3">
+            <TextField fx:id="totalIndexTextField" editable="false" prefHeight="27.0" prefWidth="54.0" promptText="Max" GridPane.columnIndex="3">
                <font>
                   <Font size="14.0" />
                </font>

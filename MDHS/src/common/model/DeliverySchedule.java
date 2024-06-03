@@ -1,6 +1,7 @@
 
 package common.model;
 
+import common.UserInputException;
 import java.io.Serializable;
 
 /**
@@ -20,6 +21,7 @@ public class DeliverySchedule implements Serializable {
     
     /** 
      * Used to set a day's Delivery Schedule. 
+     * 
      * @param postcode
      * @param deliveryDay
      * @param deliveryCost 
@@ -28,6 +30,17 @@ public class DeliverySchedule implements Serializable {
         this.postcode = postcode;
         this.deliveryDay = deliveryDay;
         this.deliveryCost = deliveryCost;
+    }
+    
+    public DeliverySchedule(String postcode, String deliveryDay, String deliveryCost) { 
+        try {this.postcode = Integer.parseInt(postcode);} catch (NumberFormatException e) { 
+            throw new UserInputException("\nPostcode must be an Integer value.");}
+        
+        try {this.deliveryCost = Double.parseDouble(deliveryCost);} catch (NumberFormatException e) { 
+            throw new UserInputException("\nDeliveryCost must be an Integer value, or a decimal value.");}
+        
+        this.deliveryDay = deliveryDay; 
+        
     }
 
     public void setPostcode(int postcode) {

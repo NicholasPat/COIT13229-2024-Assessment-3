@@ -6,8 +6,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 /**
+ * DatabaseConnection.java class.<p> 
+ * This class is responsible for communicating with the Database (DB). This is 
+ * done via Prepared Statements which are more secure as using Strings leads the 
+ * ability for malicious actors to insert their own MySQL code into the queries 
+ * and potentially damage the DB. 
  * 
- * @author lucht, linke
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
  */
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost/mdhsDB";
@@ -15,7 +22,6 @@ public class DatabaseConnection {
     private static final String PASSWORD = System.getenv("DBMSpassword"); //your own password to Root account of MySQL
     private Connection connection = null;
     
-    //private PreparedStatement 
     //Database Queries -- Account related 
     private PreparedStatement addAccount = null; 
     private PreparedStatement getAccountByEmail = null; 
@@ -51,94 +57,66 @@ public class DatabaseConnection {
     private PreparedStatement updateDeliverySchedule = null;
     private PreparedStatement deleteDeliverySchedule = null;
     
+    /** 
+     * Prepares the connection. Upon successful connection calls for the method to 
+     * prepare all the statements for use with the program 
+     */
     public DatabaseConnection () {
         try {
-            // attempt to establish dmbs connection
             connection = DriverManager.getConnection( URL,USERNAME,PASSWORD );
             prepareDatabaseQueries(); 
         } catch (SQLException sqlException ) {
-            //System.out.println("Database connection failure. \nPlease check your dbms password.");   
-            //sqlException.printStackTrace();
             System.out.println("SQLException, error message: " + sqlException);
-            sqlException.printStackTrace();
             System.exit( 1 ); // exit if couldnt connect to db
         }
     }
     
     /** 
-     * This method prepares the queries for use with the program 
-     * @throws SQLException 
+     * This method prepares the queries for use with the program. 
+     * @throws SQLException Throws if there is an issue preparing the statements 
+     *                      or if there is an issue with the connection for whatever reason. 
      */
-    private void prepareDatabaseQueries() throws SQLException{ 
-        // = connection.prepareStatement("");
-        
+    private void prepareDatabaseQueries() throws SQLException{
         //Account related queries
-        addAccount = connection.prepareStatement("INSERT INTO Account "
-                + "(firstName, lastName, emailAddress, `password`, phoneNumber, deliveryAddress, postcode, isAdmin)"
+        addAccount = connection.prepareStatement("INSERT INTO Account (firstName, lastName, emailAddress, `password`, phoneNumber, deliveryAddress, postcode, isAdmin) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        getAccountByEmail = connection.prepareStatement("SELECT * "
-                + "FROM Account "
-                + "WHERE emailAddress = ?");
-        getAllAccounts = connection.prepareStatement("SELECT * "
-                + "FROM account");
-        getCustomerById = connection.prepareStatement("SELECT * "
-                + "FROM account "
-                + "WHERE accountId = ?");
+        getAccountByEmail = connection.prepareStatement("SELECT * FROM Account WHERE emailAddress = ?");
+        getAllAccounts = connection.prepareStatement("SELECT * FROM account");
+        getCustomerById = connection.prepareStatement("SELECT * FROM account WHERE accountId = ?");
         
         //Product related queries
-        addProduct = connection.prepareStatement("INSERT INTO Product "
-                + "(productName, quantity, unit, price, ingredients) "
+        addProduct = connection.prepareStatement("INSERT INTO Product (productName, quantity, unit, price, ingredients) "
                 + "VALUES(?, ?, ?, ?, ?)");
-        editProduct = connection.prepareStatement("UPDATE Product "
-                + "SET productName = ?, quantity = ?, unit = ?, price = ?, ingredients = ? "
-                + "WHERE productId = ?"); //productName is another option, but error handle uniqueness 
-        getAllProducts = connection.prepareStatement("SELECT * "
-                + "FROM Product");
-        getProductById = connection.prepareStatement("SELECT * "
-                + "FROM Product "
-                + "WHERE productId = ?");
-        productExists = connection.prepareStatement("SELECT COUNT(*) "
-                + "FROM Product "
+        editProduct = connection.prepareStatement("UPDATE Product SET productName = ?, quantity = ?, unit = ?, price = ?, ingredients = ? "
+                + "WHERE productId = ?"); 
+        getAllProducts = connection.prepareStatement("SELECT * FROM Product");
+        getProductById = connection.prepareStatement("SELECT * FROM Product WHERE productId = ?");
+        productExists = connection.prepareStatement("SELECT COUNT(*) FROM Product "
                 + "WHERE productName = ? AND quantity = ? AND unit = ? AND price = ? AND ingredients = ?");
         deleteProductById = connection.prepareStatement("DELETE FROM Product WHERE productId = ?"); 
-        editProduct = connection.prepareStatement("UPDATE `Product` "
-                + "SET productName = ?, quantity = ?, unit = ?, price = ?, ingredients = ? "
-                + "WHERE productId = ?"); 
-        
+        editProduct = connection.prepareStatement("UPDATE `Product` SET productName = ?, quantity = ?, unit = ?, price = ?, ingredients = ? "
+                + "WHERE productId = ?");
         
         //Order related queries 
-        addOrder = connection.prepareStatement("INSERT INTO `Order` "
-                + "(accountId, deliveryTime, totalCost) "
+        addOrder = connection.prepareStatement("INSERT INTO `Order` (accountId, deliveryTime, totalCost) "
                 + "VALUES(?, ?, ?)", 
                 Statement.RETURN_GENERATED_KEYS);
-        addOrderItem = connection.prepareStatement("INSERT INTO OrderItems "
-                + "(orderId, productId, quantity, cost) "
+        addOrderItem = connection.prepareStatement("INSERT INTO OrderItems (orderId, productId, quantity, cost) "
                 + "VALUES(?, ?, ?, ?)");
-        
         getAllOrders = connection.prepareStatement("SELECT * FROM `Order`");
-        getOrderByCustomerId = connection.prepareStatement("SELECT * "
-                + "FROM `Order` "
-                + "WHERE accountId = ?"); 
-        getOrderitemsByOrderId = connection.prepareStatement("SELECT * "
-                + "FROM `OrderItems` "
-                + "WHERE orderId = ?"); 
+        getOrderByCustomerId = connection.prepareStatement("SELECT * FROM `Order` WHERE accountId = ?"); 
+        getOrderitemsByOrderId = connection.prepareStatement("SELECT * FROM `OrderItems` WHERE orderId = ?"); 
         
         deleteOrder = connection.prepareStatement("DELETE FROM `Order` WHERE orderId = ?");
         deleteOrderItems = connection.prepareStatement("DELETE FROM `OrderItems` WHERE orderId = ?");
-
+        
         updateOrder = connection.prepareStatement("UPDATE `Order` SET accountId = ?, deliveryTime = ?, totalCost = ? WHERE orderId = ?");
         updateOrderItem = connection.prepareStatement("UPDATE `OrderItems` SET productId = ?, quantity = ?, cost = ? WHERE orderId = ? AND productId = ?");
-
-
+        
         //Delivery Schedule related queries 
-        addDeliverySchedule = connection.prepareStatement("INSERT INTO DeliverySchedule "
-                + "(postcode, deliveryDay, deliveryCost)"
-                + "VALUES(?, ?, ?)"); 
-        getAllDeliverySchedules = connection.prepareStatement("SELECT * "
-                + "FROM DeliverySchedule");
-        getDeliveryScheduleByPostcode = connection.prepareStatement("SELECT * "
-                + "FROM `DeliverySchedule` "
-                + "WHERE postcode = ? ");
+        addDeliverySchedule = connection.prepareStatement("INSERT INTO DeliverySchedule (postcode, deliveryDay, deliveryCost VALUES(?, ?, ?)"); 
+        getAllDeliverySchedules = connection.prepareStatement("SELECT * FROM DeliverySchedule");
+        getDeliveryScheduleByPostcode = connection.prepareStatement("SELECT * FROM `DeliverySchedule` WHERE postcode = ? ");
         checkDeliverySchedule = connection.prepareStatement("SELECT COUNT(*) FROM DeliverySchedule WHERE postcode = ?");
         insertDeliverySchedule = connection.prepareStatement("INSERT INTO DeliverySchedule (postcode, deliveryDay, deliveryCost) VALUES (?, ?, ?)");
         updateDeliverySchedule = connection.prepareStatement("UPDATE DeliverySchedule SET deliveryDay = ?, deliveryCost = ? WHERE postcode = ?");
@@ -146,9 +124,11 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Gets an account via email. This is used for the login of the Customer / 
+     * Admin. 
      * 
      * @param email Searching for user via their email 
-     * @return an Account with the linked email, or if no match simply returns a null object
+     * @return      An Account with the linked email, or if no match simply returns a null object
      */
     public Account getAccountByEmail(String email) { 
         //Assumption - 1 result as cannot have two usernames 
@@ -192,9 +172,11 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Attempts to add an Account to the DB using parameters determined by the client. 
      * 
-     * @param acc Account object being added to the DB 
-     * @return TRUE - Successful addition of Account / FALSE - Unsuccessful addition of Account
+     * @param acc   Account object being added to the DB 
+     * @return      TRUE - Successful addition of Account / 
+     *              FALSE - Unsuccessful addition of Account
      */
     public Boolean addAccount(Account acc) { 
         try { 
@@ -236,7 +218,8 @@ public class DatabaseConnection {
     }
     
     /** 
-     * Adds a list of products to the database from a given ArrayList.
+     * Adds a list of products to the database from a given ArrayList. 
+     * 
      * @param products ArrayList of products to be added to the database
      */
     public void addProductsFromFile(ArrayList<Product> products) { 
@@ -268,6 +251,7 @@ public class DatabaseConnection {
     
     /**
      * Checks if the product in question exists already or not 
+     * 
      * @param product to check if already in database
      * @return true if the product exists, false otherwise
      */
@@ -296,7 +280,8 @@ public class DatabaseConnection {
     }
     
     /** 
-     * Creates an ArrayList with all of the Delivery Schedules 
+     * Creates an ArrayList with all of the Delivery Schedules. 
+     * 
      * @return ArrayList of the Delivery Schedules 
      */
     public ArrayList<DeliverySchedule> getDeliverySchedules() {
@@ -318,9 +303,10 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Gets any and all Delivery Schedules using postcode identifier. 
      * 
-     * @param postcode
-     * @return 
+     * @param postcode  Used to find a relevant Delivery Schedule 
+     * @return          Either found Delivery Schedule or a null object 
      */
     public DeliverySchedule getDeliveryScheduleByPostcode(int postcode) {
         ResultSet resultSet = null ; 
@@ -344,8 +330,9 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Get all Products from the DB. 
      * 
-     * @return 
+     * @return List of all the Products 
      */
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
@@ -369,9 +356,10 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Gets the Order via Customer ID. 
      * 
-     * @param custId
-     * @return 
+     * @param custId    Customer ID used to get the Order in question 
+     * @return          Return the Order in relation to the Customer ID 
      */
     public Order getOrderByCustomerId(int custId){
         ResultSet resultSet = null ; 
@@ -416,8 +404,9 @@ public class DatabaseConnection {
    }
     
     /** 
+     * Deletes an Order in question. 
      * 
-     * @param orderId 
+     * @param orderId   Order ID used to identify what Order to delete 
      */
     public void deleteOrder(int orderId) {
        try {
@@ -433,8 +422,9 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Adds an Order to the DB based on Customer variables specified. 
      * 
-     * @param order 
+     * @param order Order object used to add to the DB 
      */
     public void saveOrder(Order order) {
         try {
@@ -488,6 +478,7 @@ public class DatabaseConnection {
     }
     
     /** 
+    * Gets all accounts from the DB. 
     * 
     * @return List of all Accounts 
     */
@@ -522,6 +513,7 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Gets all Orders from the DB. 
      * 
      * @return List of all Orders 
      */
@@ -559,6 +551,7 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Gets a singular Product from the DB based on the Product ID. 
      * 
      * @param productId ID to be used for the entry search 
      * @return Singular Product object 
@@ -594,9 +587,10 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Gets Customer object via ID. 
      * 
-     * @param customerId 
-     * @return 
+     * @param customerId    ID to search for Customer with 
+     * @return              Single Customer object 
      */
     public Customer getCustomerById(int customerId) { 
        Customer currentCustomer = null; 
@@ -626,9 +620,11 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Adds Delivery Schedule or updates if it already exists. 
      * 
-     * @param schedule 
-     * @return  
+     * @param schedule  Object with information for addition or editing 
+     * @return          TRUE - Successful add or edit / FALSE - Unsuccessful add 
+     *                  or edit 
      */
     public boolean recordDeliverySchedule(DeliverySchedule schedule) {
         try {
@@ -665,9 +661,11 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Deletes a Schedule based on whole object. Mainly using postcode since 
+     * Schedule can only have one per postcode. 
      * 
-     * @param schedule 
-     * @return  
+     * @param schedule  Schedule object to get the postcode for deletion 
+     * @return          TRUE - Successful deletion / FALSE - Unsuccessful deletion 
      */
     public boolean deleteDeliverySchedule(DeliverySchedule schedule) {
         try {
@@ -687,9 +685,10 @@ public class DatabaseConnection {
     }
     
     /** 
+     * Updates the DON'T DEPRECATE YET! 
      * 
-     * @param schedule
-     * @return 
+     * @param schedule  
+     * @return          
      */
     public boolean updateDeliverySchedule(DeliverySchedule schedule) { 
         int postcode = schedule.getPostcode(); 
@@ -721,9 +720,10 @@ public class DatabaseConnection {
     }
     
     /**
-     * Adds product to DB. Used Add function in the client ManageProductController.java 
-     * @param product Product to be added to the DB
-     * @return Identifier for if addition was successful 
+     * Adds product to DB. Used Add function in the client ManageProductController.java. 
+     * 
+     * @param product   Product to be added to the DB
+     * @return          Identifier for if addition was successful 
      */
     public boolean addProduct(Product product) { 
         String productName = product.getProductName(); 
@@ -758,9 +758,10 @@ public class DatabaseConnection {
     
     /** 
      * Received product ID from the client and then actions deletion of the 
-     * product from the DB 
-     * @param productId 
-     * @return 
+     * product from the DB. 
+     * 
+     * @param productId ID used to identify Product to delete. 
+     * @return          TRUE - Successful deletion / FALSE - Unsuccessful deletion. 
      */
     public boolean deleteProduct(int productId) {
         int result; 
@@ -786,9 +787,10 @@ public class DatabaseConnection {
      * Edits the product completely, won't bother checking if values are varied.
      * This is so the server won't be bogged down trying to figure out what is 
      * different as well. Plus saves prepared statement space as would need one 
-     * for each table column.
-     * @param product Product object with variables to allow for update 
-     * @return 
+     * for each table column. 
+     * 
+     * @param product   Product object with variables to allow for update 
+     * @return          TRUE - Successful update / FALSE - Unsuccessful update 
      */
     public boolean updateProduct(Product product) { 
         String productName = product.getProductName(); 

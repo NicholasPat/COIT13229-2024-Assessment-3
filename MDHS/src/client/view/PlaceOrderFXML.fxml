@@ -15,7 +15,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.PlaceOrderFXMLController">
+<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.PlaceOrderFXMLController">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="84.0" layoutX="15.0" layoutY="265.0" stroke="BLACK" strokeType="INSIDE" width="336.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="178.0" layoutX="13.0" layoutY="82.0" stroke="BLACK" strokeType="INSIDE" width="336.0" />
@@ -70,8 +70,8 @@
                   <Insets left="20.0" />
                </GridPane.margin>
             </Button>
-            <TextField fx:id="currentOrderItemTextField" editable="false" prefHeight="25.0" prefWidth="34.0" GridPane.columnIndex="1" />
-            <TextField fx:id="totalOrderItemTextField" editable="false" prefHeight="27.0" prefWidth="54.0" GridPane.columnIndex="3" />
+            <TextField fx:id="currentOrderItemTextField" editable="false" prefHeight="25.0" prefWidth="34.0" promptText="Current" GridPane.columnIndex="1" />
+            <TextField fx:id="totalOrderItemTextField" editable="false" prefHeight="27.0" prefWidth="54.0" promptText="Max" GridPane.columnIndex="3" />
             <Label prefHeight="17.0" prefWidth="21.0" text="  of" GridPane.columnIndex="2" />
          </children>
       </GridPane>
@@ -118,7 +118,7 @@
             <ComboBox fx:id="hourComboBox" prefHeight="25.0" prefWidth="76.0" promptText="Hours" GridPane.columnIndex="2" />
             <ComboBox fx:id="minuteComboBox" prefHeight="25.0" prefWidth="86.0" promptText="Minutes" GridPane.columnIndex="4" />
             <Label prefHeight="17.0" prefWidth="24.0" text=" : " GridPane.columnIndex="3" />
-            <TextField fx:id="deliveryDayTextField" editable="false" prefHeight="25.0" prefWidth="141.0" />
+            <TextField fx:id="deliveryDayTextField" editable="false" prefHeight="25.0" prefWidth="141.0" promptText="Delivery Day" />
             <Label prefHeight="17.0" prefWidth="21.0" text=" @" GridPane.columnIndex="1" />
          </children>
       </GridPane>
@@ -134,14 +134,14 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextField fx:id="subtotalTextField" editable="false" prefHeight="25.0" prefWidth="115.0" GridPane.columnIndex="1" />
+            <TextField fx:id="subtotalTextField" editable="false" prefHeight="25.0" prefWidth="115.0" promptText="Subtotal ($)" GridPane.columnIndex="1" />
             <Label text="Subtotal" />
             <Label text="Delivery Fee" GridPane.rowIndex="1" />
-            <TextField fx:id="deliveryCostTextField" editable="false" prefHeight="25.0" prefWidth="115.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="deliveryCostTextField" editable="false" prefHeight="25.0" prefWidth="115.0" promptText="Delivery Fee ($)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="Tax (10%)" GridPane.rowIndex="2" />
-            <TextField fx:id="taxTextField" editable="false" prefHeight="25.0" prefWidth="115.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="taxTextField" editable="false" prefHeight="25.0" prefWidth="115.0" promptText="Amount of Tax Paid ($)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="Total Cost" GridPane.rowIndex="3" />
-            <TextField fx:id="totalCostTextField" editable="false" prefHeight="25.0" prefWidth="115.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="totalCostTextField" editable="false" prefHeight="25.0" prefWidth="115.0" promptText="Total Cost ($)" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
    </children>

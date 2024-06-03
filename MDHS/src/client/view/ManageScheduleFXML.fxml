@@ -33,8 +33,8 @@
       <Label layoutX="157.0" layoutY="151.0" text="Postcode" />
       <Label layoutX="159.0" layoutY="188.0" text="Day" />
       <Label layoutX="158.0" layoutY="225.0" text="Cost ($)" />
-      <TextField fx:id="postcodeTextField" layoutX="228.0" layoutY="147.0" />
-      <TextField fx:id="costTextField" layoutX="228.0" layoutY="221.0" />
+      <TextField fx:id="postcodeTextField" layoutX="228.0" layoutY="147.0" promptText="Input Postcode" />
+      <TextField fx:id="costTextField" layoutX="228.0" layoutY="221.0" promptText="Input Cost ($)" />
       <ChoiceBox fx:id="deliveryDayChoiceBox" layoutX="228.0" layoutY="184.0" prefWidth="150.0" />
       <GridPane layoutX="181.0" layoutY="323.0" prefHeight="17.0" prefWidth="238.0">
          <columnConstraints>
@@ -61,12 +61,12 @@
                   <Font size="18.0" />
                </font>
             </Button>
-            <TextField fx:id="currentIndexTextField" editable="false" prefHeight="25.0" prefWidth="34.0" GridPane.columnIndex="1">
+            <TextField fx:id="currentIndexTextField" editable="false" prefHeight="25.0" prefWidth="34.0" promptText="Current" GridPane.columnIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </TextField>
-            <TextField fx:id="totalIndexTextField" editable="false" prefHeight="27.0" prefWidth="54.0" GridPane.columnIndex="3">
+            <TextField fx:id="totalIndexTextField" editable="false" prefHeight="27.0" prefWidth="54.0" promptText="Max" GridPane.columnIndex="3">
                <font>
                   <Font size="14.0" />
                </font>

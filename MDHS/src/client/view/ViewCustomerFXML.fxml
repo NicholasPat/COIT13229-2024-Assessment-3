@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ViewCustomerFXMLController">
+<AnchorPane fx:id="contentAnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ViewCustomerFXMLController">
    <children>
       <Label layoutX="172.0" layoutY="8.0" text="Maleny Dairy to Home System">
          <font>
@@ -40,16 +40,16 @@
             <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <TextField fx:id="firstNameTextField" editable="false" GridPane.columnIndex="1" />
-            <TextField fx:id="lastNameTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="emailTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="firstNameTextField" editable="false" promptText="Customer First Name " GridPane.columnIndex="1" />
+            <TextField fx:id="lastNameTextField" editable="false" promptText="Customer Last Name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="emailTextField" editable="false" promptText="Customer Email Address" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="First Name" />
             <Label text="Last Name" GridPane.rowIndex="1" />
             <Label text="Email" GridPane.rowIndex="2" />
             <Label text="Delivery Address" GridPane.rowIndex="4" />
             <Label text="Phone Number" GridPane.rowIndex="3" />
-            <TextField fx:id="phonenumberTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <TextField fx:id="addressTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="phonenumberTextField" editable="false" promptText="Customer Phone Number" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="addressTextField" editable="false" promptText="Customer Delivery Address" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label text="Staff Member" GridPane.rowIndex="5" />
             <CheckBox fx:id="adminCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
@@ -84,12 +84,12 @@
                   <Font size="18.0" />
                </font>
             </Button>
-            <TextField fx:id="currentIndexTextField" editable="false" prefHeight="25.0" prefWidth="34.0" GridPane.columnIndex="1">
+            <TextField fx:id="currentIndexTextField" editable="false" prefHeight="25.0" prefWidth="34.0" promptText="Current" GridPane.columnIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </TextField>
-            <TextField fx:id="totalIndexTextField" editable="false" prefHeight="27.0" prefWidth="54.0" GridPane.columnIndex="3">
+            <TextField fx:id="totalIndexTextField" editable="false" prefHeight="27.0" prefWidth="54.0" promptText="Max" GridPane.columnIndex="3">
                <font>
                   <Font size="14.0" />
                </font>

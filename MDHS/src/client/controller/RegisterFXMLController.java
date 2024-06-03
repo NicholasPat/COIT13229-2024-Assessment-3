@@ -1,10 +1,12 @@
-
 package client.controller;
 
 import client.MDHSClient;
 import client.Session;
 import common.Authenticator;
+import common.UserInputException;
+import common.Utility;
 import common.model.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -18,7 +20,11 @@ import javafx.scene.layout.AnchorPane;
 /**
  * FXML Controller class
  *
- * @author lucht
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
+ * @see Initializable 
+ * @see SceneController 
  */
 public class RegisterFXMLController implements Initializable, SceneController {
 
@@ -46,7 +52,10 @@ public class RegisterFXMLController implements Initializable, SceneController {
     private Button dashboardButton;
     @FXML
     private TextField postcodeTextField;
-
+    
+    /** 
+     * On changing the scene to this one, clear the text fields. 
+     */
     @Override
     public void handleSceneChange() {
         clear();
@@ -58,12 +67,21 @@ public class RegisterFXMLController implements Initializable, SceneController {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }    
-
+    
+    /**
+     * On click, takes all text fields and attempt to create an Account, if failed, 
+     * throw an error to be displayed to the user. If successful, throw an INFORMATION 
+     * Alert 
+     * 
+     * @param event 
+     * @throws IOException 
+     * @throws UserInputException 
+     * @throws Exception 
+     */
     @FXML
     private void registerButtonHandler(ActionEvent event) {
         Session session = Session.getSession();
-
-       
+        
         String fName = firstNameTextField.getText().trim();
         String lName = lastNameTextField.getText().trim();
         String email = emailTextField.getText().trim();
@@ -73,16 +91,27 @@ public class RegisterFXMLController implements Initializable, SceneController {
         String postcode = postcodeTextField.getText().trim();
         Boolean isAdmin = adminCheckbox.isSelected();
         
-
+        //Doing password check here because it won't work in the class itself. Due to not passing into it the String of the password 
+        if (!Utility.isValidString(pass, 7, 30, true)) { 
+            String error = "Invalid input for password, must be between 7 and 30 digits in length"; 
+            System.out.println(error); 
+            Utility.alertGenerator("Password input error", 
+                    "Error inputting password", error, 1);
+            return; 
+        }
+        
         try {
             byte[] password = Authenticator.encrypt(session.getPublicKey(), pass);
             Account acc = null;
             if (isAdmin) {
-                acc = new Administrator(isAdmin, fName, lName, email, password);
+                acc = new Administrator(isAdmin, fName, lName, 
+                        email, password);
             } else {
-                acc = new Customer(Integer.parseInt(phone), addr, Integer.parseInt(postcode), fName, lName, email, password);
+                acc = new Customer(phone, addr, postcode, 
+                        fName, lName, email, password);
             }
             
+            //Send String tag to the server, and then the object it will be waiting for 
             session.objOut.writeObject("Register");
             session.objOut.writeObject(acc); // send account info to server
             
@@ -91,32 +120,73 @@ public class RegisterFXMLController implements Initializable, SceneController {
 
             if (response instanceof Account) {
                 Account user = (Account) response;
-                System.out.println("Registration successful: " + user.getEmailAddress());
+                
+                String successMessage = "Registration successful for: " + user.getEmailAddress() + "!"; 
+                System.out.println(successMessage);
+                Utility.alertGenerator("Successful registration!", 
+                        "Successful registration!", successMessage, 2);
                 session.setUser(user);  // login (set user to session) & return to dashboard
                 MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
             } else if (response == null) {
-                System.out.println("Registration Failed.");
+                String error = "Registration failed.\nOne reason could be because we don't support delivery to your postcode: " + postcode; 
+                System.out.println(error);
+                
+                //Assumption, failure could be because of not supported postcode 
+                Utility.alertGenerator("Error occured", "Error adding customer", error, 1);
                 session.setUser(null);
+                
             } else {
-                System.out.println("Unexpected response: " + response.getClass());
+                String error = "Unexpected response: " + response.getClass(); 
+                System.out.println(error);
+                Utility.alertGenerator("Unexpected response!", "Unexpected response from the server", error, 2);
+                
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception during login: " + ex.getMessage());
+        } catch (IOException ex) { //Exception with input output streams 
+            String error = "IOException occured during login: " + ex.getMessage(); 
+            System.out.println(error);
+            Utility.alertGenerator("IOException has occured", 
+                    "IOException occured!", error, 1);
+            session.setUser(null);
+            
+        } catch (UserInputException ex) { //Exception with adding Account 
+            String error = "UserInputException occured during login: " + ex.getMessage();
+            System.out.println(error);
+            Utility.alertGenerator("UserInputException has Occured!", 
+                    "Misinput has occured with the following", error, 1);
+            session.setUser(null); 
+            
+        } catch (Exception ex) { //Exception in general 
+            String error = "Exception occured during login: " + ex.getMessage(); 
+            System.out.println(error);
+            Utility.alertGenerator("Exception has occured!", 
+                    "Exception occured with the following", error, 1);
             session.setUser(null);
         }
     }
-
+    
+    /**
+     * Clears all fields 
+     * 
+     * @param event 
+     */
     @FXML
     private void clearButtonHandler(ActionEvent event) {
         clear();
     }
-
+    
+    /** 
+     * Returns to the dashboard 
+     * 
+     * @param event 
+     */
     @FXML
     private void dashboardButtonHandler(ActionEvent event) {
         MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
     
+    /** 
+     * Clears all entries for re-entry 
+     */
     private void clear() {
         firstNameTextField.clear();
         lastNameTextField.clear();
@@ -127,5 +197,4 @@ public class RegisterFXMLController implements Initializable, SceneController {
         adminCheckbox.setSelected(false);
         postcodeTextField.clear();
     }
-    
 }

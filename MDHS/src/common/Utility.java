@@ -5,12 +5,14 @@ import java.sql.Date;
 import java.util.Calendar;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import javafx.scene.control.Alert;
 
 public class Utility {
     /**
-     * Check if a string is empty
-     * @param str String to check
-     * @return TRUE - if empty / FALSE - contains content
+     * Check if a string is empty. 
+     * 
+     * @param str   String to check
+     * @return      TRUE - if empty / FALSE - contains content
      */
     public static boolean isEmpty(String str) {
         if (str.equals(""))
@@ -19,13 +21,37 @@ public class Utility {
             return false;    
     }
     
+    /** 
+     * Generates an Alert and displays it for the user. Passing information to 
+     * generate the right Alert for the situation. 
+     * 
+     * @param title     Title for the Alert window popup 
+     * @param header    Message to be output in the header of the Alert 
+     * @param message   Message to be output in the body of the Alert
+     * @param i         1 - ERROR alert type / 2 - INFORMATION Alert type
+     */
+    public static void alertGenerator(String title, String header, String message, int i) { 
+        Alert alert = null; 
+        switch (i) {
+            case 1 -> alert = new Alert(Alert.AlertType.ERROR);
+            case 2 -> alert = new Alert(Alert.AlertType.INFORMATION);
+            default -> {
+            }
+        }
+        alert.setTitle(title); 
+        alert.setHeaderText(header);
+        alert.setContentText(message); 
+        alert.showAndWait(); 
+    }
+    
     /**
-     * Check if a string is valid
-     * @param str String to check
+     * Check if a string is valid. 
+     * 
+     * @param str       String to check
      * @param minLength Minimum length allowed
      * @param maxLength Maximum length allowed
      * @param canContainNumbers Is allowed to have integer values 
-     * @return TRUE - valid string / FALSE - invalid string
+     * @return          TRUE - valid string / FALSE - invalid string
     */
     public static boolean isValidString(String str, int minLength, int maxLength, boolean canContainNumbers) {
         boolean valid = true;
@@ -42,9 +68,24 @@ public class Utility {
     }
     
     /** 
-     * Check if a string is an email (contains '@')
-     * @param str String to check 
-     * @return TRUE - valid email / FALSE - invalid email 
+     * Method to test if the phone number matches 10 digit requirement. 
+     * 
+     * @param numberToTest Number which is to be tested as a phone number
+     * @return             TRUE - Valid phone number / FALSE - Invalid phone number
+     */
+    public static boolean isValidPhoneNumber(String numberToTest) { 
+        boolean result = true; 
+        String regexStr = "^[0-9]{10}$"; 
+        if (!numberToTest.matches(regexStr)) 
+            result = false;
+        return result; 
+    }
+    
+    /** 
+     * Check if a string is an email (contains '@'). 
+     * 
+     * @param str   String to check 
+     * @return      TRUE - valid email / FALSE - invalid email 
      */
     public static boolean isValidEmail(String str) {      
 	boolean valid = false;
@@ -56,9 +97,10 @@ public class Utility {
     }
     
    /**
-     * Check if a string is numeric
-     * @param str String to check
-     * @return TRUE - is numeric / FALSE - not numeric
+     * Check if a string is numeric. 
+     * 
+     * @param str   String to check
+     * @return      TRUE - is numeric / FALSE - not numeric
      */
     public static boolean isStringNumeric(String str) {
         boolean valid = true;
@@ -70,12 +112,13 @@ public class Utility {
     }
     
     /**
-     * Check if Number is between 2 values
-     * Number is parsed as long as to check it is less than max int
-     * @param num long to check
+     * Check if Number is between 2 values. <p>
+     * Number is parsed as long as to check it is less than max int. 
+     * 
+     * @param num   long to check
      * @param lower Lower limit
      * @param upper Upper limit
-     * @return TRUE - if between lower & upper values / FALSE - if outside
+     * @return      TRUE - if between lower & upper values / FALSE - if outside
      */
     public static boolean isValidInt(long num, int lower, int upper) {
         boolean valid = true;
@@ -88,10 +131,11 @@ public class Utility {
     }
     
     /**
-     * Check if string is a valid option from an array
-     * @param str string to check
-     * @param options array of options
-     * @return TRUE - In array / FALSE - not in array
+     * Check if string is a valid option from an array. 
+     * 
+     * @param str       string to check
+     * @param options   array of options
+     * @return          TRUE - In array / FALSE - not in array
      */
     public static boolean isValidOption(String str, String[] options) {
         boolean valid = false;
@@ -106,9 +150,9 @@ public class Utility {
     
     /** 
      * 
-     * @param e
-     * @param arr
-     * @return 
+     * @param e     
+     * @param arr   
+     * @return      
      */
     public static int indexOf(String e, String[] arr) {
         int index = -1;
@@ -121,22 +165,43 @@ public class Utility {
         return index;
     }
     
+    /** 
+     * 
+     * @param time
+     * @return 
+     */
     private static boolean isValid12HourFormat(String time) {
         // Regular expression to match the 12-hour format (HH:MMam/pm)
         String regex = "(0?[1-9]|1[0-2]):[0-5][0-9]\\s?[AaPp][Mm]";
         return time.matches(regex);
     }
     
+    /** 
+     * 
+     * @param time
+     * @return 
+     */
     private static boolean isValid24HourFormat(String time) {
         // Regular expression to match the 24-hour format (HH:MM)
         String regex = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
         return time.matches(regex);
     }
     
+    /** 
+     * 
+     * @param time
+     * @return 
+     */
     public static boolean isValidTime(String time) {
         return isValid12HourFormat(time) || isValid24HourFormat(time);
     }
     
+    /** 
+     * 
+     * @param time
+     * @return
+     * @throws UserInputException 
+     */
     public static String convertTo24HourFormat(String time) throws UserInputException{
         if (isValid12HourFormat(time)) {
              // Convert 12-hour format to 24-hour format

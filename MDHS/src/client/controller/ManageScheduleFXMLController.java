@@ -3,6 +3,8 @@ package client.controller;
 
 import client.MDHSClient;
 import client.Session;
+import common.UserInputException;
+import common.Utility;
 import common.model.DeliverySchedule;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,7 +22,9 @@ import javafx.scene.layout.AnchorPane;
 /**
  * FXML Controller class
  *
- * @author lucht, linke
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
  */
 public class ManageScheduleFXMLController implements Initializable, SceneController {
 
@@ -77,6 +81,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     
     /**
      * Initializes the controller class.
+     * 
      * @param url
      * @param rb
      */
@@ -86,6 +91,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     }    
     
     /**
+     * Returns to the Dashboard. 
      * 
      * @param event 
      */
@@ -95,6 +101,8 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     }
     
     /**
+     * Cycles back through the Schedule list. If at the bottom of the list, rolls 
+     * over to the top of the list. 
      * 
      * @param event 
      */
@@ -103,9 +111,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         //Error if there are no more than 1 entries (either null entry or it's 
         //a single result from the server 
         if (deliverySchedules.size() == 1) { 
-            alertInformation("No other delivery schedules in list, please "
-                    + "add some more to create a list.\nClick 'New' then input "
-                    + "desired information, and then click 'Add'"); 
+            smallAlert(); 
             return;
         }
         
@@ -127,9 +133,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         //Error if there are no more than 1 entries (either null entry or it's 
         //a single result from the server 
         if (deliverySchedules.size() == 1) { 
-            alertInformation("No other delivery schedules in list, please "
-                    + "add some more to create a list.\nClick 'New' then input "
-                    + "desired information, and then click 'Add'"); 
+            smallAlert(); 
             return;
         }
         
@@ -155,9 +159,10 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
             alertError(errorMessage); 
             return;
         }
-        recordDeliverySchedule();
+        
         
         try {
+            recordDeliverySchedule();
             session.objOut.writeObject("RecordSchedule");
             session.objOut.writeObject(currentSchedule);
             String message = (String) session.objIn.readObject(); 
@@ -169,6 +174,10 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
                 alertError("Schedule with postcode: " + currentSchedule.getPostcode() + 
                         " was unsuccessfully added"); 
             }
+        } catch (UserInputException e) { 
+            String message = "Exception occured in creating the Product, message: " + e.getMessage(); 
+            System.out.println(message); 
+            Utility.alertGenerator("Input mismatch", "Input mismatch as occured!", message, 1); 
         } catch (Exception ex) {
             //ex.printStackTrace();
             System.out.println("Exception while adding schedule: " + ex.getMessage());
@@ -190,9 +199,10 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
             alertError(errorMessage); 
             return;
         }
-        recordDeliverySchedule(); 
+        
         
         try {
+            recordDeliverySchedule(); 
             session.objOut.writeObject("RecordSchedule");
             session.objOut.writeObject(currentSchedule);
             String message = (String) session.objIn.readObject();
@@ -204,6 +214,8 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
                 alertError("Schedule with postcode: " + currentSchedule.getPostcode() + 
                         " was unsuccessfully updated"); 
             }
+            
+        } catch (UserInputException e) { 
             
         } catch (Exception ex) {
             //ex.printStackTrace();
@@ -293,9 +305,12 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     /**
      * Takes current fields and creates an object with there information. Performs 
      * error handling 
+     * @throws UserInputException 
      */
-    private void recordDeliverySchedule() {
-        String deliveryDay = deliveryDayChoiceBox.getValue();
+    private void recordDeliverySchedule() throws UserInputException {
+        String deliveryDay = deliveryDayChoiceBox.getValue().toLowerCase();
+        String cost = costTextField.getText().trim(); 
+        String postcode = postcodeTextField.getText().trim(); 
         
         //Noticed that sometimes it gets parsed as null, so force as Monday if the case 
         //Normally it will be 
@@ -303,34 +318,6 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
             deliveryDay = "Monday"; 
         }
         
-        //Define variables and set as basically null 
-        double cost = 0; 
-        int postcode = 0;
-        String errorMessage = "";
-        
-        //Try and set the cost, if it fails, write to error message 
-        try { 
-            cost = Double.parseDouble(costTextField.getText());
-        } catch (NumberFormatException e) { 
-            errorMessage += "Error with cost: " + e.getMessage() + "\n";
-        }
-        
-        //Try and set the postcode, if it fails, write to error message 
-        try { 
-            postcode = Integer.parseInt(postcodeTextField.getText());
-        } catch (NumberFormatException e) { 
-            errorMessage += "Error with postcode: " + e.getMessage() + "\n";
-        }
-        
-        //If tries failed, then output error alert, and then return before 
-        //creating the object 
-        if (!errorMessage.equals("")) { 
-            alertError(errorMessage); 
-            clear();
-            return; 
-        }
-        
-        //Assuming checks are passed, then create the object as per normal
         currentSchedule = new DeliverySchedule(postcode, deliveryDay, cost);
     }
     
@@ -381,6 +368,15 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     private void alertInformation(String message) { 
         Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
         alert.showAndWait();
+    }
+    
+    /** 
+     * Used when going too far forward or back in the cycles, creates an Alert. 
+     */
+    private void smallAlert() { 
+        String message = "No other delivery schedules in the list, please add some more to create a list.\n"
+                + "Click 'New' then input desired information, and then click 'Add'"; 
+        Utility.alertGenerator("Notice, no other records", "No other records in DB", message, 2);
     }
     
     /** 
