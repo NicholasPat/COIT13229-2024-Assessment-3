@@ -164,6 +164,7 @@ public class ManageProductFXMLController implements Initializable, SceneControll
             alertError("Please search for a product first, then enter changes."); 
             return; 
         }
+        
         try {
             session.objOut.writeObject("EditProduct");
             session.objOut.writeObject(currentProduct);
@@ -206,7 +207,7 @@ public class ManageProductFXMLController implements Initializable, SceneControll
             session.objOut.writeObject(currentProduct.getProductId());
             String message = (String) session.objIn.readObject(); 
             
-            if (message.equalsIgnoreCase(message)) { 
+            if (message.equalsIgnoreCase("DeleteProductSuccess")) { 
                 alertInformation("Product with ID: " + currentProduct.getProductId() + 
                         ", and name: " + currentProduct.getProductName() + " was "
                         + "successful deleted.");

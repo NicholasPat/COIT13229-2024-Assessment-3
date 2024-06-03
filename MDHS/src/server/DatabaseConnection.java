@@ -628,17 +628,21 @@ public class DatabaseConnection {
     /** 
      * 
      * @param schedule 
+     * @return  
      */
-    public void recordDeliverySchedule(DeliverySchedule schedule) {
+    public boolean recordDeliverySchedule(DeliverySchedule schedule) {
         try {
+            //Check if the Delivery Schedule Exists 
             checkDeliverySchedule.setInt(1, schedule.getPostcode());
             ResultSet resultSet = checkDeliverySchedule.executeQuery();
-
-            boolean exists = false;
+            
+            //If it does, set the state to true, if not then keep as false 
+            boolean exists = false; 
             if (resultSet.next()) {
                 exists = resultSet.getInt(1) > 0;
             }
-
+            
+            //Perform an update or addition 
             if (exists) {
                 System.out.println("Update: " + schedule.getPostcode());
                 updateDeliverySchedule.setString(1, schedule.getDeliveryDay());
@@ -654,14 +658,18 @@ public class DatabaseConnection {
             }
         } catch (SQLException ex) {
             System.err.println("Error in `recordDeliverySchedule()`: " + ex.getMessage());
+            return false; 
         }
+        
+        return true; 
     }
     
     /** 
      * 
      * @param schedule 
+     * @return  
      */
-    public void deleteDeliverySchedule(DeliverySchedule schedule) {
+    public boolean deleteDeliverySchedule(DeliverySchedule schedule) {
         try {
             checkDeliverySchedule.setInt(1, schedule.getPostcode());
             ResultSet resultSet = checkDeliverySchedule.executeQuery();
@@ -671,7 +679,45 @@ public class DatabaseConnection {
             }
         } catch (SQLException ex) {
             System.err.println("Error in `deleteDeliverySchedule()`: " + ex.getMessage());
+            return false;
         }
+        
+        //Assuming all good even at this point 
+        return true; 
+    }
+    
+    /** 
+     * 
+     * @param schedule
+     * @return 
+     */
+    public boolean updateDeliverySchedule(DeliverySchedule schedule) { 
+        int postcode = schedule.getPostcode(); 
+        String day = schedule.getDeliveryDay(); 
+        double cost = schedule.getDeliveryCost(); 
+        
+        int result = 0; 
+        
+        try { 
+            updateDeliverySchedule.setString(1, day); 
+            updateDeliverySchedule.setDouble(2, cost); 
+            updateDeliverySchedule.setInt(3, postcode); 
+            
+            result = updateDeliverySchedule.executeUpdate(); 
+            
+            if (result == 1) { 
+                System.out.println("Successfully edited Delivery Schedule with postcode: " + postcode);
+                return true; 
+            } else { 
+                System.out.println("Unsuccessfully edited Delivery Schedule with postcode: " + postcode); 
+                return false; 
+            }
+            
+        } catch (SQLException ex) {
+            System.err.println("Error in `recordDeliverySchedule()`: " + ex.getMessage());
+        }
+        
+        return true; 
     }
     
     /**
@@ -698,10 +744,10 @@ public class DatabaseConnection {
             result = addProduct.executeUpdate(); 
             
             if (result == 1) { 
-                System.out.println("Successfully added product (code: " + result + ")");
+                System.out.println("Successfully added product");
                 return true; 
             } else { 
-                System.out.println("Unsuccessfully added product (code: " + result + ")"); 
+                System.out.println("Addition of product failed"); 
                 return false; 
             }
         } catch (SQLException e) {
@@ -765,10 +811,10 @@ public class DatabaseConnection {
             result = editProduct.executeUpdate(); 
             
             if (result == 1) { 
-                System.out.println("Successfully edited product (code: " + result + ")");
+                System.out.println("Successfully edited product with ID: " + productId);
                 return true; 
             } else { 
-                System.out.println("Unsuccessfully edited product (code: " + result + ")"); 
+                System.out.println("Unsuccessfully edited product with ID: " + productId); 
                 return false; 
             }
             
@@ -777,4 +823,6 @@ public class DatabaseConnection {
             return false; 
         }
     }
+    
+    
 }

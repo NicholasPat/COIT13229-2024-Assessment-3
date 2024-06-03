@@ -229,11 +229,23 @@ class ConnectionThread extends Thread {
                 } else if (option.equalsIgnoreCase("RecordSchedule")){ 
                     System.out.println("RecordSchedule");
                     DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
-                    database.recordDeliverySchedule(schedule);
+                    boolean check = database.recordDeliverySchedule(schedule);
+                    if (check) { 
+                        objOut.writeObject("AddScheduleSuccess"); 
+                    } else { 
+                        objOut.writeObject("AddScheduleFail"); 
+                    }
+                    System.out.println("");
                     
                 } else if (option.equalsIgnoreCase("DeleteSchedule")){ 
                     System.out.println("DeleteSchedule");
                     DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
+                    boolean check = database.deleteDeliverySchedule(schedule); 
+                    if (check) { 
+                        objOut.writeObject("DeleteScheduleSuccess");
+                    } else { 
+                        objOut.writeObject("DeleteScheduleFail");}
+                    System.out.println("");
                     
                 } else if (option.equalsIgnoreCase("EditProduct")) { 
                     System.out.println("EditProduct"); 
@@ -242,8 +254,19 @@ class ConnectionThread extends Thread {
                     if (check) { 
                         objOut.writeObject("UpdateProductSuccess");
                     } else { 
-                        objOut.writeObject("UpdateProductFail");
+                        objOut.writeObject("UpdateProductFail");}
+                    System.out.println("");
+                
+                } else if (option.equalsIgnoreCase("EditSchedule")) { 
+                    System.out.println("EditSchedule"); 
+                    DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
+                    boolean check = database.updateDeliverySchedule(schedule); 
+                    if (check) { 
+                        objOut.writeObject("EditScheduleSuccess"); 
+                    } else { 
+                        objOut.writeObject("EditScheduleFail"); 
                     }
+                    System.out.println("");
                 }
             }
         } catch (IOException e){ System.out.println(/*close failed*/);
