@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author lucht
+ * 
+ * 
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno
+ * @author Christopher Cox 
  */
 public class Order implements Serializable {
     private int orderId;
@@ -17,12 +20,14 @@ public class Order implements Serializable {
     private double totalCost;
     
     /** 
-     * 
+     * Empty constructor. 
      */
     public Order() {
+        //No code 
     }
     
     /** 
+     * 
      * 
      * @param customerId
      * @param deliveryTime
@@ -35,6 +40,7 @@ public class Order implements Serializable {
     }
     
     /** 
+     * 
      * 
      * @param customerId
      * @param deliveryTime
@@ -49,6 +55,7 @@ public class Order implements Serializable {
     }
     
     /** 
+     * 
      * 
      * @param orderId
      * @param customerId

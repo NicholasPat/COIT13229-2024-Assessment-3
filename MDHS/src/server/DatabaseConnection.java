@@ -45,6 +45,7 @@ public class DatabaseConnection {
     private PreparedStatement getOrderitemsByOrderId = null; 
     private PreparedStatement deleteOrder = null;
     private PreparedStatement deleteOrderItems = null;
+    private PreparedStatement deleteOrderItem = null; 
     private PreparedStatement updateOrder = null;
     private PreparedStatement updateOrderItem = null;
     
@@ -112,6 +113,7 @@ public class DatabaseConnection {
         
         deleteOrder = connection.prepareStatement("DELETE FROM `Order` WHERE orderId = ?");
         deleteOrderItems = connection.prepareStatement("DELETE FROM `OrderItems` WHERE orderId = ?");
+        deleteOrderItem = connection.prepareStatement("DELETE FROM `OrderItems` WHERE orderId = ? AND productId = ?"); 
         
         updateOrder = connection.prepareStatement("UPDATE `Order` SET accountId = ?, deliveryTime = ?, totalCost = ? WHERE orderId = ?");
         updateOrderItem = connection.prepareStatement("UPDATE `OrderItems` SET productId = ?, quantity = ?, cost = ? WHERE orderId = ? AND productId = ?");
@@ -479,7 +481,8 @@ public class DatabaseConnection {
                     throw new SQLException("Creating order failed, no ID obtained.");
                 }
             }
-        } catch (SQLException sqlException) {System.out.println("SQL Exception: " + sqlException.getMessage());
+        } catch (SQLException sqlException) {
+            System.out.println("SQL Exception: " + sqlException.getMessage());
         } 
     }
     
@@ -774,8 +777,10 @@ public class DatabaseConnection {
     public boolean deleteProduct(int productId) {
         int result; 
         try { 
+            disableKeyChecks.executeUpdate(); 
             deleteProductById.setInt(1, productId); 
             result = deleteProductById.executeUpdate(); 
+            enableKeyChecks.executeUpdate(); 
             
             if (result == 1) { 
                 System.out.println("Successfully deleted product (code: " + result + ")");

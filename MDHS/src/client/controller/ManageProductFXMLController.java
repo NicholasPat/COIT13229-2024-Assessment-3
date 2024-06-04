@@ -364,3 +364,12 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     }
     
 }
+
+/* 
+        catch (IOException | ClassNotFoundException | UserInputException e) {
+            String exceptionClass = e.getClass().getName();//.replace("common.",""); 
+            String message = "An Exception has occured!\n" + e.getMessage(); 
+            String title = exceptionClass + " occurred!"; 
+            exceptionOutput(title, message, 1); 
+        }
+*/

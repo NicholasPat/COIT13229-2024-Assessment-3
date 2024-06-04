@@ -5,6 +5,7 @@ import client.Session;
 import common.UserInputException;
 import common.Utility;
 import common.model.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
@@ -81,7 +82,9 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     private DeliverySchedule schedule;
     
     /** 
-     * 
+     * Upon changing the scene to the current one, will invoke the following steps 
+     * Mainly: Load Order + Order Items from the server, and set the combo boxes. 
+     * Afterwards, populate the form. 
      */
     @Override
     public void handleSceneChange() {
@@ -124,7 +127,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     }    
     
     /** 
-     * 
+     * Sends user back to the Dashboard. 
      * 
      * @param event 
      */
@@ -134,15 +137,36 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     }
     
     /**
+     * Upon clicking, cycles backwards through the list of Order Items attached 
+     * to the current Order. 
      * 
      * @param event 
      */
     @FXML
     private void previousOrderItemButtonHandler(ActionEvent event) {
-        recordOrderItem();
+        try {
+            if (currentItemIndex == numberOfItems)
+                recordOrderItem();
+        } catch (UserInputException e) { 
+            String message = "Please input a whole number and select a "
+                    + "Product before cycling through the entries.\n" + e.getMessage(); 
+            String title = "Notice!"; 
+            exceptionOutput(title, message, 2); 
+            return;
+        } catch (Exception e) { 
+            //This should not happen 
+            //System.out.println("Previous cycle general Exception occurred!"); 
+        }
+        
+        if (numberOfItems == 1 || numberOfItems ==0) { 
+            return;
+        }
+        
         currentItemIndex--;
+        
         if (currentItemIndex < 0 && numberOfItems >= 0)
             currentItemIndex = numberOfItems-1; // if index went below 0 cycle back to end of list
+        
         if (!orderItems.isEmpty()) {
             currentItem = orderItems.get(currentItemIndex);
             populateItemForm();
@@ -150,15 +174,35 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     }
     
     /**
+     * Moves through the list of Order Items to the next option. If at end, will 
+     * cycle back around to the bottom. 
      * 
      * @param event 
      */
     @FXML
     private void nextOrderItemButtonHandler(ActionEvent event) {
-        recordOrderItem();
+        try {
+            if (currentItemIndex == numberOfItems)
+                recordOrderItem();
+        } catch (UserInputException e) { 
+            String message = "Please input a whole number or choose a Product before cycling through the entries."; 
+            String title = "Notice!"; 
+            exceptionOutput(title, message, 2); 
+            return;
+        } catch (Exception e) { 
+            //Nothing happens, add is where it matters 
+            //System.out.println("Next cycle general Exception occurred!"); 
+        }
+        
+        if (numberOfItems == 0 || numberOfItems == 1) { 
+            return; 
+        }
+        
         currentItemIndex++;
+        
         if ( currentItemIndex >= numberOfItems ) // if index went above total number, then cycle back to first entry
             currentItemIndex = 0;
+        
         if (!orderItems.isEmpty()) {
             currentItem = orderItems.get(currentItemIndex);
             populateItemForm();
@@ -166,6 +210,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     }
     
     /**
+     * Adds Order Item to the list. 
      * 
      * @param event 
      */
@@ -179,49 +224,95 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             productChoiceBox.setValue(null);
             quantityTextField.clear();
             populateItemForm();
+            costUpdate(); 
         } catch (UserInputException ie) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, ie.getMessage());   
-            alert.showAndWait();
-        } 
+            String message = "Error occured with adding an Order!\n" + ie.getMessage(); 
+            String title = "Error occurred!"; 
+            exceptionOutput(title, message, 1); 
+        } catch (Exception e) { 
+            String message = "Notice regarding duplicate!\n" + e.getMessage(); 
+            String title = "Notice!"; 
+            exceptionOutput(title, message, 2); 
+        }
     }
     
     /**
+     * Removes an Order Item that is selected. If not actually added to the list, 
+     * it will throw an error and return. 
      * 
      * @param event 
      */
     @FXML
     private void removeOrderItemButtonHandler(ActionEvent event) {
-        if (!orderItems.isEmpty()) {
-            orderItems.remove(currentItemIndex);
-            
-            numberOfItems = Integer.max(orderItems.size(), 1);
-            if (currentItemIndex >= orderItems.size()) {
-                currentItemIndex = orderItems.size()-1;
-            }
-                
-            if (!orderItems.isEmpty()) {
-                currentItem = orderItems.get(currentItemIndex);
-            } else {
-                currentItem = new OrderItem();
-                productChoiceBox.setValue(null);
-                quantityTextField.clear();
-            }
+        if (orderItems.isEmpty()) { 
+            String message = "No order items in list, please add some before removing!"; 
+            String title = "Notice!"; 
+            exceptionOutput(title, message, 2); 
+            return; 
         }
+        
+        if (currentItem == null) { 
+            exceptionOutput("Notice!", 
+                    "No active Order Item added. Please remove a previous Order Item!", 1); 
+            return; 
+        }
+        
+        try { 
+            if (!orderItems.isEmpty()) {
+                orderItems.remove(currentItemIndex);
+
+                numberOfItems = Integer.max(orderItems.size(), 1);
+                if (currentItemIndex >= orderItems.size()) {
+                    currentItemIndex = orderItems.size()-1;
+                }
+
+                if (!orderItems.isEmpty()) {
+                    currentItem = orderItems.get(currentItemIndex);
+
+                } else {
+                    currentItem = new OrderItem();
+                    productChoiceBox.setValue(null);
+                    quantityTextField.clear();
+                }
+            } 
+        } catch (Exception e) { 
+            exceptionOutput("Exception has occurred with removing an entry!", 
+                    "Please remember to add an Order Item before attempting to remove it!", 1);
+        }
+        
         populateItemForm();  
+        costUpdate(); 
     }
     
     /**
+     * Handles the placing of the Order if there are Order Items in it. 
      * 
      * @param event 
      */
     @FXML
     private void placeOrderButtonHandler(ActionEvent event) {
-        recordOrderItem();
+        if (orderItems.isEmpty() || orderItems.get(0) == null) { 
+            String message = "Order Item list is empty, please add some Order Items to your Order then add!"; 
+            exceptionOutput("Notice!", message, 2); 
+            return; 
+        }
+        
+        try { 
+            //recordOrderItem();
+        } catch (UserInputException e) { 
+            String message = "Error occured with adding order: " + e.getMessage() + 
+                    "\nPlease add a Product to your order first."; 
+            String title = "An Exception has occurred!"; 
+            exceptionOutput(title, message, 1); 
+            return; 
+        }
+        
         session = Session.getSession();
         
         int accountId = session.getUser().getAccountId();
         String deliveryTime = hourComboBox.getValue() +":"+minuteComboBox.getValue();
         double totalCost = costUpdate();
+        
         try {
             // TODO: Update Order
             session.objOut.writeObject("PlaceOrder");
@@ -232,33 +323,45 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             Order order = new Order(currentOrderId, accountId, deliveryTime, orderItems, totalCost);
             session.objOut.writeObject(order);
             
-            MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception while deleting order: " + ex.getMessage());
+            exceptionOutput("Notice!", "Successfully added an Order!", 2); 
+            
+        } catch (IOException e) {
+            String message = "An Exception has occurred while placing the Order! " + e.getMessage();
+            String title = "An Exception has occurred!"; 
+            exceptionOutput(title, message, 1); 
         }
     }
     
     /**
+     * Handles the removal of an Order if one is actively and exists. 
      * 
      * @param event 
      */
     @FXML
     private void cancelOrderButtonHandler(ActionEvent event) {
+        if (orderItems.isEmpty()) { 
+            String message = "Please ensure you have Placed an inital Order first."; 
+            String title = "Noitce!"; 
+            exceptionOutput(title, message, 2); 
+            return;
+        }
         session = Session.getSession();
+        
         try {
             session.objOut.writeObject("CancelOrder");
-            
             session.objOut.writeObject(session.getUser().getAccountId());
-            
             clear();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception while deleting order: " + ex.getMessage());
+            MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
+            
+        } catch (IOException e) {
+            String message = "An Exception has occurred while deleting the Order! " + e.getMessage();
+            String title = "An Exception has occurred!"; 
+            exceptionOutput(title, message, 1); 
         }
     }
     
     /**
+     * Deals with the selection of the --
      * 
      * @param selectedProduct 
      */
@@ -268,8 +371,8 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
                 currentItem.setProductId(product.getProductId());
             }
         }
-        // determine selected product
-        populateItemForm();
+        //Determine selected product
+        populateItemForm(); 
     }
     
     /**
@@ -277,20 +380,20 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      * with the combo box 
      */
     private void loadProducts() {
-        Session session = Session.getSession();
+        Session currentSession = Session.getSession();
         try {
-            session.objOut.writeObject("AllProducts");
-            productList = (ArrayList<Product>) session.objIn.readObject();
+            currentSession.objOut.writeObject("AllProducts");
+            productList = (ArrayList<Product>) currentSession.objIn.readObject();
 
-        } catch (Exception ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             String message = "Exception while loading the product list: " + ex.getMessage(); 
             exceptionOutput("General Exception occurred!", message, 1); 
-            session.setUser(null);
+            currentSession.setUser(null);
         }
     }
     
     /**
-     * 
+     * Pings the server for existing Order information. 
      */
     private void loadExistingOrderData() {
         // load customer info
@@ -303,16 +406,15 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             session.objOut.writeObject(user.getPostcode());
 
             schedule = (DeliverySchedule) session.objIn.readObject();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception while loading delivery schedule: " + ex.getMessage());
+        } catch (IOException | ClassNotFoundException ex) {
+            String error = "Exception occurred while loading delivery schedule:\n" + ex.getMessage(); 
+            exceptionOutput("General Exception occured!", error, 1);
         }
         
         // if customer already has order load its data
         try {
             session.objOut.writeObject("GetCustomerOrder");
             session.objOut.writeObject(user.getAccountId());
-            
             
             Order order = (Order) session.objIn.readObject();
             if (order != null) {
@@ -321,6 +423,17 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
                 
                 numberOfItems = orderItems.size();
                 if (numberOfItems > 0) {
+                    System.out.println("CHECK PRODUCT EXISTENCE"); 
+                    String message = checkIfProductExists(); 
+        
+                    if (!message.equals("")) { 
+                        System.out.println(message); 
+                        String title = "Notice! Removed Products!"; 
+                        exceptionOutput(title, message, 2); 
+                    }
+                        
+                    
+                    numberOfItems = orderItems.size(); 
                     currentItemIndex = 0;
                     currentItem = orderItems.get(currentItemIndex);
                 } else {
@@ -329,43 +442,103 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             } else {
                 currentItem = new OrderItem();
             }
-        } catch (Exception ex) {
-            //ex.printStackTrace();
-            System.out.println("Exception while loading customer order: " + ex.getMessage());
+        } catch (IOException | ClassNotFoundException ex) {
+            String error = "Exception occured while loading customer order:\n" + ex.getMessage();
+            exceptionOutput("General Exception occurred!", error, 1); 
         } 
     }
     
     /**
+     * Records the OrderItem selected, and then adds to record. 
      * 
+     * @throws UserInputException   Thrown if there is a mis-input
+     * @throws Exception            Thrown if a Product added is already in the 
+     *                              list 
      */
-    private void recordOrderItem() {
-        int qty = Integer.parseInt(quantityTextField.getText().trim());
+    private void recordOrderItem() throws UserInputException, Exception {
+        int qty; 
         double cost = 0;
+        
+        //Trying outside constructor since quantity directly influences the cost 
+        try { 
+            qty = Integer.parseInt(quantityTextField.getText().trim());
+        } catch (NumberFormatException e) { 
+            throw new UserInputException("Invalid input for quantity:\n" + e.getMessage()); 
+        }
+        
+        if (productChoiceBox.getValue() == null) { 
+            throw new UserInputException("Please select a Product as well!"); 
+        }
+        
+        if (currentItemIndex != numberOfItems) { 
+            throw new UserInputException("Please select the most recent Order Item according to count: " + numberOfItems); 
+        }
+        
+        //Because cost is based on already checked Product * checked quantity, 
+        //won't need error handling for if valid, as should always be a valid 
+        //value 
         for (Product product : productList) {
             if (product.getProductId() == currentItem.getProductId()) {
                 cost = product.getPrice() * qty;
                 cost = Math.round(cost * 100.0) / 100.0;
             }
         }
-        if (orderItems.size() <= currentItemIndex) {
-            orderItems.add(new OrderItem(currentItem.getProductId(), qty, cost));
-        } else {
-            orderItems.set(currentItemIndex, new OrderItem(currentItem.getProductId(), qty, cost));
+        
+        //
+        try { 
+            if (orderItems.size() <= currentItemIndex) {
+                orderItems.add(new OrderItem(currentItem.getProductId(), qty, cost));
+            } else {
+                orderItems.set(currentItemIndex, new OrderItem(currentItem.getProductId(), qty, cost));
+            }
+        } catch (UserInputException e) { 
+            throw new UserInputException("Invalid Product selected for Order Item:\n"
+                + e.getMessage()); 
         }
+        
+        checkEntryExists(); 
+        
+        //Number of items for how many items to cycle through. 
         numberOfItems = orderItems.size();
     }
     
-    /**
+    /** 
+     * This is a brute force, but checks each orderItem to determine if there is 
+     * a Product already chosen, because if there is, it will cause some issues 
+     * when adding Product List to the DB. i and j check if they are the same entry. 
+     * Won't throw an error for if the entry is on the same orderItem, hence the 
+     * i and j values acting as counters. 
      * 
+     * @throws Exception    Exception occurs when there is an entry found when 
+     *                      doing the search for if there are any matching entries 
+     */
+    private void checkEntryExists() throws Exception{
+        int i = 0; //Check 1's count 
+        for (OrderItem orderItemsCheck : orderItems) {
+            int j = 0; //Check 2's counter 
+            for (OrderItem previousCheck : orderItems) {
+                //If a match is found, AND it's not from the same index, then throw Exception 
+                if (orderItemsCheck.getProductId() == previousCheck.getProductId() && i != j) {
+                    throw new Exception("Product entry already exists, please edit "
+                            + "previous product instance to reflect the extra count desired!"); 
+                }
+                j++; 
+            }
+            i++; 
+        }
+    }
+    
+    /**
+     * Populates the form with data from the Order. 
      */
     private void populateForm() {
-        // Populate delivery schedule info
+        //Populate delivery schedule info
         if (schedule != null) {
             deliveryDayTextField.setText(schedule.getDeliveryDay());
             deliveryCostTextField.setText("$"+schedule.getDeliveryCost());
         } 
         
-        // Set existing delivery Time
+        //Set existing delivery Time
         if (currentOrder != null && currentOrder.getDeliveryTime() != null) {
             String deliveryTime = currentOrder.getDeliveryTime();
             System.out.println(deliveryTime);
@@ -376,14 +549,15 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             }
         }
         
-        // set existing order items
+        //Set existing order items
         if (!orderItems.isEmpty()) {
-            populateItemForm();           
+            populateItemForm();    
+            costUpdate(); 
         }
     }
     
     /**
-     * 
+     * Takes the current information given from the server and outputs it to the fields. 
      */
     private void populateItemForm() {
         for (Product product : productList) {
@@ -397,26 +571,28 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         if (currentItem.getQuantity() != 0) {
             quantityTextField.setText(currentItem.getQuantity()+"");
         }
-
+        
         for (Product product : productList) {
             if (product.getProductId() == currentItem.getProductId()) {
                 productPriceTextField.setText("$"+product.getPrice());
             }
         }
         
-        costUpdate();
+        //Moving to after method in some cases. Causes some issues with logic 
+        //When cycling from a current uncommitted item. 
+        //costUpdate(); 
     }
     
     /**
-     * 
+     * Updates the cost fields with information from the current order. 
      * 
      * @return Total cost as a value 
      */
     private double costUpdate() {
         double subtotal = 0;
         double delivery = schedule.getDeliveryCost();
-        double tax = 0;
-        double total = 0;
+        double tax;
+        double total;
 
         // Calculate subtotal
         for (OrderItem item : orderItems) {
@@ -447,7 +623,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     }
     
     /**
-     * 
+     * Clears all fields 
      */
     private void clear() {
         currentItem = new OrderItem();
@@ -473,12 +649,57 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         totalCostTextField.clear();
     }
     
+    /** 
+     * This is meant to check each of the Order Items against the products. This 
+     * is to determine if there is a missing product, and if there is, remove it 
+     * from the list. Won't commit to the server, but the Customer can then do that.
+     * Or admin can do it via observing in Order list. 
+     * 
+     * @return  message with it there is any changes. 
+     */
+    private String checkIfProductExists() {
+        String message = ""; 
+        List<OrderItem> list = new ArrayList<>(); //Index counter 
+        
+        if (!orderItems.isEmpty()) {
+            
+            for (OrderItem check : orderItems) {
+                System.out.println("Now checking: " + check.toString()); 
+                int j = 0; //Count of matches, either 0 or 1
+                
+                for (Product checkProduct : productList) {
+                    //If product IDs match, then add
+                    if (check.getProductId() == checkProduct.getProductId()) { 
+                        j++; //If matching, increase count of j. Doesn't reset 
+                        System.out.println("MATCH: " + j); 
+                        break; 
+                    }
+                }
+                
+                //If there were no matching Products. 
+                if (j == 0) {list.add(check);}
+            }
+        }
+        
+        //If list isn't empty, then remove an entry 
+        if (!list.isEmpty()) { 
+            message += (list.size()) + " Products have been removed.\nThis "
+                    + "is reflected in the Order Items listings";
+            for (int m = 0; m < list.size(); m++) { 
+                orderItems.remove(list.get(m)); 
+            }
+        }
+        
+        return message; 
+    }
+    
     /**
+     * Generates an Alert with title, header, and body. Type is determined by 
+     * the i value. Won't always be used for "Exception" cases. 
      * 
-     * 
-     * @param title
-     * @param message
-     * @param i 
+     * @param title     Title for the alert to be shown 
+     * @param message   Body message for the alert 
+     * @param i         1 - ERROR / 2 - INFORMATION
      */
     private void exceptionOutput(String title, String message, int i) { 
         System.out.println(message); 
