@@ -1,4 +1,3 @@
-
 package client.controller;
 
 import client.*;
@@ -18,7 +17,9 @@ import javafx.scene.control.TextField;
 /**
  * FXML Controller class
  *
- * @author lucht
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
  */
 public class LoginFXMLController implements Initializable, SceneController {
 
@@ -49,7 +50,8 @@ public class LoginFXMLController implements Initializable, SceneController {
     }    
     
     /** 
-     * On click, returns to the dashboard 
+     * On click, returns to the dashboard. 
+     * 
      * @param event 
      */
     @FXML
@@ -61,23 +63,14 @@ public class LoginFXMLController implements Initializable, SceneController {
      * Attempts to login. Sends information entered to the server which checks the 
      * password in the database. Upon a successful login, will change scene to 
      * the Dashboard and set the user as a Customer or Admin. 
+     * 
      * @param event 
      */
     @FXML
     private void loginButtonHandler(ActionEvent event) {
         Session session = Session.getSession();
-        
         String email = emailTextField.getText().trim();
         String pass = passwordTextField.getText().trim();
-        String errorMessage = errorMessageCheck(email, pass);
-        
-        if (!Utility.isEmpty(errorMessage)) { 
-            Alert alert = new Alert(Alert.AlertType.ERROR,errorMessage);
-            alert.showAndWait(); 
-            
-            clear();
-            return;
-        }
         
         try {
             byte[] password = Authenticator.encrypt(session.getPublicKey(), pass);
@@ -94,6 +87,7 @@ public class LoginFXMLController implements Initializable, SceneController {
                 System.out.println("Login successful: " + user.getEmailAddress());
                 session.setUser(user); // login (set user to session) & return to dashboard
                 MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
+                
             } else if (response == null) {
                 System.out.println("Login failed: Invalid credentials");
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, 
@@ -101,11 +95,18 @@ public class LoginFXMLController implements Initializable, SceneController {
                 alert.showAndWait();
                 session.setUser(null);
                 clear();
+                
             } else {
                 System.out.println("Unexpected response: " + response.getClass());
+                
             }
+        } catch (UserInputException e) { 
+            String message = "Exception during login: " + e.getMessage(); 
+            System.out.println(message); 
+            Utility.alertGenerator("Input mismatch occurred!", 
+                    "Input mismatch occurred!", message, 1);
+            
         } catch (Exception ex) {
-            //ex.printStackTrace();
             System.out.println("Exception during login: " + ex.getMessage());
             
             Alert alert = new Alert(Alert.AlertType.INFORMATION, 
@@ -118,6 +119,7 @@ public class LoginFXMLController implements Initializable, SceneController {
     
     /** 
      * Upon clicking goes to the Registration page 
+     * 
      * @param event 
      */
     @FXML
@@ -131,29 +133,5 @@ public class LoginFXMLController implements Initializable, SceneController {
     private void clear() {
         emailTextField.clear();
         passwordTextField.clear();
-    }
-    
-    /** 
-     * Checks that the email and password fit ideal formats 
-     * @param email 
-     * @param pass 
-     * @return Returns error message, either empty string, or with error 
-     */
-    private String errorMessageCheck(String email, String pass) { 
-        String message = ""; 
-        
-        if (Utility.isEmpty(email)) 
-            message += "Email is a mandatory field.\n";
-        
-        if (!Utility.isValidString(email, 0, 100, true)) 
-            message += "Email address cannot exceed 100 characters.\n";
-        
-        if (!Utility.isValidEmail(email)) 
-            message += "Email address must contain an '@' symbol.\n";
-                
-        if (!Utility.isValidString(pass, 7, 30, true)) 
-            message += "\nInvalid password.\nPassword must be at least 7 characters, and no more than 30 characters.";
-        
-        return message; 
     }
 }

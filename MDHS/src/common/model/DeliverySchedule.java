@@ -5,8 +5,11 @@ import common.UserInputException;
 import java.io.Serializable;
 
 /**
- *
- * @author lucht
+ * 
+ * 
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno
+ * @author Christopher Cox 
  */
 public class DeliverySchedule implements Serializable {
     private int postcode;
@@ -20,11 +23,12 @@ public class DeliverySchedule implements Serializable {
     }
     
     /** 
-     * Used to set a day's Delivery Schedule. 
+     * Used to set a day's Delivery Schedule. Mainly used by the server, so no 
+     * error handling needed. 
      * 
-     * @param postcode
-     * @param deliveryDay
-     * @param deliveryCost 
+     * @param postcode      Postcode for the delivery location. Primary key 
+     * @param deliveryDay   Day of delivery, Monday, Tuesday, etc. 
+     * @param deliveryCost  Cost of the delivery in $ 
      */
     public DeliverySchedule(int postcode, String deliveryDay, double deliveryCost) {
         this.postcode = postcode;
@@ -32,6 +36,14 @@ public class DeliverySchedule implements Serializable {
         this.deliveryCost = deliveryCost;
     }
     
+    /** 
+     * Main constructor for determining if the details from the client is accurate 
+     * and correct. 
+     * 
+     * @param postcode
+     * @param deliveryDay
+     * @param deliveryCost 
+     */
     public DeliverySchedule(String postcode, String deliveryDay, String deliveryCost) { 
         try {this.postcode = Integer.parseInt(postcode);} catch (NumberFormatException e) { 
             throw new UserInputException("\nPostcode must be an Integer value.");}
@@ -39,6 +51,7 @@ public class DeliverySchedule implements Serializable {
         try {this.deliveryCost = Double.parseDouble(deliveryCost);} catch (NumberFormatException e) { 
             throw new UserInputException("\nDeliveryCost must be an Integer value, or a decimal value.");}
         
+        //Should always be a value, won't error handle for it 
         this.deliveryDay = deliveryDay; 
         
     }

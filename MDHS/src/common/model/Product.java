@@ -32,11 +32,11 @@ public class Product implements Serializable {
      * Generates a Product object, also has error handling implemented to ensure 
      * correct variables are passed. 
      * 
-     * @param productName
-     * @param quantity
-     * @param unit
-     * @param price
-     * @param ingredients 
+     * @param productName   Name of the Product
+     * @param quantity      Max Quantity of the Product 
+     * @param unit          Unit of the Product 
+     * @param price         Price of the item in $ 
+     * @param ingredients   List of ingredients, no separator 
      */
     public Product(String productName, int quantity, String unit, double price, String ingredients) {
         if (!Utility.isValidString(productName, 1, 30, true))
@@ -59,13 +59,14 @@ public class Product implements Serializable {
      * Constructor used by the client (Administrator) to add a product, hence the 
      * error handling. 
      * 
+     * @param productId         ID of the Product 
      * @param productName       Name of the Product item 
      * @param quantityString    Max quantity of the Product item 
      * @param unit              Unit of the item (not total) 
      * @param priceString       Price of the individual units of the item 
      * @param ingredients       List of ingredients for them item 
      */
-    public Product (String productName, String quantityString, String unit, String priceString, String ingredients) { 
+    public Product (int productId, String productName, String quantityString, String unit, String priceString, String ingredients) { 
         if (!Utility.isValidString(productName, 5, 30, true))
             throw new UserInputException("\nProduct name is invalid.\nPlease input a name more than 5 characters and less than 30 characters.");
                 
@@ -81,13 +82,13 @@ public class Product implements Serializable {
         try {quantity = Integer.parseInt(quantityString); 
         } catch (NumberFormatException e) {throw new UserInputException("\nQuantity must be a whole number.");}
         
-        try {price = Integer.parseInt(priceString);
+        try {price = Double.parseDouble(priceString);
         } catch (NumberFormatException e) {throw new UserInputException("\nPrice must be a whole number, or a number with a decimal place.");}
         
         this.productName = productName; 
         this.unit = unit; 
         this.ingredients = ingredients; 
-        
+        this.productId = productId; 
     }
     
     /** 

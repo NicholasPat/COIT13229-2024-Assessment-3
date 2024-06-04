@@ -1,9 +1,9 @@
-
 package client.controller;
 
 import client.MDHSClient;
 import client.Session;
 import common.UserInputException;
+import common.Utility;
 import common.model.*;
 import java.net.URL;
 import java.util.List;
@@ -22,7 +22,9 @@ import javafx.scene.layout.AnchorPane;
 /**
  * FXML Controller class
  *
- * @author lucht
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
  */
 public class PlaceOrderFXMLController implements Initializable, SceneController {
 
@@ -78,6 +80,9 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     private List<Product> productList;
     private DeliverySchedule schedule;
     
+    /** 
+     * 
+     */
     @Override
     public void handleSceneChange() {
         clear();
@@ -104,7 +109,10 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     }
     
     /**
-     * Initializes the controller class.
+     * Initializes the controller class. 
+     * 
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -114,12 +122,21 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             }
         });
     }    
-
+    
+    /** 
+     * 
+     * 
+     * @param event 
+     */
     @FXML
     private void dashboardButtonHandler(ActionEvent event) {
         MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
-
+    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void previousOrderItemButtonHandler(ActionEvent event) {
         recordOrderItem();
@@ -131,7 +148,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             populateItemForm();
         }
     }
-
+    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void nextOrderItemButtonHandler(ActionEvent event) {
         recordOrderItem();
@@ -143,7 +164,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             populateItemForm();
         }
     }
-
+    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void addOrderItemButtonHandler(ActionEvent event) {
         try {
@@ -159,7 +184,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             alert.showAndWait();
         } 
     }
-
+    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void removeOrderItemButtonHandler(ActionEvent event) {
         if (!orderItems.isEmpty()) {
@@ -180,7 +209,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         }
         populateItemForm();  
     }
-
+    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void placeOrderButtonHandler(ActionEvent event) {
         recordOrderItem();
@@ -205,7 +238,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             System.out.println("Exception while deleting order: " + ex.getMessage());
         }
     }
-
+    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void cancelOrderButtonHandler(ActionEvent event) {
         session = Session.getSession();
@@ -221,6 +258,10 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         }
     }
     
+    /**
+     * 
+     * @param selectedProduct 
+     */
     private void handleProductSelection(String selectedProduct) {
         for (Product product : productList) {
             if (product.toString().equals(selectedProduct)) {
@@ -231,6 +272,10 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         populateItemForm();
     }
     
+    /**
+     * Gets products from the server and loads them into a product list, for use 
+     * with the combo box 
+     */
     private void loadProducts() {
         Session session = Session.getSession();
         try {
@@ -238,12 +283,15 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             productList = (ArrayList<Product>) session.objIn.readObject();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception while loading product list: " + ex.getMessage());
+            String message = "Exception while loading the product list: " + ex.getMessage(); 
+            exceptionOutput("General Exception occurred!", message, 1); 
             session.setUser(null);
         }
     }
     
+    /**
+     * 
+     */
     private void loadExistingOrderData() {
         // load customer info
         session = Session.getSession();
@@ -282,11 +330,14 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
                 currentItem = new OrderItem();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             System.out.println("Exception while loading customer order: " + ex.getMessage());
         } 
     }
     
+    /**
+     * 
+     */
     private void recordOrderItem() {
         int qty = Integer.parseInt(quantityTextField.getText().trim());
         double cost = 0;
@@ -304,6 +355,9 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         numberOfItems = orderItems.size();
     }
     
+    /**
+     * 
+     */
     private void populateForm() {
         // Populate delivery schedule info
         if (schedule != null) {
@@ -328,6 +382,9 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         }
     }
     
+    /**
+     * 
+     */
     private void populateItemForm() {
         for (Product product : productList) {
             if (product.getProductId() == currentItem.getProductId()) {
@@ -350,6 +407,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         costUpdate();
     }
     
+    /**
+     * 
+     * 
+     * @return Total cost as a value 
+     */
     private double costUpdate() {
         double subtotal = 0;
         double delivery = schedule.getDeliveryCost();
@@ -384,13 +446,15 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         return total;
     }
     
+    /**
+     * 
+     */
     private void clear() {
         currentItem = new OrderItem();
         orderItems = new ArrayList<>();
         currentItemIndex = 0;
         numberOfItems = 1;
         currentOrder = new Order();
-        
         
         productChoiceBox.getItems().clear();
         hourComboBox.getItems().clear();
@@ -407,7 +471,17 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         subtotalTextField.clear(); 
         taxTextField.clear();
         totalCostTextField.clear();
-        
-        
+    }
+    
+    /**
+     * 
+     * 
+     * @param title
+     * @param message
+     * @param i 
+     */
+    private void exceptionOutput(String title, String message, int i) { 
+        System.out.println(message); 
+        Utility.alertGenerator(title, title, message, i);
     }
 }

@@ -3,6 +3,7 @@ package client.controller;
 
 import client.MDHSClient;
 import client.Session;
+import common.UserInputException;
 import common.Utility;
 import common.model.Product;
 import java.net.URL;
@@ -21,7 +22,9 @@ import javafx.scene.layout.AnchorPane;
 /**
  * FXML Controller class
  *
- * @author lucht, linke
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
  */
 public class ManageProductFXMLController implements Initializable, SceneController {
 
@@ -37,6 +40,8 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     private TextArea ingredientsTextArea;
     @FXML
     private TextField unitTextField;
+    @FXML
+    private TextField productIdTextField;
     @FXML
     private Button dashboardButton;
     @FXML
@@ -62,10 +67,9 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     private List<Product> productList;
     private int currentProductIndex;
     private int numberOfProducts;
-    private int currentProductId; 
     
     /**
-     * 
+     * Handles the change to this scene. Clears logs and gets current list from server. 
      */
     @Override
     public void handleSceneChange() {
@@ -83,6 +87,7 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     }    
     
     /**
+     * Returns to Dashboard. 
      * 
      * @param event 
      */
@@ -92,23 +97,25 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     }
     
     /**
+     * Cycles back through the entries. 
      * 
      * @param event 
      */
     @FXML
     private void previousIndexButtonHandler(ActionEvent event) {
         currentProductIndex--;
+        
         if (currentProductIndex < 0 && numberOfProducts >= 0)
             currentProductIndex = numberOfProducts-1; // if index went below 0 cycle back to end of list
+        
         if (!productList.isEmpty()) {
             currentProduct = productList.get(currentProductIndex);
             populateForm();
         }
-        currentProductId = currentProduct.getProductId();
     }
     
     /**
-     * 
+     * Cycles forward through the entries. 
      * @param event 
      */
     @FXML
@@ -120,7 +127,6 @@ public class ManageProductFXMLController implements Initializable, SceneControll
             currentProduct = productList.get(currentProductIndex);
             populateForm();
         }
-        currentProductId = currentProduct.getProductId(); 
     }
     
     /**
@@ -129,25 +135,39 @@ public class ManageProductFXMLController implements Initializable, SceneControll
      */
     @FXML
     private void addButtonHandler(ActionEvent event) {
-        if (currentProductId != -1) { 
-            alertError("Please press the 'New' button before defining a product."); 
+        if (!"".equals(productIdTextField.getText())) { 
+            String error = "Please click on 'New' first."; 
+            exceptionOutput("Notice!", error, 2); 
             return; 
         }
-        recordProduct();
+        
         try {
+            recordProduct();
             session.objOut.writeObject("RecordProduct");
             session.objOut.writeObject(currentProduct);
             String outcome = (String) session.objIn.readObject(); 
             if (outcome.equalsIgnoreCase("RecordProductSuccess")) {
-                alertInformation("Product was successfully sent to the server and added to the DB");
+                String outcomeString = "Product was successfully recorded!"; 
+                String title = "Successful addition of product!"; 
+                exceptionOutput(title, outcomeString, 2); 
+                
             } else { 
-                alertError("An error was noted with the addition of the product"); 
+                String outcomeString = "Product was unsuccessfully recorded!"; 
+                String title = "Unsuccessful addition of product!"; 
+                exceptionOutput(title, outcomeString, 1); 
             }
             
+        } catch (UserInputException e) { 
+            String message = "Input mismatch occured!: " + e.getMessage(); 
+            String title = "Input mismatch!"; 
+            exceptionOutput(title, message, 1); 
+            return; 
+            
         } catch (Exception ex) {
-            //ex.printStackTrace();
-            System.out.println("Exception while adding product: " + ex.getMessage());
-            alertError("Exception while adding product:\n" + ex.getMessage()); 
+            String message = "General Exception occured!\n" + ex.getMessage(); 
+            String title = "General Exception occurted!"; 
+            exceptionOutput(title, message, 1); 
+            return; 
         }
         clear();
         loadProducts();
@@ -160,30 +180,39 @@ public class ManageProductFXMLController implements Initializable, SceneControll
      */
     @FXML
     private void updateButtonHandler(ActionEvent event) {
-        if (currentProductId == -1) { 
-            alertError("Please search for a product first, then enter changes."); 
+        if ("".equals(productIdTextField.getText())) { 
+            String error = "Please search for a product for updating first."; 
+            exceptionOutput("Notice!", error, 2); 
             return; 
         }
         
-        try {
+        try { 
+            recordProduct(); 
+            System.out.println(currentProduct.getProductId()); 
             session.objOut.writeObject("EditProduct");
             session.objOut.writeObject(currentProduct);
             String message = (String) session.objIn.readObject(); 
             
-            if (message.equalsIgnoreCase(message)) { 
-                alertInformation("Product with ID: " + currentProduct.getProductId() + 
-                        ", and name: " + currentProduct.getProductName() + " was "
-                        + "successful edited.");
+            if (message.equalsIgnoreCase("UpdateProductSuccess")) { 
+                String outcomeString = "Product was successfully edited!"; 
+                String title = "Successful edit of product!"; 
+                exceptionOutput(title, outcomeString, 2); 
+                
             } else { 
-                alertError("Product with ID: " + currentProduct.getProductId() + 
-                        ", and name: " + currentProduct.getProductName() + " was "
-                        + "unsuccessfully edited.");
+                String outcomeString = "Product was unsuccessfully edited!"; 
+                String title = "Unsuccessful edit of product!"; 
+                exceptionOutput(title, outcomeString, 1); 
             }
             
+        } catch (UserInputException e) { 
+            String message = "Input mismatch occured!: " + e.getMessage(); 
+            String title = "Input mismatch!"; 
+            exceptionOutput(title, message, 1); 
+            
         } catch (Exception ex) {
-            //ex.printStackTrace();
-            System.out.println("Exception while updating product: " + ex.getMessage());
-            alertError("Exception while updating the product:\n" + ex.getMessage()); 
+            String message = "General Exception occured!\n" + ex.getMessage(); 
+            String title = "General Exception occurted!"; 
+            exceptionOutput(title, message, 1); 
         }
         
         clear();
@@ -197,30 +226,38 @@ public class ManageProductFXMLController implements Initializable, SceneControll
      */
     @FXML
     private void deleteButtonHandler(ActionEvent event) {
-        if (currentProductId == -1) { 
-            alertError("Please search for a product for deletion first."); 
+        if ("".equals(productIdTextField.getText())) { 
+            String error = "Please search for a product for deletion first."; 
+            exceptionOutput("Notice!", error, 2); 
             return; 
         }
         
         try {
+            recordProduct(); 
             session.objOut.writeObject("DeleteProduct");
             session.objOut.writeObject(currentProduct.getProductId());
             String message = (String) session.objIn.readObject(); 
             
             if (message.equalsIgnoreCase("DeleteProductSuccess")) { 
-                alertInformation("Product with ID: " + currentProduct.getProductId() + 
-                        ", and name: " + currentProduct.getProductName() + " was "
-                        + "successful deleted.");
+                String outcomeString = "Product was successfully deleted!"; 
+                String title = "Successful deletion of product!"; 
+                exceptionOutput(title, outcomeString, 2); 
+                
             } else { 
-                alertError("Product with ID: " + currentProduct.getProductId() + 
-                        ", and name: " + currentProduct.getProductName() + " was "
-                        + "unsuccessfully deleted.");
+                String outcomeString = "Product was unsuccessfully deleted!"; 
+                String title = "Unsuccessful deletion of product!"; 
+                exceptionOutput(title, outcomeString, 1); 
             }
             
+        } catch (UserInputException e) { 
+            String message = "Input mismatch occured!: " + e.getMessage(); 
+            String title = "Input mismatch!"; 
+            exceptionOutput(title, message, 1); 
+            
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception while deleting product: " + ex.getMessage());
-            alertError("Exception occured while deleting product" + ex.getMessage());
+            String message = "General Exception occured!\n" + ex.getMessage(); 
+            String title = "General Exception occurted!"; 
+            exceptionOutput(title, message, 1); 
         }
         
         clear();
@@ -235,7 +272,6 @@ public class ManageProductFXMLController implements Initializable, SceneControll
      */
     @FXML
     private void newButtonHandler(ActionEvent event) {
-        currentProductId = -1; 
         clear();
     }
     
@@ -251,52 +287,41 @@ public class ManageProductFXMLController implements Initializable, SceneControll
             if (numberOfProducts > 0) {
                 currentProductIndex = 0;
                 currentProduct = productList.get(currentProductIndex);
-                currentProductId = currentProduct.getProductId(); 
             } else {
                 currentProduct = new Product();
             }
+        } catch (UserInputException e) { 
+            String message = "Input mismatch occured!: " + e.getMessage(); 
+            String title = "Input mismatch!"; 
+            exceptionOutput(title, message, 1); 
+            
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception while loading product list: " + ex.getMessage());
-            alertError("Exception while loading product list:\n" + ex.getMessage()); 
+            String message = "General Exception occured!\n" + ex.getMessage(); 
+            String title = "General Exception occurted!"; 
+            exceptionOutput(title, message, 1); 
         }
         
-        for (Product p : productList) {
-            System.out.println(p.toString());
-        }
+        //for (Product p : productList) {
+            //System.out.println(p.toString());
+       // }
     }
     
     /** 
-     * Records the current product for addition 
+     * Records the current product selected
+     * @throws UserInputException 
      */
-    private void recordProduct() {
-        int qty = 0; 
-        double price = 0;
+    private void recordProduct() throws UserInputException {
+        //Make all into strings, error handling done in the constructor 
+        int productId = 0; 
+        String qty = quantityTextField.getText().trim(); 
+        String price = priceTextField.getText().trim(); 
         String name = nameTextField.getText().trim();
         String unit = unitTextField.getText().trim();
         String ingredients = ingredientsTextArea.getText().trim();
+        if (!"".equals(productIdTextField.getText())) 
+            productId = Integer.parseInt(productIdTextField.getText()); 
         
-        String errorMessage = errorHandler(name, unit, ingredients); 
-        
-        try { 
-            qty = Integer.parseInt(quantityTextField.getText().trim());
-        } catch (NumberFormatException ex) { 
-            errorMessage += "Error with quantity: " + ex.getMessage() + "\n";
-        }
-        
-        try { 
-            price = Double.parseDouble(priceTextField.getText().trim());
-        } catch (NumberFormatException ex) { 
-            errorMessage += "Error with price: " + ex.getMessage() + "\n";
-        }
-        
-        if (!errorMessage.equals("")) { 
-            alertError(errorMessage); 
-            clear();
-            return;
-        }
-        
-        currentProduct = new Product(name, qty, unit, price, ingredients);
+        currentProduct = new Product(productId, name, qty, unit, price, ingredients);
     }
     
     /** 
@@ -310,6 +335,7 @@ public class ManageProductFXMLController implements Initializable, SceneControll
         ingredientsTextArea.setText(currentProduct.getIngredients());
         currentIndexTextField.setText(currentProductIndex+1+"");
         totalIndexTextField.setText(numberOfProducts+"");
+        productIdTextField.setText(currentProduct.getProductId()+""); 
     }
     
     /** 
@@ -326,43 +352,15 @@ public class ManageProductFXMLController implements Initializable, SceneControll
         unitTextField.clear();
         priceTextField.clear();
         ingredientsTextArea.setText("");
+        productIdTextField.clear(); 
         
         currentIndexTextField.setText("0"); 
         totalIndexTextField.setText("1"); 
     }
     
-    /** 
-     * Creates an error Alert. Saves having to create a new Alert object in each 
-     * catch{} block
-     * @param message 
-     */
-    private void alertError(String message) { 
-        Alert alert = new Alert(Alert.AlertType.ERROR, message);
-        alert.showAndWait(); 
-    }
-    
-    /** 
-     * Creates an information Alert. Saves having to create a new one each time 
-     * @param message 
-     */
-    private void alertInformation(String message) { 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
-        alert.showAndWait();
-    }
-    
-    private String errorHandler(String name, String unit, String ingredients) { 
-        String message = ""; 
-        
-        if (!Utility.isEmpty(name)) 
-            message += "\nProduct Name is a mandatory field.";
-        
-        if (!Utility.isEmpty(unit))
-            message += "\nUni is a mandatory field."; 
-        
-        if (!Utility.isEmpty(ingredients)) 
-            message += "\nIngredients is a mandatory field."; 
-        
-        return message; 
+    private void exceptionOutput(String title, String message, int i) { 
+        System.out.println(message); 
+        Utility.alertGenerator(title, title, message, i);
     }
     
 }

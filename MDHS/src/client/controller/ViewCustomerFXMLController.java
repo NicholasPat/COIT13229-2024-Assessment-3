@@ -133,8 +133,8 @@ public class ViewCustomerFXMLController implements Initializable, SceneControlle
             adminCheckbox.setSelected(false);
         }
         
-        totalIndexTextField.setText(numberOfAccounts+1+"");
-        currentIndexTextField.setText(currentAccountIndex+"");
+        totalIndexTextField.setText(numberOfAccounts+"");
+        currentIndexTextField.setText(currentAccountIndex+1+"");
     }
     
     private void clear() { 

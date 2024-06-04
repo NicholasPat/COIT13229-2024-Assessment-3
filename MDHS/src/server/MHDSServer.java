@@ -283,9 +283,9 @@ class ConnectionThread extends Thread {
                     DeliverySchedule schedule = (DeliverySchedule) objIn.readObject();
                     boolean check = database.recordDeliverySchedule(schedule);
                     if (check) { 
-                        objOut.writeObject("AddScheduleSuccess"); 
+                        objOut.writeObject("RecordScheduleSuccess"); 
                     } else { 
-                        objOut.writeObject("AddScheduleFail"); 
+                        objOut.writeObject("RecordScheduleFail"); 
                     }
                     System.out.println("");
                     

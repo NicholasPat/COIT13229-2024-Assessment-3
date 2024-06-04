@@ -70,8 +70,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
     
     /**
      * On click, takes all text fields and attempt to create an Account, if failed, 
-     * throw an error to be displayed to the user. If successful, throw an INFORMATION 
-     * Alert 
+     * throw an error to be displayed to the user. 
      * 
      * @param event 
      * @throws IOException 
@@ -165,7 +164,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
     }
     
     /**
-     * Clears all fields 
+     * Clears all fields. 
      * 
      * @param event 
      */
@@ -175,7 +174,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
     }
     
     /** 
-     * Returns to the dashboard 
+     * Returns to the dashboard. 
      * 
      * @param event 
      */
@@ -185,7 +184,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
     }
     
     /** 
-     * Clears all entries for re-entry 
+     * Clears all entries for re-entry. 
      */
     private void clear() {
         firstNameTextField.clear();

@@ -13,7 +13,6 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
@@ -62,9 +61,10 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     private int currentScheduleIndex;
     private int numberOfSchedules;
     private int newScheduleFlag;
+    private final String inputMismatchTitle = "Input mismatch occurred!"; 
     
     /**
-     * Upon changing the scene to the current, perfoem the following steps 
+     * Upon changing the scene to the current, perform the following steps 
      */
     @Override
     public void handleSceneChange() {
@@ -76,7 +76,6 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         deliveryDayChoiceBox.setValue("Monday");
         
         populateForm();
-        
     }
     
     /**
@@ -152,36 +151,33 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
      */
     @FXML
     private void addButtonHandler(ActionEvent event) {
-        //Necessitates the requirement of flag set to 1, othetwise error is thrown 
-        //and the method ends early. Avoids accidental doubling up 
-        String errorMessage = errorHandleButton(3);
-        if (!errorMessage.equals("")) { 
-            alertError(errorMessage); 
-            return;
-        }
-        
-        
         try {
             recordDeliverySchedule();
             session.objOut.writeObject("RecordSchedule");
             session.objOut.writeObject(currentSchedule);
             String message = (String) session.objIn.readObject(); 
             
-            if (message.equalsIgnoreCase("AddScheduleSuccess")) { 
-                alertInformation("Schedule with postcode: " + currentSchedule.getPostcode() + 
-                        " was successfully added");
+            if (message.equalsIgnoreCase("RecordScheduleSuccess")) { 
+                String outcome = "Schedule was successfully added!"; 
+                String title = "Successful addition of Schedule!"; 
+                exceptionOutput(title, outcome, 2); 
+                
             } else { 
-                alertError("Schedule with postcode: " + currentSchedule.getPostcode() + 
-                        " was unsuccessfully added"); 
+                String outcome = "Schedule was unsuccessfully added"; 
+                String title = "Unsuccessful addition of the schedule!"; 
+                exceptionOutput(title, outcome, 1); 
             }
+            
         } catch (UserInputException e) { 
-            String message = "Exception occured in creating the Product, message: " + e.getMessage(); 
-            System.out.println(message); 
-            Utility.alertGenerator("Input mismatch", "Input mismatch as occured!", message, 1); 
+            String message = "Input mismatch ocurred when adding the Delivery Schedule! " + e.getMessage();
+            exceptionOutput(inputMismatchTitle, message, 1); 
+            return; 
+            
         } catch (Exception ex) {
-            //ex.printStackTrace();
-            System.out.println("Exception while adding schedule: " + ex.getMessage());
-            alertError("Exception occured while adding schedule: " + ex.getMessage()); 
+            String message = "Exception occurred while adding the schedule: " +ex.getMessage();
+            String title = "General Exception occurred in load Schedule";
+            exceptionOutput(title, message, 1); 
+            return; 
         }
         clear();
         loadSchedules();
@@ -189,38 +185,39 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     }
     
     /**
+     * Handles the updating of the Schedule. However Add and Edit use the same 
+     * 'RecordSchedule' server tag, so edits can happen when adding but doesn't 
+     * matter too much really, just some redundancy 
      * 
      * @param event 
      */
     @FXML
     private void updateButtonHandler(ActionEvent event) {
-        String errorMessage = errorHandleButton(2);
-        if (!errorMessage.equals("")) { 
-            alertError(errorMessage); 
-            return;
-        }
-        
-        
         try {
             recordDeliverySchedule(); 
             session.objOut.writeObject("RecordSchedule");
             session.objOut.writeObject(currentSchedule);
             String message = (String) session.objIn.readObject();
             
-            if (message.equalsIgnoreCase("EditScheduleSuccess")) { 
-                alertInformation("Schedule with postcode: " + currentSchedule.getPostcode() + 
-                        " was successfully updated");
+            if (message.equalsIgnoreCase("RecordScheduleSuccess")) { 
+                String outcome = "Schedule was successfully updated!"; 
+                String title = "Successful update of the Schedule!"; 
+                exceptionOutput(title, outcome, 2); 
+                
             } else { 
-                alertError("Schedule with postcode: " + currentSchedule.getPostcode() + 
-                        " was unsuccessfully updated"); 
+                String outcome = "Schedule was unsuccessfully edited"; 
+                String title = "Unsuccessful edit of the schedule!"; 
+                exceptionOutput(title, outcome, 1); 
             }
             
         } catch (UserInputException e) { 
+            String message = "Input mismatched ocurred when adding the Delivery Schedule! " + e.getMessage();
+            exceptionOutput(inputMismatchTitle, message, 1); 
             
         } catch (Exception ex) {
-            //ex.printStackTrace();
-            System.out.println("Exception while updating schedule: " + ex.getMessage());
-            alertError("Exception occured while updating schedule: " + ex.getMessage()); 
+            String message = "Exception occurred while updating the schedule: " +ex.getMessage();
+            String title = "General Exception occurred in load Schedule";
+            exceptionOutput(title, message, 1); 
         }
         
         clear();
@@ -230,32 +227,36 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     
     /**
      * Takes current information and deletes the associated entry. Takes the whole 
-     * object for ease
+     * object for ease of coding. 
      * @param event 
      */
     @FXML
     private void deleteButtonHandler(ActionEvent event) {
-        String errorMessage = errorHandleButton(1);
-        if (!errorMessage.equals("")) { 
-            alertError(errorMessage); 
-            return;
-        }
-        recordDeliverySchedule();
-        
         try {
+            recordDeliverySchedule();
             session.objOut.writeObject("DeleteSchedule");
             session.objOut.writeObject(currentSchedule);
             String message = (String) session.objIn.readObject(); 
             
             if (message.equalsIgnoreCase("DeleteScheduleSuccess")) { 
-                alertInformation("Schedule was successfully deleted");
+                String outcome = "Schedule was successfully deleted!"; 
+                String title = "Successful deletion of the Schedule!"; 
+                exceptionOutput(title, outcome, 2); 
+                
             } else { 
-                alertError("Schedule was unsuccessfully deleted");
+                String outcome = "Schedule was unsuccessfully deleted!"; 
+                String title = "Unsuccessful deletion of the schedule!"; 
+                exceptionOutput(title, outcome, 1); 
             }
             
+        } catch (UserInputException e) { 
+            String message = "Input mismatched ocurred when adding the Delivery Schedule! " + e.getMessage();
+            exceptionOutput(inputMismatchTitle, message, 1); 
+            
         } catch (Exception ex) {
-            //ex.printStackTrace();
-            System.out.println("Exception while deleting schedule: " + ex.getMessage());
+            String message = "Exception has occured while deleting the schedule: " + ex.getMessage();
+            String title = "General Exception occurred while deleting Schedule";
+            exceptionOutput(title, message, 1); 
         }
         
         //Reset the scene 
@@ -266,7 +267,8 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     
     /**
      * Sets text fields to null, and also sets a flag to make it so Update and 
-     * Delete methods won't continue, ensuring no messiness with that 
+     * Delete methods won't continue, ensuring no messiness with that. 
+     * 
      * @param event 
      */
     @FXML
@@ -293,12 +295,13 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
                 currentSchedule = new DeliverySchedule();
                 currentScheduleIndex = -1; //Should resolve as 0 then on input 
                 numberOfSchedules = 0; //Redundancy, ensures is 0 
-                alertInformation("No schedules have been booked");
+                Utility.alertGenerator("No schedules booked", "No schedules have been booked!", 
+                        "No schedules have been booked, please book some", 2); 
             }
         } catch (Exception ex) {
-            //ex.printStackTrace();
-            System.out.println("Exception while loading Delivery Schedule: " + ex.getMessage());
-            alertError("Error occured while loading Schedule list: " + ex.getMessage()); 
+            String message = "General Exception occurred while loading Delivery Schedule! " + ex.getMessage();
+            String title = "General Exception occurred in load Schedule";
+            exceptionOutput(title, message, 1); 
         }
     }
     
@@ -312,8 +315,9 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         String cost = costTextField.getText().trim(); 
         String postcode = postcodeTextField.getText().trim(); 
         
-        //Noticed that sometimes it gets parsed as null, so force as Monday if the case 
-        //Normally it will be 
+        /*Noticed that sometimes it gets parsed as null, so force as Monday if the case 
+        //I think this is because setting as New sometimes breaks it, manual change will 
+        //make it the actual value*/
         if (deliveryDay == null) { 
             deliveryDay = "Monday"; 
         }
@@ -330,6 +334,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         costTextField.setText(currentSchedule.getDeliveryCost()+"");
         currentIndexTextField.setText(currentScheduleIndex+1+"");
         totalIndexTextField.setText(numberOfSchedules+"");
+        postcodeTextField.setEditable(false); 
     }
     
     /**
@@ -347,27 +352,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         currentIndexTextField.clear();
         totalIndexTextField.clear();
         
-        //Why was it false? 
         postcodeTextField.setEditable(true);
-    }
-    
-    /** 
-     * Creates an error Alert. Saves having to create a new Alert object in each 
-     * catch{} block
-     * @param message 
-     */
-    private void alertError(String message) { 
-        Alert alert = new Alert(Alert.AlertType.ERROR, message);
-        alert.showAndWait(); 
-    }
-    
-    /** 
-     * Creates an information Alert. Saves having to create a new one each time 
-     * @param message 
-     */
-    private void alertInformation(String message) { 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
-        alert.showAndWait();
     }
     
     /** 
@@ -379,63 +364,17 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
         Utility.alertGenerator("Notice, no other records", "No other records in DB", message, 2);
     }
     
-    /** 
+    /**
+     * Because error messages for exceptions are the same cookie cutter format, 
+     * using this to create the alert and print the outcome to log too. Should 
+     * make it cleaner. 
      * 
-     * @param i
-     * @return 
+     * @param title     String for title and header of the Alert 
+     * @param message   Body text for the Alert 
+     * @param i         Identifier for which alert to output 
      */
-    private String errorHandleButton(int i) { 
-        String message = ""; 
-        
-        //Deletion case 
-        if (newScheduleFlag == 1 && i == 1) 
-            message += "Please search for a Schedule for deletion first.\n";
-        
-        //Editing case
-        if (newScheduleFlag == 1 && i == 2) 
-            message += "Please search for a Schedule for editing first.\n";
-        
-        //Adding case (If haven't pressed 'New', then throw error message) 
-        if (newScheduleFlag == 0 && i == 3) 
-            message += "Please click the 'New' button before adding a new Schedule.\n";
-        
-        return message; 
+    private void exceptionOutput(String title, String message, int i) { 
+        System.out.println(message);
+        Utility.alertGenerator(title, title, message, i);
     }
-    
 }
-
-/* Old newButtonHandler() method 
-    @FXML
-    private void newButtonHandler(ActionEvent event) {
-        clear();
-        loadSchedules();
-        postcodeTextField.setEditable(true);
-        try {
-            numberOfSchedules++;
-            currentScheduleIndex = numberOfSchedules-1;
-            currentSchedule = new DeliverySchedule();
-            populateForm();
-        } catch (UserInputException ie) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, ie.getMessage());   
-            alert.showAndWait();
-        } 
-    }
-*/
-
-    /** 
-     * Unsure if it works like this, but it kinda works, it just won't get the 
-     * proper state (response statement won't work) 
-     * @param message
-     * @return 
-     */
-/*
-    private boolean alertConfirmation(String message) { 
-        boolean state = false; 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.OK, ButtonType.NO); 
-        Optional<ButtonType> response = alert.showAndWait();
-        if (response.get().equals(ButtonType.OK)) { 
-            state = true; 
-        }
-        return state; 
-    }
-*/

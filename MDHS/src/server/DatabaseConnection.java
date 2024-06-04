@@ -57,6 +57,9 @@ public class DatabaseConnection {
     private PreparedStatement updateDeliverySchedule = null;
     private PreparedStatement deleteDeliverySchedule = null;
     
+    private PreparedStatement disableKeyChecks = null; 
+    private PreparedStatement enableKeyChecks = null; 
+    
     /** 
      * Prepares the connection. Upon successful connection calls for the method to 
      * prepare all the statements for use with the program 
@@ -121,6 +124,9 @@ public class DatabaseConnection {
         insertDeliverySchedule = connection.prepareStatement("INSERT INTO DeliverySchedule (postcode, deliveryDay, deliveryCost) VALUES (?, ?, ?)");
         updateDeliverySchedule = connection.prepareStatement("UPDATE DeliverySchedule SET deliveryDay = ?, deliveryCost = ? WHERE postcode = ?");
         deleteDeliverySchedule = connection.prepareStatement("DELETE FROM DeliverySchedule WHERE postcode = ?");
+        
+        disableKeyChecks = connection.prepareStatement("SET foreign_key_checks = 0;"); 
+        enableKeyChecks = connection.prepareStatement("SET foreign_key_checks = 1"); 
     }
     
     /** 
@@ -672,8 +678,10 @@ public class DatabaseConnection {
             checkDeliverySchedule.setInt(1, schedule.getPostcode());
             ResultSet resultSet = checkDeliverySchedule.executeQuery();
             if (resultSet.next()) {
+                disableKeyChecks.executeUpdate(); 
                 deleteDeliverySchedule.setInt(1, schedule.getPostcode());
                 deleteDeliverySchedule.executeUpdate();
+                enableKeyChecks.executeUpdate(); 
             }
         } catch (SQLException ex) {
             System.err.println("Error in `deleteDeliverySchedule()`: " + ex.getMessage());

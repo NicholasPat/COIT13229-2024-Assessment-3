@@ -45,8 +45,9 @@
             <Label text="Details" GridPane.rowIndex="1" />
             <Label text="Price ($)" GridPane.rowIndex="2" />
             <Label text="Ingredients" GridPane.rowIndex="3" />
-            <TextArea fx:id="ingredientsTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" promptText="Input Ingredients List" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextArea fx:id="ingredientsTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Input Ingredients List" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="unitTextField" promptText="Units" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <TextField fx:id="productIdTextField" editable="false" promptText="ProductID" GridPane.columnIndex="2" />
          </children>
       </GridPane>
       <Button fx:id="dashboardButton" layoutX="14.0" layoutY="359.0" mnemonicParsing="false" onAction="#dashboardButtonHandler" prefHeight="17.0" prefWidth="116.0" text="&lt; Dashboard">
