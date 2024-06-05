@@ -1,4 +1,3 @@
-
 package client.controller;
 
 import client.MDHSClient;
@@ -6,6 +5,7 @@ import client.Session;
 import common.UserInputException;
 import common.Utility;
 import common.model.DeliverySchedule;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +68,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
      */
     @Override
     public void handleSceneChange() {
+        //Set the current session, clear the fields, and then load schedules. 
         session = Session.getSession();
         clear();
         loadSchedules();
@@ -124,6 +125,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     }
     
     /**
+     * Cycle through the index and reach the next one. If no more, then do nothing. 
      * 
      * @param event 
      */
@@ -146,12 +148,14 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     }
     
     /**
+     * Adds edited Schedule to the DB. 
      * 
      * @param event 
      */
     @FXML
     private void addButtonHandler(ActionEvent event) {
         try {
+            //Record information for sending to the server, then ping and send to server. 
             recordDeliverySchedule();
             session.objOut.writeObject("RecordSchedule");
             session.objOut.writeObject(currentSchedule);
@@ -159,13 +163,11 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
             
             if (message.equalsIgnoreCase("RecordScheduleSuccess")) { 
                 String outcome = "Schedule was successfully added!"; 
-                String title = "Successful addition of Schedule!"; 
-                exceptionOutput(title, outcome, 2); 
+                exceptionOutput("Successful addition of Schedule", outcome, 2); 
                 
             } else { 
-                String outcome = "Schedule was unsuccessfully added"; 
-                String title = "Unsuccessful addition of the schedule!"; 
-                exceptionOutput(title, outcome, 1); 
+                String outcome = "Schedule was unsuccessfully added";
+                exceptionOutput("Unsuccessful addition of Schedule!", outcome, 1); 
             }
             
         } catch (UserInputException e) { 
@@ -173,12 +175,13 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
             exceptionOutput(inputMismatchTitle, message, 1); 
             return; 
             
-        } catch (Exception ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             String message = "Exception occurred while adding the schedule: " +ex.getMessage();
-            String title = "General Exception occurred in load Schedule";
-            exceptionOutput(title, message, 1); 
+            exceptionOutput("General Exception occurred!", message, 1); 
             return; 
         }
+        
+        //Clear, load, populate. 
         clear();
         loadSchedules();
         populateForm();  
@@ -187,7 +190,8 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     /**
      * Handles the updating of the Schedule. However Add and Edit use the same 
      * 'RecordSchedule' server tag, so edits can happen when adding but doesn't 
-     * matter too much really, just some redundancy 
+     * matter too much really, just some redundancy. <p>
+     * Similar code to 'add'. 
      * 
      * @param event 
      */
@@ -227,7 +231,9 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     
     /**
      * Takes current information and deletes the associated entry. Takes the whole 
-     * object for ease of coding. 
+     * object for ease of coding. <p>
+     * Saimilar code to 'add'. 
+     * 
      * @param event 
      */
     @FXML
@@ -283,10 +289,12 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
      */
     private void loadSchedules() {
         try {
+            //Set flag to 0, get List from server. 
             newScheduleFlag = 0; 
             session.objOut.writeObject("FullDeliverySchedule");
             deliverySchedules = (ArrayList<DeliverySchedule>) session.objIn.readObject();
             
+            //Set total number and then set current numbers and what not. 
             numberOfSchedules = deliverySchedules.size();
             if (numberOfSchedules > 0) {
                 currentScheduleIndex = 0;
@@ -298,7 +306,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
                 Utility.alertGenerator("No schedules booked", "No schedules have been booked!", 
                         "No schedules have been booked, please book some", 2); 
             }
-        } catch (Exception ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             String message = "General Exception occurred while loading Delivery Schedule! " + ex.getMessage();
             String title = "General Exception occurred in load Schedule";
             exceptionOutput(title, message, 1); 
@@ -307,21 +315,26 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     
     /**
      * Takes current fields and creates an object with there information. Performs 
-     * error handling 
-     * @throws UserInputException 
+     * error handling. 
+     * 
+     * @throws UserInputException   Thrown if the user makes a misinput 
      */
     private void recordDeliverySchedule() throws UserInputException {
+        //Set all variables as Strings, makes error handling much easier. 
         String deliveryDay = deliveryDayChoiceBox.getValue().toLowerCase();
         String cost = costTextField.getText().trim(); 
         String postcode = postcodeTextField.getText().trim(); 
         
-        /*Noticed that sometimes it gets parsed as null, so force as Monday if the case 
-        //I think this is because setting as New sometimes breaks it, manual change will 
-        //make it the actual value*/
+        /*
+        Noticed that sometimes it gets parsed as null, so force as Monday if the case 
+        I think this is because setting as New sometimes breaks it, manual change will 
+        make it the actual value
+        */
         if (deliveryDay == null) { 
             deliveryDay = "Monday"; 
         }
         
+        //Set current Schedule to what was input. Only gets to this point if no errors. 
         currentSchedule = new DeliverySchedule(postcode, deliveryDay, cost);
     }
     

@@ -23,8 +23,6 @@ import javafx.scene.layout.AnchorPane;
  * @author Brodie Lucht 
  * @author Nicholas Paterno 
  * @author Christopher Cox 
- * @see Initializable 
- * @see SceneController 
  */
 public class RegisterFXMLController implements Initializable, SceneController {
 
@@ -62,6 +60,9 @@ public class RegisterFXMLController implements Initializable, SceneController {
     }
     /**
      * Initializes the controller class.
+     * 
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -100,6 +101,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
         }
         
         try {
+            //Encrypt and send with a null account. 
             byte[] password = Authenticator.encrypt(session.getPublicKey(), pass);
             Account acc = null;
             if (isAdmin) {
@@ -114,9 +116,9 @@ public class RegisterFXMLController implements Initializable, SceneController {
             session.objOut.writeObject("Register");
             session.objOut.writeObject(acc); // send account info to server
             
-            // wait for server response with logged-in account
+            //Wait for server response with logged-in account
             Object response = session.objIn.readObject();
-
+            
             if (response instanceof Account) {
                 Account user = (Account) response;
                 

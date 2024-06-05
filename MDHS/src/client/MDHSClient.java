@@ -1,4 +1,3 @@
-
 package client;
 
 import javafx.application.Application;
@@ -7,12 +6,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import client.controller.*;
 
 /**
- *
- * @author lucht
+ * Initiates the stage for the JavaFX and defines the core enums for use with 
+ * calling scene transitions 
+ * 
+ * @author Brodie Lucht 
  */
 public class MDHSClient extends Application {
     private static Stage stage;
@@ -41,12 +41,18 @@ public class MDHSClient extends Application {
         }
     }
     
-    // Define FXML scenes array
+    //Define FXML scenes array
     private static Scene[] scenes = new Scene[SceneType.values().length];
 
-    // Define controller array
+    //Define controller array
     private static Object[] controllers = new Object[SceneType.values().length];
-
+    
+    /** 
+     * Starts the program.
+     * 
+     * @param stage
+     * @throws Exception    If an error occurs 
+     */
     @Override
     public void start(Stage stage) throws Exception {
         for (SceneType sceneType : SceneType.values()) {
@@ -63,7 +69,8 @@ public class MDHSClient extends Application {
     }
 
     /**
-     * Main Method
+     * Main Method.
+     * 
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -72,7 +79,8 @@ public class MDHSClient extends Application {
     }
     
     /**
-     * Change between scenes
+     * Change between scenes.
+     * 
      * @param sc SceneType enum of target scene (SceneType.DASHBOARD)
      */
     public static void changeScene(SceneType sc) {
@@ -122,5 +130,4 @@ public class MDHSClient extends Application {
                 break;
         }
     }
-
 }

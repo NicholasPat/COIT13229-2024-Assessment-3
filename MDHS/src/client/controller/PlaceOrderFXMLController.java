@@ -13,7 +13,6 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -109,6 +108,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         minuteComboBox.setValue("00");
         
         populateForm();
+        costUpdate(); 
     }
     
     /**
@@ -148,28 +148,33 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             if (currentItemIndex == numberOfItems)
                 recordOrderItem();
         } catch (UserInputException e) { 
-            String message = "Please input a whole number and select a "
-                    + "Product before cycling through the entries.\n" + e.getMessage(); 
-            String title = "Notice!"; 
-            exceptionOutput(title, message, 2); 
+            String message = "Please input a whole number or choose a Product before cycling through the entries."; 
+            exceptionOutput("Notice!", message, 2); 
             return;
-        } catch (Exception e) { 
-            //This should not happen 
-            //System.out.println("Previous cycle general Exception occurred!"); 
-        }
+        } catch (Exception e) {/*Nothing*/}
         
-        if (numberOfItems == 1 || numberOfItems ==0) { 
-            return;
-        }
+        try {
+            if (numberOfItems == 1 || numberOfItems == 0) {return;}
+            currentItemIndex--;
+            
+            //Broken?? 
+            if (currentItemIndex < 0 && numberOfItems >= 0) {
+                currentItemIndex = numberOfItems - 1; // if index went below 0 cycle back to end of list
+            } 
+            
+            if (!orderItems.isEmpty()) {
+                currentItem = orderItems.get(currentItemIndex);
+                populateItemForm();
+            }
         
-        currentItemIndex--;
-        
-        if (currentItemIndex < 0 && numberOfItems >= 0)
-            currentItemIndex = numberOfItems-1; // if index went below 0 cycle back to end of list
-        
-        if (!orderItems.isEmpty()) {
-            currentItem = orderItems.get(currentItemIndex);
-            populateItemForm();
+        /*
+            This happens for a reason I do not know, but need to manually set the 
+            max when attempting to reach it. As it is, it works, so leaving it. 
+        */
+        } catch (Exception e) {
+            System.out.println("Cycle Down Exception!"); 
+            currentItemIndex = numberOfItems-1; 
+            populateForm(); 
         }
     }
     
@@ -184,28 +189,34 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         try {
             if (currentItemIndex == numberOfItems)
                 recordOrderItem();
+            
         } catch (UserInputException e) { 
             String message = "Please input a whole number or choose a Product before cycling through the entries."; 
-            String title = "Notice!"; 
-            exceptionOutput(title, message, 2); 
+            exceptionOutput("Notice!", message, 2); 
             return;
-        } catch (Exception e) { 
-            //Nothing happens, add is where it matters 
-            //System.out.println("Next cycle general Exception occurred!"); 
-        }
+            
+        }catch (Exception e){/*Do nothing*/}
         
-        if (numberOfItems == 0 || numberOfItems == 1) { 
-            return; 
-        }
-        
-        currentItemIndex++;
-        
-        if ( currentItemIndex >= numberOfItems ) // if index went above total number, then cycle back to first entry
-            currentItemIndex = 0;
-        
-        if (!orderItems.isEmpty()) {
-            currentItem = orderItems.get(currentItemIndex);
-            populateItemForm();
+        try {
+            if (numberOfItems == 0 || numberOfItems == 1) {return;}
+            currentItemIndex++;
+            
+            //If index went above total number, cycle back -- Broken?? 
+            if (currentItemIndex >= numberOfItems) {currentItemIndex = 0;}
+            
+            if (!orderItems.isEmpty()) {
+                currentItem = orderItems.get(currentItemIndex);
+                populateItemForm();
+            }
+            
+        /*
+            This happens for a reason I do not know, but need to manually set the 
+            max when attempting to reach it. As it is, it works, so leaving it. 
+        */
+        } catch (Exception e) {
+            System.out.println("Cycle Up Exception!"); 
+            currentItemIndex = numberOfItems-1; 
+            populateForm(); 
         }
     }
     
@@ -216,7 +227,15 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @FXML
     private void addOrderItemButtonHandler(ActionEvent event) {
+        if (currentItemIndex+1 != numberOfItems && numberOfItems !=1) { 
+            System.out.println("Current Index: " + currentItemIndex + "\nNumber of Items total: " + numberOfItems + "\n");
+            String message = "Please select the most recent OrderItem according to count: " + (numberOfItems-1);
+            exceptionOutput("Notice!", message, 2); 
+            return; 
+        }
+        
         try {
+            //Get all information recorded in the Form. Then clean up. 
             recordOrderItem();
             numberOfItems++;
             currentItemIndex = numberOfItems-1;
@@ -226,13 +245,12 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             populateItemForm();
             costUpdate(); 
         } catch (UserInputException ie) {
-            String message = "Error occured with adding an Order!\n" + ie.getMessage(); 
-            String title = "Error occurred!"; 
-            exceptionOutput(title, message, 1); 
+            currentItemIndex = numberOfItems-1; 
+            String message = "Error occured with adding an Order!\n" + ie.getMessage();
+            exceptionOutput("Error occurred!", message, 1); 
         } catch (Exception e) { 
-            String message = "Notice regarding duplicate!\n" + e.getMessage(); 
-            String title = "Notice!"; 
-            exceptionOutput(title, message, 2); 
+            String message = "Notice regarding duplicate!\n" + e.getMessage();
+            exceptionOutput("Notice!", message, 2); 
         }
     }
     
@@ -244,13 +262,17 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @FXML
     private void removeOrderItemButtonHandler(ActionEvent event) {
+        /*
+        Case of if the orderItems if empty, then don't do anything, since will 
+        break otherwise. 
+        */
         if (orderItems.isEmpty()) { 
-            String message = "No order items in list, please add some before removing!"; 
-            String title = "Notice!"; 
-            exceptionOutput(title, message, 2); 
+            String message = "No order items in list, please add some before attempting to remove!";
+            exceptionOutput("Notice!", message, 2); 
             return; 
         }
         
+        //Another rror handle:  If the current item is the null item, then don't 
         if (currentItem == null) { 
             exceptionOutput("Notice!", 
                     "No active Order Item added. Please remove a previous Order Item!", 1); 
@@ -280,6 +302,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
                     "Please remember to add an Order Item before attempting to remove it!", 1);
         }
         
+        //Populate, update the cost. 
         populateItemForm();  
         costUpdate(); 
     }
@@ -291,6 +314,10 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @FXML
     private void placeOrderButtonHandler(ActionEvent event) {
+        /*
+        If the items is empty, OR the current item is a null one, then don't add,
+        will break otherwise. 
+        */
         if (orderItems.isEmpty() || orderItems.get(0) == null) { 
             String message = "Order Item list is empty, please add some Order Items to your Order then add!"; 
             exceptionOutput("Notice!", message, 2); 
@@ -327,8 +354,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             
         } catch (IOException e) {
             String message = "An Exception has occurred while placing the Order! " + e.getMessage();
-            String title = "An Exception has occurred!"; 
-            exceptionOutput(title, message, 1); 
+            exceptionOutput("an Exception has occurred!", message, 1); 
         }
     }
     
@@ -339,12 +365,18 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @FXML
     private void cancelOrderButtonHandler(ActionEvent event) {
+        /*
+        Can't cancel what doesn't exist already. Although could say there is an 
+        assumption that wouldn't want to reset the scene. To do that though, just 
+        go back to dashboard and re-enter. 
+        */
         if (orderItems.isEmpty()) { 
             String message = "Please ensure you have Placed an inital Order first."; 
             String title = "Noitce!"; 
             exceptionOutput(title, message, 2); 
             return;
         }
+        
         session = Session.getSession();
         
         try {
@@ -355,13 +387,13 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             
         } catch (IOException e) {
             String message = "An Exception has occurred while deleting the Order! " + e.getMessage();
-            String title = "An Exception has occurred!"; 
-            exceptionOutput(title, message, 1); 
+            exceptionOutput("An Exception has occurred!", message, 1); 
         }
     }
     
     /**
-     * Deals with the selection of the --
+     * Deals with the selection of the Products as per the list received from the 
+     * Server. 
      * 
      * @param selectedProduct 
      */
@@ -390,6 +422,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             exceptionOutput("General Exception occurred!", message, 1); 
             currentSession.setUser(null);
         }
+        
     }
     
     /**
@@ -417,21 +450,30 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             session.objOut.writeObject(user.getAccountId());
             
             Order order = (Order) session.objIn.readObject();
+            
             if (order != null) {
                 currentOrder = order;
                 orderItems = order.getProductList();
                 
                 numberOfItems = orderItems.size();
                 if (numberOfItems > 0) {
-                    System.out.println("CHECK PRODUCT EXISTENCE"); 
-                    String message = checkIfProductExists(); 
-        
-                    if (!message.equals("")) { 
-                        System.out.println(message); 
-                        String title = "Notice! Removed Products!"; 
-                        exceptionOutput(title, message, 2); 
+                                        
+                    /*
+                    Error handle is Products are missing, won't reflect in server 
+                    though, this is just to demonstrate an output. Also, output 
+                    a notice alert saying what is happening. 
+                    */
+                    int previousCount = orderItems.size(); 
+                    List<OrderItem> orderItemCheck = Utility.checkIfProductExists(orderItems, productList);
+                    int postCount = orderItemCheck.size();
+                    int numberRemoved = previousCount - postCount ;
+                    
+                    if (numberRemoved != 0) { 
+                        exceptionOutput("Notice! Removed Products", numberRemoved + 
+                                " Products have been removed!\nThis is reflected "
+                                + "in the Order Items listings", 2); 
+                        orderItems = orderItemCheck; 
                     }
-                        
                     
                     numberOfItems = orderItems.size(); 
                     currentItemIndex = 0;
@@ -468,10 +510,6 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         
         if (productChoiceBox.getValue() == null) { 
             throw new UserInputException("Please select a Product as well!"); 
-        }
-        
-        if (currentItemIndex != numberOfItems) { 
-            throw new UserInputException("Please select the most recent Order Item according to count: " + numberOfItems); 
         }
         
         //Because cost is based on already checked Product * checked quantity, 
@@ -647,50 +685,6 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         subtotalTextField.clear(); 
         taxTextField.clear();
         totalCostTextField.clear();
-    }
-    
-    /** 
-     * This is meant to check each of the Order Items against the products. This 
-     * is to determine if there is a missing product, and if there is, remove it 
-     * from the list. Won't commit to the server, but the Customer can then do that.
-     * Or admin can do it via observing in Order list. 
-     * 
-     * @return  message with it there is any changes. 
-     */
-    private String checkIfProductExists() {
-        String message = ""; 
-        List<OrderItem> list = new ArrayList<>(); //Index counter 
-        
-        if (!orderItems.isEmpty()) {
-            
-            for (OrderItem check : orderItems) {
-                System.out.println("Now checking: " + check.toString()); 
-                int j = 0; //Count of matches, either 0 or 1
-                
-                for (Product checkProduct : productList) {
-                    //If product IDs match, then add
-                    if (check.getProductId() == checkProduct.getProductId()) { 
-                        j++; //If matching, increase count of j. Doesn't reset 
-                        System.out.println("MATCH: " + j); 
-                        break; 
-                    }
-                }
-                
-                //If there were no matching Products. 
-                if (j == 0) {list.add(check);}
-            }
-        }
-        
-        //If list isn't empty, then remove an entry 
-        if (!list.isEmpty()) { 
-            message += (list.size()) + " Products have been removed.\nThis "
-                    + "is reflected in the Order Items listings";
-            for (int m = 0; m < list.size(); m++) { 
-                orderItems.remove(list.get(m)); 
-            }
-        }
-        
-        return message; 
     }
     
     /**

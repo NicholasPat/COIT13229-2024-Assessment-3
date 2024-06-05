@@ -1,10 +1,11 @@
-
 package common;
 
-import java.sql.Date;
-import java.util.Calendar;
+import common.model.OrderItem;
+import common.model.Product;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.Alert;
 
 public class Utility {
@@ -150,6 +151,7 @@ public class Utility {
     
     /** 
      * 
+     * 
      * @param e     
      * @param arr   
      * @return      
@@ -217,5 +219,55 @@ public class Utility {
         }
         return time;
     }
-
+    
+    /** 
+     * This is meant to check each of the Order Items against the products. This 
+     * is to determine if there is a missing product, and if there is, remove it 
+     * from the list. Won't commit to the server, but the Customer can then do that.
+     * Or admin can do it via observing in Order list. 
+     * 
+     * @param orderItemList List of OrderItems 
+     * @param productList   List of Products to compare with OrderItems 
+     * @return list         List of OrderItems that were to be removed. 
+     */
+    public static List<OrderItem> checkIfProductExists(List<OrderItem> orderItemList, List<Product> productList) {
+        List<OrderItem> list = new ArrayList<>(); //Index counter         
+        if (!orderItemList.isEmpty()) {
+            
+            for (int n=0; n < orderItemList.size(); n++) {
+                int a = 0; 
+                
+                for (int i=0; i < productList.size(); i++) {    
+                    
+                    if (orderItemList.get(n).getProductId() == productList.get(i).getProductId()) { 
+                        a++; 
+                        break; 
+                    }
+                }
+                if (a == 0) {list.add(orderItemList.get(n));}
+            }
+        }
+        
+        //If list isn't empty, then remove items from orderItems
+        if (!list.isEmpty()) {orderItemList.removeAll(list);}
+        
+        return orderItemList; 
+    }
+    
+    /** 
+     * Used after the checkIfProductExists() method as it will check if any entries 
+     * were added to the List and then remove those and send back the finished 
+     * checks. 
+     * 
+     * @param list          List of OrderItems to remove. 
+     * @param orderItems    List of Customer OrderItems 
+     * @return              Final List of if OrderItems are missing 
+     */
+    public static String checkProductMissing(List<OrderItem> list, List<OrderItem> orderItems) { 
+        String message = ""; 
+        
+        
+        
+        return message; 
+    }
 }

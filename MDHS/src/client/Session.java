@@ -9,6 +9,8 @@ import common.model.Account;
 /**
  * This class is used like a session handler, or a cookie. It will hold current
  * information sent from the server plus any other flags needed. 
+ * 
+ * @author Brodie Lucht 
  */
 public class Session {
     /* Session Information */
@@ -21,11 +23,9 @@ public class Session {
     
     private Socket socket ; 
     public ObjectOutputStream objOut; 
-    public ObjectInputStream objIn; 
-    
-    
-    
+    public ObjectInputStream objIn;
     private final static Session instance = new Session();
+    
     public static Session getSession() {
         return instance;
     }
@@ -38,12 +38,18 @@ public class Session {
         initialiseConnection();
     }
     
+    /** 
+     * Starts up the connection to the server, if fails, simply returns a generic 
+     * IO error 
+     */
     public void initialiseConnection() { 
         try {
+            //Generate Socket and the Input / Output Data Streams 
             socket = new Socket(hostName, serverPort);
             objOut =new ObjectOutputStream( socket.getOutputStream() );
             objIn = new ObjectInputStream( socket.getInputStream() );
-
+            
+            //If PublicKey is not set, then request it. 
             if (publicKey == null) {
                 objOut.writeObject("PublicKey");
                 setPublicKey();
@@ -55,9 +61,14 @@ public class Session {
         }
     }
     
+    /**
+     * Get the Public Key from the server and set the publicKey variable 
+     */
     private void setPublicKey() { 
         try { 
             publicKey = (PublicKey) objIn.readObject();
+            
+            //Bottom code: Only necessary for Data streams. 
             
             //dataOut.writeUTF("Public key please") ; 
             //int pubKeyLength = objIn.readInt() ; 

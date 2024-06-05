@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package client.controller;
 
 import client.*;
@@ -16,7 +12,7 @@ import javafx.scene.control.Button;
 /**
  * FXML Controller class
  *
- * @author lucht
+ * @author Brodie Lucht 
  */
 public class DashboardFXMLController implements Initializable, SceneController {
 
@@ -38,13 +34,17 @@ public class DashboardFXMLController implements Initializable, SceneController {
     private Button customerRecordsButton;
     @FXML
     private Button orderRecordsButton;
-
-    private Session session; 
     @FXML
     private Button loginButton;
     @FXML
     private Button logoutButton;
     
+    private Session session; 
+    
+    /**
+     * When transitioning to the scene, will hide or show specific buttons depending 
+     * on if the Account logged in is an Admin, or is a Customer. 
+     */
     @Override
     public void handleSceneChange() {
         session = Session.getSession();
@@ -88,6 +88,9 @@ public class DashboardFXMLController implements Initializable, SceneController {
     
     /**
      * Initializes the controller class.
+     * 
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -156,8 +159,8 @@ public class DashboardFXMLController implements Initializable, SceneController {
 
     @FXML
     private void logoutButtonHandler(ActionEvent event) {
-        Session session = Session.getSession();
-        session.setUser(null);
+        Session currentSession = Session.getSession();
+        currentSession.setUser(null);
         MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
     }
     

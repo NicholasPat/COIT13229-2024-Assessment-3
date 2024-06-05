@@ -10,7 +10,6 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
@@ -43,6 +42,9 @@ public class LoginFXMLController implements Initializable, SceneController {
     }
     /**
      * Initializes the controller class.
+     * 
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -73,46 +75,46 @@ public class LoginFXMLController implements Initializable, SceneController {
         String pass = passwordTextField.getText().trim();
         
         try {
+            /*
+            Encrypt the password to byte, and create Account object with pass 
+            and email. 
+            */
             byte[] password = Authenticator.encrypt(session.getPublicKey(), pass);
             Account usr = new Account(email, password);
-
+            
+            //Tell server for login inbound. 
             session.objOut.writeObject("Login");
             session.objOut.writeObject(usr); // send account info to server
 
-            // wait for server response with logged-in account
+            //Wait for server response with logged-in account
             Object response = session.objIn.readObject();
-
+            
             if (response instanceof Account) {
+                //Get response, and then simply move back to dash, not outputting information. 
                 Account user = (Account) response;
                 System.out.println("Login successful: " + user.getEmailAddress());
                 session.setUser(user); // login (set user to session) & return to dashboard
                 MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
                 
             } else if (response == null) {
-                System.out.println("Login failed: Invalid credentials");
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, 
-                    "Login failed: Invalid credentials");
-                alert.showAndWait();
+                String message = "Login failed: Invalid credentials"; 
+                alertHandler("Login failed", message, 1); 
                 session.setUser(null);
                 clear();
                 
             } else {
-                System.out.println("Unexpected response: " + response.getClass());
-                
+                //Edge case. 
+                String message = "unexpected response: " + response.getClass(); 
+                alertHandler("Unexpected response from Server!", message, 1); 
             }
+            
         } catch (UserInputException e) { 
             String message = "Exception during login: " + e.getMessage(); 
-            System.out.println(message); 
-            Utility.alertGenerator("Input mismatch occurred!", 
-                    "Input mismatch occurred!", message, 1);
+            alertHandler("Exception during login!", message, 1);
             
         } catch (Exception ex) {
-            System.out.println("Exception during login: " + ex.getMessage());
-            
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, 
-                "Exception occured during login:\n" + ex.getMessage()); 
-            alert.showAndWait(); 
-            
+            String message = "Exception during login: " + ex.getMessage(); 
+            alertHandler("Exception!", message, 1); 
             session.setUser(null);
         } 
     }
@@ -133,5 +135,17 @@ public class LoginFXMLController implements Initializable, SceneController {
     private void clear() {
         emailTextField.clear();
         passwordTextField.clear();
+    }
+    
+    /** 
+     * Generate an alert via following criteria 
+     * 
+     * @param title     Title and Header of the Alert
+     * @param message   Body message of the Alert 
+     * @param i         1 - ERROR / 2 - INFORMATION 
+     */
+    private void alertHandler(String title, String message, int i) { 
+        System.out.println(message); 
+        Utility.alertGenerator(title, title, message, i); 
     }
 }

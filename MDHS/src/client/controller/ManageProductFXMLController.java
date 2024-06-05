@@ -1,4 +1,3 @@
-
 package client.controller;
 
 import client.MDHSClient;
@@ -6,6 +5,7 @@ import client.Session;
 import common.UserInputException;
 import common.Utility;
 import common.model.Product;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,6 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -61,15 +60,16 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     @FXML
     private Button newButton;
     
-    private Session session; 
-    
+    //Local global variables. 
+    private Session session;
     private Product currentProduct;
     private List<Product> productList;
     private int currentProductIndex;
     private int numberOfProducts;
     
     /**
-     * Handles the change to this scene. Clears logs and gets current list from server. 
+     * Handles the change to this scene. Clears logs and gets current list from 
+     * the server. 
      */
     @Override
     public void handleSceneChange() {
@@ -80,6 +80,9 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     }
     /**
      * Initializes the controller class.
+     * 
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -116,13 +119,16 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     
     /**
      * Cycles forward through the entries. 
+     * 
      * @param event 
      */
     @FXML
     private void nextIndexButtonHandler(ActionEvent event) {
         currentProductIndex++;
+        
         if ( currentProductIndex >= numberOfProducts ) // if index went above total number, then cycle back to first entry
             currentProductIndex = 0;
+        
         if (!productList.isEmpty()) {
             currentProduct = productList.get(currentProductIndex);
             populateForm();
@@ -130,11 +136,13 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     }
     
     /**
+     * Adds the Product to DB, takes user input and attempts to do so. 
      * 
      * @param event 
      */
     @FXML
     private void addButtonHandler(ActionEvent event) {
+        //Check Product ID Field is not empty. 
         if (!"".equals(productIdTextField.getText())) { 
             String error = "Please click on 'New' first."; 
             exceptionOutput("Notice!", error, 2); 
@@ -142,44 +150,47 @@ public class ManageProductFXMLController implements Initializable, SceneControll
         }
         
         try {
+            //Record Product details in textboxes, then ping server, then send Product. 
             recordProduct();
             session.objOut.writeObject("RecordProduct");
             session.objOut.writeObject(currentProduct);
             String outcome = (String) session.objIn.readObject(); 
+            
             if (outcome.equalsIgnoreCase("RecordProductSuccess")) {
                 String outcomeString = "Product was successfully recorded!"; 
-                String title = "Successful addition of product!"; 
-                exceptionOutput(title, outcomeString, 2); 
+                exceptionOutput("Successful addition of Product!", outcomeString, 2); 
                 
             } else { 
                 String outcomeString = "Product was unsuccessfully recorded!"; 
-                String title = "Unsuccessful addition of product!"; 
-                exceptionOutput(title, outcomeString, 1); 
+                exceptionOutput("Unsuccessful addition of Product!", outcomeString, 1); 
             }
             
         } catch (UserInputException e) { 
-            String message = "Input mismatch occured!: " + e.getMessage(); 
-            String title = "Input mismatch!"; 
-            exceptionOutput(title, message, 1); 
+            String message = "Input mismatch occurred!: " + e.getMessage(); 
+            exceptionOutput("Input mismatch!", message, 1); 
             return; 
             
-        } catch (Exception ex) {
-            String message = "General Exception occured!\n" + ex.getMessage(); 
-            String title = "General Exception occurted!"; 
-            exceptionOutput(title, message, 1); 
+        } catch (IOException | ClassNotFoundException ex) {
+            String message = "General Exception occurred!\n" + ex.getMessage(); 
+            exceptionOutput("Genral Exception occured!", message, 1); 
             return; 
         }
+        
+        //Clear the scene and repopulate with updated information. 
         clear();
         loadProducts();
         populateForm();  
     }
     
     /**
+     * Updates the Product entry in DB. 
      * 
      * @param event 
      */
     @FXML
     private void updateButtonHandler(ActionEvent event) {
+        /*If Product ID Field is empty, then abort because that means you haven't 
+        searched for a product first*/
         if ("".equals(productIdTextField.getText())) { 
             String error = "Please search for a product for updating first."; 
             exceptionOutput("Notice!", error, 2); 
@@ -195,24 +206,20 @@ public class ManageProductFXMLController implements Initializable, SceneControll
             
             if (message.equalsIgnoreCase("UpdateProductSuccess")) { 
                 String outcomeString = "Product was successfully edited!"; 
-                String title = "Successful edit of product!"; 
-                exceptionOutput(title, outcomeString, 2); 
+                exceptionOutput("Successful edit of Product!", outcomeString, 2); 
                 
             } else { 
                 String outcomeString = "Product was unsuccessfully edited!"; 
-                String title = "Unsuccessful edit of product!"; 
-                exceptionOutput(title, outcomeString, 1); 
+                exceptionOutput("Unsuccessful edit of Product!", outcomeString, 1); 
             }
             
         } catch (UserInputException e) { 
-            String message = "Input mismatch occured!: " + e.getMessage(); 
-            String title = "Input mismatch!"; 
-            exceptionOutput(title, message, 1); 
+            String message = "Input mismatch occurred!: " + e.getMessage(); 
+            exceptionOutput("Input mismatch!", message, 1); 
             
-        } catch (Exception ex) {
-            String message = "General Exception occured!\n" + ex.getMessage(); 
-            String title = "General Exception occurted!"; 
-            exceptionOutput(title, message, 1); 
+        } catch (IOException | ClassNotFoundException ex) {
+            String message = "General Exception occurred!\n" + ex.getMessage(); 
+            exceptionOutput("General Exception occurred!", message, 1); 
         }
         
         clear();
@@ -221,6 +228,7 @@ public class ManageProductFXMLController implements Initializable, SceneControll
     }
     
     /** 
+     * Deletes Product entry from DB 
      * 
      * @param event 
      */
@@ -232,42 +240,45 @@ public class ManageProductFXMLController implements Initializable, SceneControll
             return; 
         }
         
+        //Try and send the Product input to the server. Catch failure. 
         try {
+            //Record current information about Product to Object 
             recordProduct(); 
+            
+            //Send server message that incoming Product is for deletion from DB 
             session.objOut.writeObject("DeleteProduct");
             session.objOut.writeObject(currentProduct.getProductId());
+            
+            //Confirmation message sent, more like 'outcome' 
             String message = (String) session.objIn.readObject(); 
             
             if (message.equalsIgnoreCase("DeleteProductSuccess")) { 
-                String outcomeString = "Product was successfully deleted!"; 
-                String title = "Successful deletion of product!"; 
-                exceptionOutput(title, outcomeString, 2); 
+                String outcomeString = "Product was successfully deleted!";
+                exceptionOutput("Successful deletion of Product!", outcomeString, 2); 
                 
             } else { 
                 String outcomeString = "Product was unsuccessfully deleted!"; 
-                String title = "Unsuccessful deletion of product!"; 
-                exceptionOutput(title, outcomeString, 1); 
+                exceptionOutput("Unsuccessful deletion of Product!", outcomeString, 1); 
             }
             
         } catch (UserInputException e) { 
             String message = "Input mismatch occured!: " + e.getMessage(); 
-            String title = "Input mismatch!"; 
-            exceptionOutput(title, message, 1); 
+            exceptionOutput("Input mismatch!", message, 1); 
             
-        } catch (Exception ex) {
-            String message = "General Exception occured!\n" + ex.getMessage(); 
-            String title = "General Exception occurted!"; 
-            exceptionOutput(title, message, 1); 
+        } catch (IOException | ClassNotFoundException ex) {
+            String message = "General Exception occurred!\n" + ex.getMessage(); 
+            exceptionOutput("General Exception occurred!", message, 1); 
         }
         
+        //Upon finishing the code above, reset the scene, re-get the Product List
         clear();
         loadProducts();
         populateForm();  
     }
 
     /** 
-     * Simply will reset the text fields and set Id to a negative value. This 
-     * should prevent errors with accidental Update and Deletion button presses. 
+     * Simply will reset the text fields to be null. 
+     * 
      * @param event 
      */
     @FXML
@@ -280,44 +291,54 @@ public class ManageProductFXMLController implements Initializable, SceneControll
      */
     private void loadProducts() {
         try {
+            //Write to the server asking for Products. 
             session.objOut.writeObject("AllProducts");
             productList = (ArrayList<Product>) session.objIn.readObject();
             
+            /*
+            Take product List returned and check the size of it, to determine
+            number of Products in the list. 
+            */
             numberOfProducts = productList.size();
             if (numberOfProducts > 0) {
                 currentProductIndex = 0;
                 currentProduct = productList.get(currentProductIndex);
             } else {
+                //If the List is empty, simply create an empty Product to be added. 
                 currentProduct = new Product();
             }
         } catch (UserInputException e) { 
-            String message = "Input mismatch occured!: " + e.getMessage(); 
-            String title = "Input mismatch!"; 
-            exceptionOutput(title, message, 1); 
+            String message = "Input mismatch occurred!: " + e.getMessage();
+            exceptionOutput("Input mismatch!", message, 1); 
             
-        } catch (Exception ex) {
-            String message = "General Exception occured!\n" + ex.getMessage(); 
-            String title = "General Exception occurted!"; 
-            exceptionOutput(title, message, 1); 
+        } catch (IOException | ClassNotFoundException ex) {
+            String message = "General Exception occurred!\n" + ex.getMessage(); 
+            exceptionOutput("General Exception occurred!", message, 1); 
         }
         
+        //Output of List to console, removed. 
         //for (Product p : productList) {
             //System.out.println(p.toString());
-       // }
+        //}
     }
     
     /** 
      * Records the current product selected
-     * @throws UserInputException 
+     * @throws UserInputException   Thrown if there is a mismatch input from the user 
      */
     private void recordProduct() throws UserInputException {
-        //Make all into strings, error handling done in the constructor 
+        /*
+        Make all into strings, error handling done in the constructor, throws 
+        UserInputException which is made for this task.
+        */
         int productId = 0; 
         String qty = quantityTextField.getText().trim(); 
         String price = priceTextField.getText().trim(); 
         String name = nameTextField.getText().trim();
         String unit = unitTextField.getText().trim();
         String ingredients = ingredientsTextArea.getText().trim();
+        
+        //Check if ID Field is not empty 
         if (!"".equals(productIdTextField.getText())) 
             productId = Integer.parseInt(productIdTextField.getText()); 
         
@@ -342,6 +363,7 @@ public class ManageProductFXMLController implements Initializable, SceneControll
      * Clears all entries 
      */
     private void clear() {
+        //Upon clearing, set new Product, ArrayList, and clear all fields 
         currentProduct = new Product();
         productList = new ArrayList<>();
         currentProductIndex = 0;
@@ -354,22 +376,22 @@ public class ManageProductFXMLController implements Initializable, SceneControll
         ingredientsTextArea.setText("");
         productIdTextField.clear(); 
         
+        //Hardcode because should always be 0 / 1
         currentIndexTextField.setText("0"); 
         totalIndexTextField.setText("1"); 
     }
     
+    /**
+     * Used to generate an Alert message and output to the console what is 
+     * happening.
+     * 
+     * @param title     Title and header for the ALert. 
+     * @param message   Body text to be used for the Alert 
+     * @param i         1 - ERROR / 2 - CONFIRMATION 
+     */
     private void exceptionOutput(String title, String message, int i) { 
         System.out.println(message); 
         Utility.alertGenerator(title, title, message, i);
     }
     
 }
-
-/* 
-        catch (IOException | ClassNotFoundException | UserInputException e) {
-            String exceptionClass = e.getClass().getName();//.replace("common.",""); 
-            String message = "An Exception has occured!\n" + e.getMessage(); 
-            String title = exceptionClass + " occurred!"; 
-            exceptionOutput(title, message, 1); 
-        }
-*/

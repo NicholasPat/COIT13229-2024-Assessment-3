@@ -1,9 +1,9 @@
-
 package client.controller;
 
 import client.MDHSClient;
 import client.Session;
 import common.model.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -19,7 +19,9 @@ import javafx.scene.layout.AnchorPane;
 /**
  * FXML Controller class
  *
- * @author lucht
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
  */
 public class ViewOrderFXMLController implements Initializable, SceneController {
 
@@ -144,14 +146,14 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
             allProducts = (List<Product>) session.objIn.readObject(); 
             deliverySchedules = (List<DeliverySchedule>) session.objIn.readObject();
             
-            if ( orderList.size() != 0 ) {
+            if ( !orderList.isEmpty() ) {
                 numberOfOrders = orderList.size();
                 currentOrderIndex = 0;
                 currentOrder = orderList.get(currentOrderIndex);
+                
                 populateForm(); // display current order
             }
-        } catch (Exception ex) {
-            //ex.printStackTrace();
+        } catch (IOException | ClassNotFoundException ex) {
             System.out.println("Exception while loading order information: " + ex.getMessage());
             
             Alert alert = new Alert(Alert.AlertType.INFORMATION, 
