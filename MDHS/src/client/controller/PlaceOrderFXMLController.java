@@ -227,9 +227,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             recordOrderItem();
             numberOfItems++;
             currentItemIndex = numberOfItems-1;
-            currentItem = new OrderItem();
-            productChoiceBox.setValue(null);
-            quantityTextField.clear();
+            callNewItem();
             populateItemForm();
             costUpdate(); 
         } catch (UserInputException ie) {
@@ -268,22 +266,16 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         }
         
         try { 
+            /*
+            Will always make it go to the next item in entry. Won't be going back 
+            an entry. 
+            */
             if (!orderItems.isEmpty()) {
                 orderItems.remove(currentItemIndex);
-
-                numberOfItems = Integer.max(orderItems.size(), 1);
-                if (currentItemIndex >= orderItems.size()) {
-                    currentItemIndex = orderItems.size()-1;
-                }
-
-                if (!orderItems.isEmpty()) {
-                    currentItem = orderItems.get(currentItemIndex);
-
-                } else {
-                    currentItem = new OrderItem();
-                    productChoiceBox.setValue(null);
-                    quantityTextField.clear();
-                }
+                
+                numberOfItems = orderItems.size() + 1;
+                exceptionOutput("Notice!", "Removed the Order item from the list.", 2); 
+                callNewItem(); 
             } 
         } catch (Exception e) { 
             exceptionOutput("Exception has occurred with removing an entry!", 
@@ -293,6 +285,16 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         //Populate, update the cost. 
         populateItemForm();  
         costUpdate(); 
+    }
+    
+    /**
+     * Sets a new OrderItem into the scene. Won't add to the List 
+     */
+    private void callNewItem() { 
+        currentItem = new OrderItem();
+        productChoiceBox.setValue(null);
+        quantityTextField.clear();
+        productPriceTextField.clear(); 
     }
     
     /**
