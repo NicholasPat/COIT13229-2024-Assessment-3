@@ -144,14 +144,6 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @FXML
     private void previousOrderItemButtonHandler(ActionEvent event) {
-        try {
-            if (currentItemIndex == numberOfItems)
-                recordOrderItem();
-        } catch (UserInputException e) { 
-            String message = "Please input a whole number or choose a Product before cycling through the entries."; 
-            exceptionOutput("Notice!", message, 2); 
-            return;
-        } catch (Exception e) {/*Nothing*/}
         
         try {
             if (numberOfItems == 1 || numberOfItems == 0) {return;}
@@ -172,8 +164,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             max when attempting to reach it. As it is, it works, so leaving it. 
         */
         } catch (Exception e) {
-            System.out.println("Cycle Down Exception!"); 
             currentItemIndex = numberOfItems-1; 
+            currentItem = new OrderItem(); 
+            quantityTextField.clear(); 
+            productPriceTextField.clear();
+            productChoiceBox.setValue(""); 
             populateForm(); 
         }
     }
@@ -186,16 +181,6 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @FXML
     private void nextOrderItemButtonHandler(ActionEvent event) {
-        try {
-            if (currentItemIndex == numberOfItems)
-                recordOrderItem();
-            
-        } catch (UserInputException e) { 
-            String message = "Please input a whole number or choose a Product before cycling through the entries."; 
-            exceptionOutput("Notice!", message, 2); 
-            return;
-            
-        }catch (Exception e){/*Do nothing*/}
         
         try {
             if (numberOfItems == 0 || numberOfItems == 1) {return;}
@@ -214,8 +199,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             max when attempting to reach it. As it is, it works, so leaving it. 
         */
         } catch (Exception e) {
-            System.out.println("Cycle Up Exception!"); 
             currentItemIndex = numberOfItems-1; 
+            currentItem = new OrderItem(); 
+            quantityTextField.clear(); 
+            productPriceTextField.clear();
+            productChoiceBox.setValue(""); 
             populateForm(); 
         }
     }
