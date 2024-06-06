@@ -279,7 +279,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             } 
         } catch (Exception e) { 
             exceptionOutput("Exception has occurred with removing an entry!", 
-                    "Please remember to add an Order Item before attempting to remove it!", 1);
+                    "Please remember to add an Order Item before attempting to remove it!", 2);
         }
         
         //Populate, update the cost. 
@@ -314,16 +314,6 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             return; 
         }
         
-        try { 
-            //recordOrderItem();
-        } catch (UserInputException e) { 
-            String message = "Error occured with adding order: " + e.getMessage() + 
-                    "\nPlease add a Product to your order first."; 
-            String title = "An Exception has occurred!"; 
-            exceptionOutput(title, message, 1); 
-            return; 
-        }
-        
         session = Session.getSession();
         
         int accountId = session.getUser().getAccountId();
@@ -334,13 +324,14 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             // TODO: Update Order
             session.objOut.writeObject("PlaceOrder");
             int currentOrderId = 0;
-            if (currentOrder != null) {
+            if (currentOrder != null) 
                 currentOrderId = currentOrder.getOrderId();
-            }
+            
             Order order = new Order(currentOrderId, accountId, deliveryTime, orderItems, totalCost);
             session.objOut.writeObject(order);
             
             exceptionOutput("Notice!", "Successfully added an Order!", 2); 
+            MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
             
         } catch (IOException e) {
             String message = "An Exception has occurred while placing the Order! " + e.getMessage();
@@ -361,9 +352,8 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         go back to dashboard and re-enter. 
         */
         if (orderItems.isEmpty()) { 
-            String message = "Please ensure you have Placed an inital Order first."; 
-            String title = "Noitce!"; 
-            exceptionOutput(title, message, 2); 
+            String message = "Please ensure you have Placed an inital Order first.";
+            exceptionOutput("Notice!", message, 2); 
             return;
         }
         
@@ -373,6 +363,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             session.objOut.writeObject("CancelOrder");
             session.objOut.writeObject(session.getUser().getAccountId());
             clear();
+            exceptionOutput("Notice!", "Removed the Order! Returning to Dashboard", 2); 
             MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
             
         } catch (IOException e) {
