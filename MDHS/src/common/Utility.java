@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.control.Alert;
 
+/** 
+ * This class is used to validate certain things. Common reference methods are 
+ * placed here as such. 
+ * 
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno
+ */
 public class Utility {
     /**
      * Check if a string is empty. 
@@ -16,10 +23,7 @@ public class Utility {
      * @return      TRUE - if empty / FALSE - contains content
      */
     public static boolean isEmpty(String str) {
-        if (str.equals(""))
-            return true;
-        else
-            return false;    
+        return str.equals("");    
     }
     
     /** 
@@ -136,7 +140,7 @@ public class Utility {
      * 
      * @param str       string to check
      * @param options   array of options
-     * @return          TRUE - In array / FALSE - not in array
+     * @return          TRUE - In array / FALSE - Not in array
      */
     public static boolean isValidOption(String str, String[] options) {
         boolean valid = false;
@@ -150,11 +154,11 @@ public class Utility {
     }
     
     /** 
+     * Checks where in array the desired String is. Determining index (position). 
      * 
-     * 
-     * @param e     
-     * @param arr   
-     * @return      
+     * @param e     String to check array for 
+     * @param arr   Array for checking where String is 
+     * @return      Index of where the String is 
      */
     public static int indexOf(String e, String[] arr) {
         int index = -1;
@@ -168,9 +172,10 @@ public class Utility {
     }
     
     /** 
+     * Checks if the time value given is valid in 12 hour format. 
      * 
-     * @param time
-     * @return 
+     * @param time  Value to check 
+     * @return      TRUE - Pass / FALSE - Fail
      */
     private static boolean isValid12HourFormat(String time) {
         // Regular expression to match the 12-hour format (HH:MMam/pm)
@@ -179,9 +184,10 @@ public class Utility {
     }
     
     /** 
+     * Checks if the time value given is valid in 24 hour format. 
      * 
-     * @param time
-     * @return 
+     * @param time  Value to check 
+     * @return      TRUE - Pass / FALSE - Fail
      */
     private static boolean isValid24HourFormat(String time) {
         // Regular expression to match the 24-hour format (HH:MM)
@@ -190,19 +196,21 @@ public class Utility {
     }
     
     /** 
+     * Determines if the time matches the time format desired. 
      * 
-     * @param time
-     * @return 
+     * @param time  Time to test if valid formatting 
+     * @return      Whether it passes the test 
      */
     public static boolean isValidTime(String time) {
         return isValid12HourFormat(time) || isValid24HourFormat(time);
     }
     
     /** 
+     * Converts 12 hour time to 24 hours. 
      * 
-     * @param time
-     * @return
-     * @throws UserInputException 
+     * @param time  Time value to be converted 
+     * @return      Returns the time in new 24 hour format 
+     * @throws UserInputException   If there is a mis-input from the user. 
      */
     public static String convertTo24HourFormat(String time) throws UserInputException{
         if (isValid12HourFormat(time)) {
@@ -252,22 +260,5 @@ public class Utility {
         if (!list.isEmpty()) {orderItemList.removeAll(list);}
         
         return orderItemList; 
-    }
-    
-    /** 
-     * Used after the checkIfProductExists() method as it will check if any entries 
-     * were added to the List and then remove those and send back the finished 
-     * checks. 
-     * 
-     * @param list          List of OrderItems to remove. 
-     * @param orderItems    List of Customer OrderItems 
-     * @return              Final List of if OrderItems are missing 
-     */
-    public static String checkProductMissing(List<OrderItem> list, List<OrderItem> orderItems) { 
-        String message = ""; 
-        
-        
-        
-        return message; 
     }
 }

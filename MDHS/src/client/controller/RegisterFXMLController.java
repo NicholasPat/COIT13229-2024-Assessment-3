@@ -103,7 +103,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
         try {
             //Encrypt and send with a null account. 
             byte[] password = Authenticator.encrypt(session.getPublicKey(), pass);
-            Account acc = null;
+            Account acc;
             if (isAdmin) {
                 acc = new Administrator(isAdmin, fName, lName, 
                         email, password);
@@ -119,15 +119,14 @@ public class RegisterFXMLController implements Initializable, SceneController {
             //Wait for server response with logged-in account
             Object response = session.objIn.readObject();
             
-            if (response instanceof Account) {
-                Account user = (Account) response;
-                
+            if (response instanceof Account user) {
                 String successMessage = "Registration successful for: " + user.getEmailAddress() + "!"; 
                 System.out.println(successMessage);
                 Utility.alertGenerator("Successful registration!", 
                         "Successful registration!", successMessage, 2);
                 session.setUser(user);  // login (set user to session) & return to dashboard
                 MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
+                
             } else if (response == null) {
                 String error = "Registration failed.\nOne reason could be because we don't support delivery to your postcode: " + postcode; 
                 System.out.println(error);
@@ -173,6 +172,22 @@ public class RegisterFXMLController implements Initializable, SceneController {
     @FXML
     private void clearButtonHandler(ActionEvent event) {
         clear();
+    }
+    
+    /**
+     * Handles the disabling or re-enabling of textFields when the staff 
+     * checkbox is selected. To demonstrate that those fields are not used in that 
+     * registration. 
+     * 
+     * @param event 
+     */
+    @FXML
+    private void staffMemberCheckBoxHandler(ActionEvent event) {
+        boolean status; 
+        status = adminCheckbox.isSelected();
+        phonenumberTextField.setDisable(status); 
+        addressTextField.setDisable(status); 
+        postcodeTextField.setDisable(status);
     }
     
     /** 

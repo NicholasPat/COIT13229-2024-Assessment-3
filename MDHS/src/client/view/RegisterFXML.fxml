@@ -53,7 +53,7 @@
             <TextField fx:id="phonenumberTextField" promptText="Input Phone Numb. (10 digits, no spaces)" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <TextField fx:id="addressTextField" promptText="Input Address for Delivery" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Label text="Staff Member" GridPane.rowIndex="7" />
-            <CheckBox fx:id="adminCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <CheckBox fx:id="adminCheckbox" mnemonicParsing="false" onAction="#staffMemberCheckBoxHandler" GridPane.columnIndex="1" GridPane.rowIndex="7" />
             <Label text="Postcode" GridPane.rowIndex="6" />
             <TextField fx:id="postcodeTextField" promptText="Input Postcode" GridPane.columnIndex="1" GridPane.rowIndex="6" />
          </children>

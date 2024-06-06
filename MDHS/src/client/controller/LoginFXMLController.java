@@ -109,8 +109,8 @@ public class LoginFXMLController implements Initializable, SceneController {
             }
             
         } catch (UserInputException e) { 
-            String message = "Exception during login: " + e.getMessage(); 
-            alertHandler("Exception during login!", message, 1);
+            String message = "Exception during login:\n" + e.getMessage(); 
+            alertHandler("Exception during login!", message, 2);
             
         } catch (Exception ex) {
             String message = "Exception during login: " + ex.getMessage(); 

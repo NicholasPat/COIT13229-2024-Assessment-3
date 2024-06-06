@@ -4,6 +4,7 @@ package client.controller;
 import client.MDHSClient;
 import client.Session;
 import common.model.DeliverySchedule;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -18,7 +19,9 @@ import javafx.scene.layout.AnchorPane;
 /**
  * FXML Controller class
  *
- * @author lucht
+ * @author Brodie Lucht 
+ * @author Nicholas Paterno 
+ * @author Christopher Cox 
  */
 public class ViewScheduleFXMLController implements Initializable, SceneController {
 
@@ -47,6 +50,9 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
     }
     /**
      * Initializes the controller class.
+     * 
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -54,6 +60,7 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
     }    
     
     /** 
+     * Return to dashboard 
      * 
      * @param event 
      */
@@ -80,8 +87,7 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
             
             deliverySchedules.forEach(this::appendToTextArea);
             
-        } catch (Exception ex) {
-            //ex.printStackTrace();
+        } catch (IOException | ClassNotFoundException ex) {
             System.out.println("Exception while loading Delivery Schedule: " + ex.getMessage());
             Alert alert = new Alert(Alert.AlertType.INFORMATION, 
                     "Encountered an error while loading information: " + ex.getMessage() + 
@@ -92,27 +98,17 @@ public class ViewScheduleFXMLController implements Initializable, SceneControlle
     }
     /**
      * Takes each schedule object and appends each entry to the relevant text area
+     * 
      * @param schedule 
      */
     private void appendToTextArea(DeliverySchedule schedule) {
         String entry = schedule.getPostcode() + "   ($" + schedule.getDeliveryCost() + ")\n";
-
         switch (schedule.getDeliveryDay().toLowerCase()) {
-            case "monday":
-                mondayTextArea.appendText(entry);
-                break;
-            case "tuesday":
-                tuesdayTextArea.appendText(entry);
-                break;
-            case "wednesday":
-                wednesdayTextArea.appendText(entry);
-                break;
-            case "thursday":
-                thursdayTextArea.appendText(entry);
-                break;
-            case "friday":
-                fridayTextArea.appendText(entry);
-                break;
+            case "monday" -> mondayTextArea.appendText(entry);
+            case "tuesday" -> tuesdayTextArea.appendText(entry);
+            case "wednesday" -> wednesdayTextArea.appendText(entry);
+            case "thursday" -> thursdayTextArea.appendText(entry);
+            case "friday" -> fridayTextArea.appendText(entry);
         }
     }
     

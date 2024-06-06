@@ -1,4 +1,3 @@
-
 package common.model;
 
 import java.io.Serializable;
@@ -6,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * Holds the information of a Customer's Order 
  * 
  * @author Brodie Lucht 
  * @author Nicholas Paterno
@@ -27,11 +26,11 @@ public class Order implements Serializable {
     }
     
     /** 
+     * Constructs an Order 
      * 
-     * 
-     * @param customerId
-     * @param deliveryTime
-     * @param productList 
+     * @param customerId    ID of Customer 
+     * @param deliveryTime  Time of delivery (24 hour format) 
+     * @param productList   List of OrderItems 
      */
     public Order(int customerId, String deliveryTime, List<OrderItem> productList) {
         this.customerId = customerId;
@@ -40,12 +39,12 @@ public class Order implements Serializable {
     }
     
     /** 
+     * Constructs an Order 
      * 
-     * 
-     * @param customerId
-     * @param deliveryTime
-     * @param productList
-     * @param totalCost 
+     * @param customerId    ID of Customer 
+     * @param deliveryTime  Time of delivery (24 hour format) 
+     * @param productList   List of OrderItems 
+     * @param totalCost     Total cost of the order 
      */
     public Order(int customerId, String deliveryTime, List<OrderItem> productList, double totalCost) {
         this.customerId = customerId;
@@ -55,13 +54,13 @@ public class Order implements Serializable {
     }
     
     /** 
+     * Constructs an Order 
      * 
-     * 
-     * @param orderId
-     * @param customerId
-     * @param deliveryTime
-     * @param productList
-     * @param totalCost 
+     * @param orderId       ID of the Order 
+     * @param customerId    ID of the Customer tied to the Order 
+     * @param deliveryTime  Time of delivery (24 hour format) 
+     * @param productList   List of OrderItems 
+     * @param totalCost     Total cost of the order (subject to variance) 
      */
     public Order(int orderId, int customerId, String deliveryTime, List<OrderItem> productList, double totalCost) {
         this.orderId = orderId;

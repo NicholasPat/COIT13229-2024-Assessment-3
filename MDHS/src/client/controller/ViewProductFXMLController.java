@@ -2,7 +2,9 @@ package client.controller;
 
 import client.MDHSClient;
 import client.Session;
+import common.Utility;
 import common.model.Product;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +26,6 @@ import javafx.scene.layout.AnchorPane;
  * @author Lucht 
  * @author Nicholas Paterno 
  * @author Christopher Cox
- * @see Initializable 
- * @see SceneController 
  */
 public class ViewProductFXMLController implements Initializable, SceneController {
 
@@ -68,6 +68,9 @@ public class ViewProductFXMLController implements Initializable, SceneController
     
     /**
      * Initializes the controller class.
+     * 
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -86,7 +89,8 @@ public class ViewProductFXMLController implements Initializable, SceneController
     
     /** 
      * Cycles back through the entries. If already at the minimum entry, cycle 
-     * forward to the last entry. 
+     * forward to the last entry. No error handling due to the fact that there 
+     * is no editing, no input from the user so it isn't a necessary fucntion. 
      * 
      * @param event 
      */
@@ -101,7 +105,9 @@ public class ViewProductFXMLController implements Initializable, SceneController
     
     /** 
      * Cycles forward through the entries. If already at maximum entry, cycle back 
-     * around to the first. 
+     * around to the first. No error handling due to the fact that there 
+     * is no editing, no input from the user so it isn't a necessary fucntion. 
+     * 
      * @param event 
      */
     @FXML
@@ -120,19 +126,21 @@ public class ViewProductFXMLController implements Initializable, SceneController
     private void loadProducts() {
         Session session = Session.getSession();
         try {
+            //Write out to server code for getting all Product list. Receive it back 
             session.objOut.writeObject("AllProducts");
-
             productlist = (ArrayList<Product>) session.objIn.readObject();
-            if ( productlist.size() != 0 ) {
+            
+            if ( !productlist.isEmpty() ) {
                 numberOfProducts = productlist.size();
                 currentProductIndex = 0;
                 currentProduct = productlist.get(currentProductIndex);
                 populateForm(); // display current product
             }
             
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception while loading product list: " + ex.getMessage());
+        } catch (IOException | ClassNotFoundException ex) {
+            String message = "Exception while loading the Product list:\n" + ex.getMessage();
+            Utility.alertGenerator("Exception occurred!", 
+                    "Exception occurred!", message, 1);
         }
     }
     
@@ -148,16 +156,5 @@ public class ViewProductFXMLController implements Initializable, SceneController
         ingredientsTextArea.setText(currentProduct.getIngredients()+"");
         currentIndexTextField.setText(currentProductIndex+1+"");
         totalIndexTextField.setText(numberOfProducts+"");
-    }
-    
-    /** 
-     * Clears all text fields and text areas. 
-     */
-    private void clear() {
-        nameTextField.clear();
-        quantityTextField.clear();
-        unitTextField.clear();
-        priceTextField.clear();
-        ingredientsTextArea.clear();
     }
 }

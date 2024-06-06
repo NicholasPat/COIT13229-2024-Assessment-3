@@ -218,7 +218,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
             String message = "Input mismatched ocurred when adding the Delivery Schedule! " + e.getMessage();
             exceptionOutput(inputMismatchTitle, message, 1); 
             
-        } catch (Exception ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             String message = "Exception occurred while updating the schedule: " +ex.getMessage();
             String title = "General Exception occurred in load Schedule";
             exceptionOutput(title, message, 1); 
@@ -232,7 +232,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
     /**
      * Takes current information and deletes the associated entry. Takes the whole 
      * object for ease of coding. <p>
-     * Saimilar code to 'add'. 
+     * Similar code to 'add'. 
      * 
      * @param event 
      */
@@ -259,7 +259,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
             String message = "Input mismatched ocurred when adding the Delivery Schedule! " + e.getMessage();
             exceptionOutput(inputMismatchTitle, message, 1); 
             
-        } catch (Exception ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             String message = "Exception has occured while deleting the schedule: " + ex.getMessage();
             String title = "General Exception occurred while deleting Schedule";
             exceptionOutput(title, message, 1); 
@@ -372,8 +372,9 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
      * Used when going too far forward or back in the cycles, creates an Alert. 
      */
     private void smallAlert() { 
-        String message = "No other delivery schedules in the list, please add some more to create a list.\n"
-                + "Click 'New' then input desired information, and then click 'Add'"; 
+        String message = """
+                         No other delivery schedules in the list, please add some more to create a list.
+                         Click 'New' then input desired information, and then click 'Add'"""; 
         Utility.alertGenerator("Notice, no other records", "No other records in DB", message, 2);
     }
     

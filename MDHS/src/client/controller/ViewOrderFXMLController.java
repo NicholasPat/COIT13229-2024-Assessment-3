@@ -253,8 +253,8 @@ public class ViewOrderFXMLController implements Initializable, SceneController {
     private double costUpdate() {
         double subtotal = 0;
         double delivery = 0;
-        double tax = 0;
-        double total = 0;
+        double tax;
+        double total;
 
         // get delivery cost
         for (Account acc : allAccounts) {
