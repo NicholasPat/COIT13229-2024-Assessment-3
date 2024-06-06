@@ -135,6 +135,12 @@ public class ViewProductFXMLController implements Initializable, SceneController
                 currentProductIndex = 0;
                 currentProduct = productlist.get(currentProductIndex);
                 populateForm(); // display current product
+                
+            } else { 
+                //If the productList was indeed empty
+                String message = "No products exist at the moment, please return another time!"; 
+                Utility.alertGenerator("No Products exist!", "No Products exist!", message, 2);
+                MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
             }
             
         } catch (IOException | ClassNotFoundException ex) {

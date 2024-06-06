@@ -87,9 +87,16 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @Override
     public void handleSceneChange() {
-        clear();
-        loadProducts();
-        loadExistingOrderData();
+        try {
+            clear();
+            loadProducts();
+            loadExistingOrderData();
+        } catch (Exception e) {
+            String message = "Exception Occurred!\n" + e.getMessage(); 
+            exceptionOutput("Notice!", message, 2); 
+            MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
+            return; 
+        }
         
         // set product options
         for (Product product : productList) {
@@ -390,13 +397,19 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     
     /**
      * Gets products from the server and loads them into a product list, for use 
-     * with the combo box 
+     * with the combo box. 
+     * 
+     * @throws Exception    Thrown if there is an issue with the Products being 
+     *                      size 0 
      */
-    private void loadProducts() {
+    private void loadProducts() throws Exception{
         Session currentSession = Session.getSession();
         try {
             currentSession.objOut.writeObject("AllProducts");
             productList = (ArrayList<Product>) currentSession.objIn.readObject();
+            
+            if (productList.isEmpty()) 
+                throw new Exception("No Products exist! Please return another time!");
 
         } catch (IOException | ClassNotFoundException ex) {
             String message = "Exception while loading the product list: " + ex.getMessage(); 
@@ -408,8 +421,10 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     
     /**
      * Pings the server for existing Order information. 
+     * 
+     * @throws Exception    Thrown if the Schedule is size 0 
      */
-    private void loadExistingOrderData() {
+    private void loadExistingOrderData() throws Exception {
         // load customer info
         session = Session.getSession();
         Customer user = (Customer) session.getUser();
@@ -420,6 +435,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             session.objOut.writeObject(user.getPostcode());
 
             schedule = (DeliverySchedule) session.objIn.readObject();
+            
         } catch (IOException | ClassNotFoundException ex) {
             String error = "Exception occurred while loading delivery schedule:\n" + ex.getMessage(); 
             exceptionOutput("General Exception occured!", error, 1);
@@ -437,7 +453,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
                 orderItems = order.getProductList();
                 
                 numberOfItems = orderItems.size();
-                if (numberOfItems > 0) {
+                if (numberOfItems > 0 && !productList.isEmpty()) {
                                         
                     /*
                     Error handle is Products are missing, won't reflect in server 

@@ -114,6 +114,8 @@ public class ManageProductFXMLController implements Initializable, SceneControll
         if (!productList.isEmpty()) {
             currentProduct = productList.get(currentProductIndex);
             populateForm();
+        } else { 
+            numberOfProducts = 0; 
         }
     }
     
@@ -132,6 +134,8 @@ public class ManageProductFXMLController implements Initializable, SceneControll
         if (!productList.isEmpty()) {
             currentProduct = productList.get(currentProductIndex);
             populateForm();
+        } else { 
+            numberOfProducts = 0; 
         }
     }
     

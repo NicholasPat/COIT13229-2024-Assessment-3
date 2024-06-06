@@ -303,6 +303,7 @@ public class ManageScheduleFXMLController implements Initializable, SceneControl
                 currentSchedule = new DeliverySchedule();
                 currentScheduleIndex = -1; //Should resolve as 0 then on input 
                 numberOfSchedules = 0; //Redundancy, ensures is 0 
+                postcodeTextField.setEditable(true); 
                 Utility.alertGenerator("No schedules booked", "No schedules have been booked!", 
                         "No schedules have been booked, please book some", 2); 
             }
