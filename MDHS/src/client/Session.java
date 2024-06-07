@@ -1,11 +1,13 @@
 package client;
 
+import common.Utility;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.*;
 
 import common.model.Account;
+import javax.swing.JOptionPane;
 /**
  * This class is used like a session handler, or a cookie. It will hold current
  * information sent from the server plus any other flags needed. 
@@ -57,7 +59,10 @@ public class Session {
 
         } catch (UnknownHostException e){ System.out.println("Sock:"+e.getMessage()); 
         } catch (EOFException e){  System.out.println("EOF: Did not recieve responce from server.");
-        } catch (IOException e){ System.out.println("IO:"+e.getMessage());
+        } catch (IOException e){ System.out.println(
+            "IO:"+e.getMessage()); 
+            JOptionPane.showMessageDialog(null, "Connection Error", "Unable to connect to server.", JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
         }
     }
     
@@ -67,18 +72,6 @@ public class Session {
     private void setPublicKey() { 
         try { 
             publicKey = (PublicKey) objIn.readObject();
-            
-            //Bottom code: Only necessary for Data streams. 
-            
-            //dataOut.writeUTF("Public key please") ; 
-            //int pubKeyLength = objIn.readInt() ; 
-            //byte[] bytesPublicKey = new byte[pubKeyLength] ; 
-            //objIn.readFully(bytesPublicKey, 0, pubKeyLength) ; 
-            
-            //X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytesPublicKey) ; 
-            //KeyFactory keyFactory = KeyFactory.getInstance("RSA") ; 
-            
-            //publicKey = keyFactory.generatePublic(pubKeySpec) ; 
         } catch (IOException e) {System.out.println("IO:"+e.getMessage());
         } catch (ClassNotFoundException e) {System.out.println("CNF:"+e.getMessage());
         }

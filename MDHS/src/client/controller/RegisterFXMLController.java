@@ -128,7 +128,7 @@ public class RegisterFXMLController implements Initializable, SceneController {
                 MDHSClient.changeScene(MDHSClient.SceneType.DASHBOARD);
                 
             } else if (response == null) {
-                String error = "Registration failed.\nOne reason could be because we don't support delivery to your postcode: " + postcode; 
+                String error = "Registration failed.\nPotential reasons could be we don't service your postcode, or an account already exists with this email."; 
                 System.out.println(error);
                 
                 //Assumption, failure could be because of not supported postcode 

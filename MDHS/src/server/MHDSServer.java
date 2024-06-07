@@ -381,6 +381,15 @@ class ConnectionThread extends Thread {
     private void register() throws IOException, ClassNotFoundException {        
         Account acc = (Account) objIn.readObject();
         try {
+            // Check if an account with the email already exists
+            Account existingAccount = database.getAccountByEmail(acc.getEmailAddress());
+            if (existingAccount != null) {
+                // Account with this email already exists
+                objOut.writeObject(null);
+                System.out.println("Registration failed: Account with this email already exists.");
+                return;
+            }
+        
             String pwd = Authenticator.decrypt(authenticator.getPrivateKey(), acc.getPassword());
             byte[] passwordBytes = pwd.getBytes(StandardCharsets.UTF_8);
             acc.setPassword(passwordBytes);
