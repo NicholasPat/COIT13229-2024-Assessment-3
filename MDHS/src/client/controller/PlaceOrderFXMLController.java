@@ -266,15 +266,25 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
             if (!orderItems.isEmpty()) {
                 orderItems.remove(currentItemIndex);
                 
-                numberOfItems = orderItems.size() + 1;
+                numberOfItems = Integer.max(orderItems.size(), 1);
+                if (currentItemIndex >= orderItems.size()) {
+                    currentItemIndex = orderItems.size()-1;
+                }
                 exceptionOutput("Notice!", "Removed the Order item from the list.", 2); 
                 callNewItem(); 
             } 
         } catch (Exception e) { 
+            numberOfItems --;
+            currentItemIndex --;
         }
-        numberOfItems --;
-        currentItemIndex --;
-        currentItem = orderItems.get(currentItemIndex);
+        
+        if (!orderItems.isEmpty()) {
+            currentItem = orderItems.get(currentItemIndex);
+        } else {
+            currentItem = new OrderItem();
+            productChoiceBox.setValue(null);
+            quantityTextField.clear();
+        }
         //Populate, update the cost. 
         populateItemForm();  
         costUpdate(); 
@@ -301,6 +311,21 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
         If the items is empty, OR the current item is a null one, then don't add,
         will break otherwise. 
         */
+        try {
+            //Get all information recorded in the Form. Then clean up. 
+            recordOrderItem();
+            populateItemForm();
+            costUpdate(); 
+        } catch (UserInputException ie) {
+            currentItemIndex = numberOfItems-1; 
+            String message = "Error occured with adding an Order!\n" + ie.getMessage();
+            exceptionOutput("Error occurred!", message, 1); 
+            return;
+        } catch (Exception e) { 
+            String message = "Notice regarding duplicate!\n" + e.getMessage();
+            exceptionOutput("Notice!", message, 2); 
+        }
+        
         if (orderItems.isEmpty() || orderItems.get(0) == null) { 
             String message = "Order Item list is empty, please add some Order Items to your Order then add!"; 
             exceptionOutput("Notice!", message, 2); 
