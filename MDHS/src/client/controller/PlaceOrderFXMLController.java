@@ -153,10 +153,11 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
     private void previousOrderItemButtonHandler(ActionEvent event) {
         
         try {
+            recordOrderItem();
+            costUpdate();
             if (numberOfItems == 1 || numberOfItems == 0) {return;}
             currentItemIndex--;
-            
-            //Broken?? 
+
             if (currentItemIndex < 0 && numberOfItems >= 0) {
                 currentItemIndex = numberOfItems - 1; // if index went below 0 cycle back to end of list
             } 
@@ -166,17 +167,13 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
                 populateItemForm();
             }
         
-        /*
-            This happens for a reason I do not know, but need to manually set the 
-            max when attempting to reach it. As it is, it works, so leaving it. 
-        */
-        } catch (Exception e) {
+        } catch (UserInputException ie) {
             currentItemIndex = numberOfItems-1; 
-            currentItem = new OrderItem(); 
-            quantityTextField.clear(); 
-            productPriceTextField.clear();
-            productChoiceBox.setValue(""); 
-            populateForm(); 
+            String message = "Error occured with adding an Order!\n" + ie.getMessage();
+            exceptionOutput("Error occurred!", message, 1); 
+        }  catch (Exception e) { 
+            String message = "Notice regarding duplicate!\n" + e.getMessage();
+            exceptionOutput("Notice!", message, 2); 
         }
     }
     
@@ -188,30 +185,26 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      */
     @FXML
     private void nextOrderItemButtonHandler(ActionEvent event) {
-        
         try {
+            recordOrderItem();
+            costUpdate();
             if (numberOfItems == 0 || numberOfItems == 1) {return;}
             currentItemIndex++;
             
-            //If index went above total number, cycle back -- Broken?? 
             if (currentItemIndex >= numberOfItems) {currentItemIndex = 0;}
             
             if (!orderItems.isEmpty()) {
                 currentItem = orderItems.get(currentItemIndex);
                 populateItemForm();
             }
-            
-        /*
-            This happens for a reason I do not know, but need to manually set the 
-            max when attempting to reach it. As it is, it works, so leaving it. 
-        */
-        } catch (Exception e) {
+
+        } catch (UserInputException ie) {
             currentItemIndex = numberOfItems-1; 
-            currentItem = new OrderItem(); 
-            quantityTextField.clear(); 
-            productPriceTextField.clear();
-            productChoiceBox.setValue(""); 
-            populateForm(); 
+            String message = "Error occured with adding an Order!\n" + ie.getMessage();
+            exceptionOutput("Error occurred!", message, 1); 
+        }  catch (Exception e) { 
+            String message = "Notice regarding duplicate!\n" + e.getMessage();
+            exceptionOutput("Notice!", message, 2); 
         }
     }
     
@@ -221,14 +214,7 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
      * @param event 
      */
     @FXML
-    private void addOrderItemButtonHandler(ActionEvent event) {
-        if (currentItemIndex+1 != numberOfItems && numberOfItems !=1) { 
-            System.out.println("Current Index: " + currentItemIndex + "\nNumber of Items total: " + numberOfItems + "\n");
-            String message = "Please select the most recent OrderItem according to count: " + (numberOfItems-1);
-            exceptionOutput("Notice!", message, 2); 
-            return; 
-        }
-        
+    private void addOrderItemButtonHandler(ActionEvent event) {   
         try {
             //Get all information recorded in the Form. Then clean up. 
             recordOrderItem();
@@ -285,10 +271,10 @@ public class PlaceOrderFXMLController implements Initializable, SceneController 
                 callNewItem(); 
             } 
         } catch (Exception e) { 
-            exceptionOutput("Exception has occurred with removing an entry!", 
-                    "Please remember to add an Order Item before attempting to remove it!", 2);
         }
-        
+        numberOfItems --;
+        currentItemIndex --;
+        currentItem = orderItems.get(currentItemIndex);
         //Populate, update the cost. 
         populateItemForm();  
         costUpdate(); 
