@@ -138,7 +138,7 @@ public class DatabaseConnection {
      * @param email Searching for user via their email 
      * @return      An Account with the linked email, or if no match simply returns a null object
      */
-    public Account getAccountByEmail(String email) { 
+    public synchronized Account getAccountByEmail(String email) { 
         //Assumption - 1 result as cannot have two usernames 
         ResultSet results = null ; 
         Account acc = null ; 
@@ -186,7 +186,7 @@ public class DatabaseConnection {
      * @return      TRUE - Successful addition of Account / 
      *              FALSE - Unsuccessful addition of Account
      */
-    public Boolean addAccount(Account acc) { 
+    public synchronized Boolean addAccount(Account acc) { 
         try { 
             String password = new String(acc.getPassword(), StandardCharsets.UTF_8);
             
@@ -230,7 +230,7 @@ public class DatabaseConnection {
      * 
      * @param products ArrayList of products to be added to the database
      */
-    public void addProductsFromFile(ArrayList<Product> products) { 
+    public synchronized void addProductsFromFile(ArrayList<Product> products) { 
         for (Product product : products) {
             String productName = product.getProductName();
             String unit = product.getUnit();
@@ -263,7 +263,7 @@ public class DatabaseConnection {
      * @param product to check if already in database
      * @return true if the product exists, false otherwise
      */
-    private boolean productExists(Product product) {
+    private synchronized boolean productExists(Product product) {
         String productName = product.getProductName();
         String unit = product.getUnit();
         int quantity = product.getQuantity();
@@ -292,7 +292,7 @@ public class DatabaseConnection {
      * 
      * @return ArrayList of the Delivery Schedules 
      */
-    public ArrayList<DeliverySchedule> getDeliverySchedules() {
+    public synchronized ArrayList<DeliverySchedule> getDeliverySchedules() {
         ArrayList<DeliverySchedule> deliverySchedules = new ArrayList<>();
 
         try (ResultSet resultSet = getAllDeliverySchedules.executeQuery()) {
@@ -316,7 +316,7 @@ public class DatabaseConnection {
      * @param postcode  Used to find a relevant Delivery Schedule 
      * @return          Either found Delivery Schedule or a null object 
      */
-    public DeliverySchedule getDeliveryScheduleByPostcode(int postcode) {
+    public synchronized DeliverySchedule getDeliveryScheduleByPostcode(int postcode) {
         ResultSet resultSet = null ; 
         DeliverySchedule schedule = null ; 
         
@@ -342,7 +342,7 @@ public class DatabaseConnection {
      * 
      * @return List of all the Products 
      */
-    public List<Product> getAllProducts() {
+    public synchronized List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
 
         try (ResultSet resultSet = getAllProducts.executeQuery()) {
@@ -369,7 +369,7 @@ public class DatabaseConnection {
      * @param custId    Customer ID used to get the Order in question 
      * @return          Return the Order in relation to the Customer ID 
      */
-    public Order getOrderByCustomerId(int custId){
+    public synchronized Order getOrderByCustomerId(int custId){
         ResultSet resultSet = null ; 
         Order order = null ; 
         List<OrderItem> orderItems = new ArrayList<>();
@@ -416,7 +416,7 @@ public class DatabaseConnection {
      * 
      * @param orderId   Order ID used to identify what Order to delete 
      */
-    public void deleteOrder(int orderId) {
+    public synchronized void deleteOrder(int orderId) {
        try {
             // Delete all order items associated with the order
             deleteOrderItems.setInt(1, orderId);
@@ -434,7 +434,7 @@ public class DatabaseConnection {
      * 
      * @param order Order object used to add to the DB 
      */
-    public void saveOrder(Order order) {
+    public synchronized void saveOrder(Order order) {
         try {
             if (order.getOrderId() != 0) {
                 // Update existing order
@@ -491,7 +491,7 @@ public class DatabaseConnection {
     * 
     * @return List of all Accounts 
     */
-    public List<Account> getAllAccounts() { 
+    public synchronized List<Account> getAllAccounts() { 
        List<Account> accounts = new ArrayList<>(); 
        
        try (ResultSet resultSet = getAllAccounts.executeQuery()) { 
@@ -526,7 +526,7 @@ public class DatabaseConnection {
      * 
      * @return List of all Orders 
      */
-    public List<Order> getAllOrders() { 
+    public synchronized List<Order> getAllOrders() { 
        List<Order> orders = new ArrayList<>();
        
        try (ResultSet resultSet = getAllOrders.executeQuery()) {
@@ -565,7 +565,7 @@ public class DatabaseConnection {
      * @param productId ID to be used for the entry search 
      * @return Singular Product object 
      */
-    public Product getProductById(int productId) { 
+    public synchronized Product getProductById(int productId) { 
        Product currentProduct = null; 
        
        try { 
@@ -601,7 +601,7 @@ public class DatabaseConnection {
      * @param customerId    ID to search for Customer with 
      * @return              Single Customer object 
      */
-    public Customer getCustomerById(int customerId) { 
+    public synchronized Customer getCustomerById(int customerId) { 
        Customer currentCustomer = null; 
        
        try { 
@@ -635,7 +635,7 @@ public class DatabaseConnection {
      * @return          TRUE - Successful add or edit / FALSE - Unsuccessful add 
      *                  or edit 
      */
-    public boolean recordDeliverySchedule(DeliverySchedule schedule) {
+    public synchronized boolean recordDeliverySchedule(DeliverySchedule schedule) {
         try {
             //Check if the Delivery Schedule Exists 
             checkDeliverySchedule.setInt(1, schedule.getPostcode());
@@ -676,7 +676,7 @@ public class DatabaseConnection {
      * @param schedule  Schedule object to get the postcode for deletion 
      * @return          TRUE - Successful deletion / FALSE - Unsuccessful deletion 
      */
-    public boolean deleteDeliverySchedule(DeliverySchedule schedule) {
+    public synchronized boolean deleteDeliverySchedule(DeliverySchedule schedule) {
         try {
             checkDeliverySchedule.setInt(1, schedule.getPostcode());
             ResultSet resultSet = checkDeliverySchedule.executeQuery();
@@ -701,7 +701,7 @@ public class DatabaseConnection {
      * @param schedule  
      * @return          
      */
-    public boolean updateDeliverySchedule(DeliverySchedule schedule) { 
+    public synchronized boolean updateDeliverySchedule(DeliverySchedule schedule) { 
         int postcode = schedule.getPostcode(); 
         String day = schedule.getDeliveryDay(); 
         double cost = schedule.getDeliveryCost(); 
@@ -736,7 +736,7 @@ public class DatabaseConnection {
      * @param product   Product to be added to the DB
      * @return          Identifier for if addition was successful 
      */
-    public boolean addProduct(Product product) { 
+    public synchronized boolean addProduct(Product product) { 
         String productName = product.getProductName(); 
         String unit = product.getUnit(); 
         int quantity = product.getQuantity(); 
@@ -774,7 +774,7 @@ public class DatabaseConnection {
      * @param productId ID used to identify Product to delete. 
      * @return          TRUE - Successful deletion / FALSE - Unsuccessful deletion. 
      */
-    public boolean deleteProduct(int productId) {
+    public synchronized boolean deleteProduct(int productId) {
         int result; 
         try { 
             disableKeyChecks.executeUpdate(); 
@@ -805,7 +805,7 @@ public class DatabaseConnection {
      * @param product   Product object with variables to allow for update 
      * @return          TRUE - Successful update / FALSE - Unsuccessful update 
      */
-    public boolean updateProduct(Product product) { 
+    public synchronized boolean updateProduct(Product product) { 
         String productName = product.getProductName(); 
         int quantity = product.getQuantity(); 
         String unit = product.getUnit(); 
